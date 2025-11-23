@@ -18,9 +18,9 @@ const PHIGauge: React.FC<PHIGaugeProps> = ({ value, size = 160, label }) => {
       <svg width={size} height={size / 2 + 20}>
         <defs>
           <linearGradient id={`g-${label}`} x1="0%" y1="0%" x2="100%">
-            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="0%" stopColor="#dc2626" />
             <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#10b981" />
+            <stop offset="100%" stopColor="#16a34a" />
           </linearGradient>
         </defs>
         <path
@@ -28,7 +28,7 @@ const PHIGauge: React.FC<PHIGaugeProps> = ({ value, size = 160, label }) => {
             size - strokeWidth / 2
           } ${size / 2}`}
           fill="none"
-          stroke="rgba(255,255,255,0.1)"
+          stroke="#e5e7eb"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
@@ -47,7 +47,7 @@ const PHIGauge: React.FC<PHIGaugeProps> = ({ value, size = 160, label }) => {
           x={size / 2}
           y={size / 2 - 5}
           textAnchor="middle"
-          className="text-3xl font-bold fill-white"
+          className="text-3xl font-bold fill-gray-900"
         >
           {value}
         </text>
@@ -55,7 +55,7 @@ const PHIGauge: React.FC<PHIGaugeProps> = ({ value, size = 160, label }) => {
           x={size / 2}
           y={size / 2 + 15}
           textAnchor="middle"
-          className="text-xs fill-gray-400"
+          className="text-xs fill-gray-600"
         >
           {label}
         </text>
