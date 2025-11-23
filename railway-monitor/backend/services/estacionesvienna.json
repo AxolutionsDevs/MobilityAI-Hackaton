@@ -1,7 +1,7 @@
 [
     {
         "id": 0,
-        "nombre": "SchweglerstraBe",
+        "nombre": "Schweglerstraße",
         "coords": {
             "x": 1000,
             "y": 1134
@@ -37,7 +37,7 @@
     },
     {
         "id": 4,
-        "nombre": "Vorgartenstrale",
+        "nombre": "Vorgartenstraße",
         "coords": {
             "x": 2202,
             "y": 710
@@ -118,7 +118,7 @@
     },
     {
         "id": 13,
-        "nombre": "Alser Strale",
+        "nombre": "Alser Straße",
         "coords": {
             "x": 1144,
             "y": 742
@@ -154,7 +154,7 @@
     },
     {
         "id": 17,
-        "nombre": "Johnstrale",
+        "nombre": "Johnstraße",
         "coords": {
             "x": 786,
             "y": 1066
@@ -163,7 +163,7 @@
     },
     {
         "id": 18,
-        "nombre": "Währinger Strale",
+        "nombre": "Währinger Straße",
         "coords": {
             "x": 1244,
             "y": 544
@@ -190,7 +190,7 @@
     },
     {
         "id": 21,
-        "nombre": "Erlaaer Strale",
+        "nombre": "Erlaaer Straße",
         "coords": {
             "x": 1142,
             "y": 1944
@@ -226,7 +226,7 @@
     },
     {
         "id": 25,
-        "nombre": "Hütteldorfer Strale",
+        "nombre": "Hütteldorfer Straße",
         "coords": {
             "x": 710,
             "y": 990
@@ -244,7 +244,7 @@
     },
     {
         "id": 27,
-        "nombre": "Loopoldau <",
+        "nombre": "Loopoldau ß",
         "coords": {
             "x": 3056,
             "y": 66
@@ -266,15 +266,6 @@
         "coords": {
             "x": 2644,
             "y": 1448
-        },
-        "radio": 12
-    },
-    {
-        "id": 30,
-        "nombre": "Ober -",
-        "coords": {
-            "x": 350,
-            "y": 1426
         },
         "radio": 12
     },
@@ -316,7 +307,7 @@
     },
     {
         "id": 35,
-        "nombre": "Aspernstrale",
+        "nombre": "Aspernstraße",
         "coords": {
             "x": 3106,
             "y": 730
@@ -370,7 +361,7 @@
     },
     {
         "id": 41,
-        "nombre": "Grolsfcldsicdlung",
+        "nombre": "Großsfcldsicdlung",
         "coords": {
             "x": 2770,
             "y": 140
@@ -406,7 +397,7 @@
     },
     {
         "id": 45,
-        "nombre": "Nuldorler Slrale",
+        "nombre": "Nußdorler Slraße",
         "coords": {
             "x": 1346,
             "y": 442
@@ -640,7 +631,7 @@
     },
     {
         "id": 71,
-        "nombre": "Thaliastrale",
+        "nombre": "Thaliastraße",
         "coords": {
             "x": 1142,
             "y": 924
@@ -685,7 +676,7 @@
     },
     {
         "id": 76,
-        "nombre": "Strale",
+        "nombre": "Straße",
         "coords": {
             "x": 1144,
             "y": 1268
@@ -748,7 +739,7 @@
     },
     {
         "id": 83,
-        "nombre": "RoBauer Lânde",
+        "nombre": "Roßauer Lfnde",
         "coords": {
             "x": 1706,
             "y": 690
@@ -793,7 +784,7 @@
     },
     {
         "id": 88,
-        "nombre": "Jägerstrale",
+        "nombre": "Jägerstraße",
         "coords": {
             "x": 1712,
             "y": 442
@@ -811,7 +802,7 @@
     },
     {
         "id": 90,
-        "nombre": "Taborstrale",
+        "nombre": "Taborstraße",
         "coords": {
             "x": 1940,
             "y": 758
@@ -820,7 +811,7 @@
     },
     {
         "id": 91,
-        "nombre": "Landstrale",
+        "nombre": "Landstraße",
         "coords": {
             "x": 2276,
             "y": 1090
@@ -910,7 +901,7 @@
     },
     {
         "id": 101,
-        "nombre": "Kendlerslrale",
+        "nombre": "Kendlerslraße",
         "coords": {
             "x": 640,
             "y": 918
@@ -937,7 +928,7 @@
     },
     {
         "id": 104,
-        "nombre": "Josefstädter Strale",
+        "nombre": "Josefstädter Straße",
         "coords": {
             "x": 1142,
             "y": 832

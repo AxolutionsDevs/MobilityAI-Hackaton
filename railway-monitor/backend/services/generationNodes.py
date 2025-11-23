@@ -5,18 +5,15 @@ import os
 import easyocr
 import math
 
-# ================= CONFIGURACIÓN =================
 INPUT_IMAGE = "vienna.png"
 JSON_OUTPUT = "estacionesvienna.json"
 VISUAL_OUTPUT = "resultadovienna.jpg"
 
-# --- PARÁMETROS ---
 MIN_RADIUS = 5      
 MAX_RADIUS = 20     
 SENSITIVITY = 30    
 UMBRAL_BLANCO = 200 
 MAX_DIST_MATCH = 100 
-# =================================================
 
 def distancia_punto_a_caja(cx, cy, bbox):
     (tl, tr, br, bl) = bbox
@@ -28,14 +25,14 @@ def distancia_punto_a_caja(cx, cy, bbox):
 
 def procesar_todo():
     if not os.path.exists(INPUT_IMAGE):
-        print(f"❌ No encuentro '{INPUT_IMAGE}'")
+        print(f"No encuentro '{INPUT_IMAGE}'")
         return
 
     img = cv2.imread(INPUT_IMAGE)
     vis_img = img.copy()
 
     # 1. DETECTAR CÍRCULOS
-    print("🔍 1. Buscando estaciones...")
+    print("1. Buscando estaciones...")
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray_blurred = cv2.medianBlur(gray, 7)
 
@@ -54,11 +51,11 @@ def procesar_todo():
                 lista_circulos.append({"x": int(x), "y": int(y), "r": int(r)})
                 cv2.circle(vis_img, (x, y), r, (0, 255, 0), 2)
 
-    print(f"   ✅ {len(lista_circulos)} círculos válidos.")
+    print(f"    {len(lista_circulos)} círculos válidos.")
 
     # 2. OCR GLOBAL
-    print("🧠 2. Leyendo textos...")
-    reader = easyocr.Reader(['es'], gpu=False)
+    print("2. Leyendo textos...")
+    reader = easyocr.Reader(['de'], gpu=False)
     resultados_ocr = reader.readtext(img, detail=1, paragraph=False)
     
     lista_textos = []
@@ -76,12 +73,10 @@ def procesar_todo():
         br = tuple(map(int, bbox[2]))
         cv2.rectangle(vis_img, tl, br, (255, 0, 0), 1)
 
-    print(f"   ✅ {len(lista_textos)} palabras detectadas.")
+    print(f"  {len(lista_textos)} palabras detectadas.")
 
-    # ====================================================================
-    # 3. MATCHING INTELIGENTE (1 a 1)
-    # ====================================================================
-    print("🔗 3. Calculando mejores parejas (Greedy Matching)...")
+
+    print(" 3. Calculando mejores parejas (Greedy Matching)...")
     
     posibles_matches = []
 
@@ -149,7 +144,7 @@ def procesar_todo():
         json.dump(estaciones_finales, f, indent=4, ensure_ascii=False)
     
     cv2.imwrite(VISUAL_OUTPUT, vis_img)
-    print(f"✅ ¡LISTO! Revisa {VISUAL_OUTPUT}")
+    print(f" ¡LISTO! Revisa {VISUAL_OUTPUT}")
 
 if __name__ == "__main__":
     procesar_todo()
