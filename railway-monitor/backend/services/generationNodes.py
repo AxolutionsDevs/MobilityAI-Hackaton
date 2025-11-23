@@ -6,9 +6,9 @@ import easyocr
 import math
 
 # ================= CONFIGURACIÓN =================
-INPUT_IMAGE = "Mexico_City_metro.png"
-JSON_OUTPUT = "estaciones_final_unicas.json"
-VISUAL_OUTPUT = "resultado_match_unico.jpg"
+INPUT_IMAGE = "vienna.png"
+JSON_OUTPUT = "estacionesvienna.json"
+VISUAL_OUTPUT = "resultadovienna.jpg"
 
 # --- PARÁMETROS ---
 MIN_RADIUS = 5      

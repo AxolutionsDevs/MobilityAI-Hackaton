@@ -1,9 +1,10 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from services.svg_processor import parse_svg
 from services.station_detector import detect_stations_from_image
-from models.svg_models import SVGProcessResponse
-from models.station_detection import StationDetectionResponse, Station, Coordinates
+from services.metro_matcher import find_best_match, get_line_color
+from models.station_detection import LinesDetectionResponse, MetroLine, StationNode
+from collections import defaultdict
+import time
 
 app = FastAPI(title="Railway Monitor Backend")
 
@@ -31,18 +32,19 @@ async def root():
     return {"message": "Railway Monitor Backend"}
 
 
-@app.post("/detect-stations", response_model=StationDetectionResponse)
+@app.post("/detect-stations", response_model=LinesDetectionResponse)
 async def detect_stations(file: UploadFile = File(...)):
     """
     Endpoint para detectar estaciones de metro en una imagen PNG.
+    Hace fuzzy matching con las estaciones del Metro CDMX y agrupa por línea.
     
     Args:
         file: Archivo PNG con el mapa del metro
         
     Returns:
-        JSON con las estaciones detectadas
+        JSON con las líneas y estaciones detectadas agrupadas
     """
-    # Validar que sea un archivo PNG
+    # Validar que sea un archivo de imagen
     if not file.content_type or "image" not in file.content_type:
         raise HTTPException(
             status_code=400, 
@@ -56,22 +58,55 @@ async def detect_stations(file: UploadFile = File(...)):
         # Procesar la imagen
         stations_data = detect_stations_from_image(image_bytes)
         
-        # Convertir a modelos Pydantic
-        stations = [
-            Station(
-                id=s["id"],
-                nombre=s["nombre"],
-                coords=Coordinates(x=s["coords"]["x"], y=s["coords"]["y"]),
-                radio=s["radio"]
-            )
-            for s in stations_data
-        ]
+        # Agrupar estaciones por línea usando fuzzy matching
+        lines_dict = defaultdict(list)
+        unmatched_stations = []
         
-        return StationDetectionResponse(
+        for station in stations_data:
+            detected_name = station["nombre"]
+            
+            # Intentar hacer match con estaciones reales
+            match_result = find_best_match(detected_name)
+            
+            if match_result:
+                real_name, line_name, score = match_result
+                
+                # Crear nodo de estación
+                station_node = StationNode(
+                    id=f"node-{station['id']}",
+                    name=real_name,
+                    x=station["coords"]["x"],
+                    y=station["coords"]["y"]
+                )
+                
+                lines_dict[line_name].append(station_node)
+            else:
+                # Estación no identificada
+                unmatched_stations.append(detected_name)
+        
+        # Convertir a lista de MetroLine
+        lines = []
+        for line_name, stations in lines_dict.items():
+            metro_line = MetroLine(
+                id=f"custom-{int(time.time() * 1000)}",
+                name=line_name,
+                color=get_line_color(line_name),
+                stations=stations
+            )
+            lines.append(metro_line)
+        
+        total_stations = sum(len(line.stations) for line in lines)
+        
+        message = f"Se detectaron {total_stations} estaciones en {len(lines)} líneas"
+        if unmatched_stations:
+            message += f". {len(unmatched_stations)} estaciones no identificadas"
+        
+        return LinesDetectionResponse(
             success=True,
-            total_stations=len(stations),
-            stations=stations,
-            message=f"Se detectaron {len(stations)} estaciones exitosamente"
+            total_lines=len(lines),
+            total_stations=total_stations,
+            lines=lines,
+            message=message
         )
         
     except Exception as e:

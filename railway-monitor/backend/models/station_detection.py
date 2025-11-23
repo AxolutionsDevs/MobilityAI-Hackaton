@@ -2,20 +2,24 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
-class Coordinates(BaseModel):
+class StationNode(BaseModel):
+    id: str
+    name: str
     x: int
     y: int
 
 
-class Station(BaseModel):
-    id: int
-    nombre: str
-    coords: Coordinates
-    radio: int
+class MetroLine(BaseModel):
+    id: str
+    name: str
+    color: str
+    stations: List[StationNode]
 
 
-class StationDetectionResponse(BaseModel):
+class LinesDetectionResponse(BaseModel):
     success: bool
+    total_lines: int
     total_stations: int
-    stations: List[Station]
+    lines: List[MetroLine]
     message: Optional[str] = None
+
