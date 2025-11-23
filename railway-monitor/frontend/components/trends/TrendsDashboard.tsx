@@ -23,6 +23,7 @@ import {
   Filter,
   Zap
 } from 'lucide-react';
+import { useCity } from '@/lib/CityContext';
 import rawData from '@/lib/data/complaints_cdmx.json';
 
 // ------------------------------------------------------------------
@@ -48,6 +49,7 @@ interface Ticket {
 // ------------------------------------------------------------------
 
 export default function TrendsDashboard() {
+  const { translations } = useCity();
   // "week" por defecto, pero puedes cambiarlo a "month" o "all"
   const [timeRange, setTimeRange] = useState<'all' | 'month' | 'week'>('all');
 
@@ -97,13 +99,13 @@ export default function TrendsDashboard() {
     const lineCounts: Record<string, number> = {};
     filteredData.forEach(d => {
       // Limpiar nombre de línea (a veces viene como int o string)
-      const linea = String(d.Linea || "Desconocida");
+      const linea = String(d.Linea || translations.unknown);
       lineCounts[linea] = (lineCounts[linea] || 0) + 1;
     });
     
     const lineDistribution = Object.entries(lineCounts)
       .map(([name, value]) => ({ 
-        name: name.startsWith('Línea') || name.startsWith('Linea') ? name : `Línea ${name}`, 
+        name: name.startsWith('Línea') || name.startsWith('Linea') || name.startsWith('Line') ? name : `${translations.line} ${name}`, 
         value 
       }))
       .sort((a, b) => b.value - a.value); // Ordenar para mejor visualización
@@ -179,10 +181,10 @@ export default function TrendsDashboard() {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900">
             <Activity className="w-6 h-6 text-blue-600" />
-            Centro de Comando: Tendencias
+            {translations.trends}
           </h2>
           <p className="text-gray-600 text-sm mt-1">
-            Análisis de incidentes en tiempo real y patrones históricos.
+            Analysis of incidents in real time and historical patterns.
           </p>
         </div>
 
@@ -197,7 +199,7 @@ export default function TrendsDashboard() {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-300'
               }`}
             >
-              {range === 'all' ? 'Histórico' : range === 'week' ? 'Últimos 7 días' : 'Últimos 30 días'}
+              {range === 'all' ? translations.historical : range === 'week' ? translations.last7Days : translations.last30Days}
             </button>
           ))}
         </div>
@@ -213,7 +215,7 @@ export default function TrendsDashboard() {
           </div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-red-600">
             <TrendingUp className="w-4 h-4 text-red-500" />
-            Top 5 Estaciones Críticas
+            {translations.top5CriticalStations}
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -245,7 +247,7 @@ export default function TrendsDashboard() {
         <div className="lg:col-span-5 bg-gray-100 p-5 rounded-xl border border-gray-300 relative">
           <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-blue-600">
             <Filter className="w-4 h-4 text-blue-500" />
-            Distribución por Línea
+            {translations.distributionByLine}
           </h3>
           <div className="h-64 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -272,7 +274,7 @@ export default function TrendsDashboard() {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-6">
               <span className="text-3xl font-bold text-gray-900">{processedStats.total}</span>
-              <span className="text-xs text-gray-600">Quejas</span>
+              <span className="text-xs text-gray-600">{translations.complaints}</span>
             </div>
           </div>
         </div>
@@ -282,7 +284,7 @@ export default function TrendsDashboard() {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-green-600">
               <Zap className="w-4 h-4 text-green-500" />
-              Volumen de Quejas (Sismógrafo)
+              {translations.complaintVolume}
             </h3>
           </div>
           <div className="h-64 w-full">

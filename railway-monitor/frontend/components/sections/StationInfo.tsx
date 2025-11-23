@@ -48,7 +48,7 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
         {/* Palabras clave predominantes */}
         <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
           <div className="text-sm text-gray-700 mb-3 text-center font-bold">
-            Palabras Clave Predominantes
+            {translations.dominantKeywords}
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
             {topKeywords.length > 0 ? (
@@ -61,7 +61,7 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
                 </span>
               ))
             ) : (
-              <span className="text-base text-gray-500">Sin datos</span>
+              <span className="text-base text-gray-500">{translations.noData}</span>
             )}
           </div>
         </div>
@@ -69,7 +69,7 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
         {/* Últimos comentarios de la estación */}
         <div className="mt-4">
           <div className="text-sm text-gray-800 mb-3 font-bold">
-            Últimos Comentarios (Estación):
+            {translations.lastComments}
           </div>
           <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
             {recentComments.length > 0 ? (
@@ -93,7 +93,7 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
               ))
             ) : (
               <p className="text-base text-gray-500 text-center py-4">
-                No hay comentarios recientes
+                {translations.noRecentComments}
               </p>
             )}
           </div>
