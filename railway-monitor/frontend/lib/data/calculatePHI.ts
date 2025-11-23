@@ -67,10 +67,16 @@ export interface PHIData {
  * 
  * Para normalizar el resultado, dividimos la suma ponderada por el total de quejas
  * y multiplicamos por 100 para obtener un porcentaje de impacto
- */
+ *//**
+* Calcula el PHI global usando penalización no lineal
+* Fórmula:
+PHIα​=100(1−∑cantidadi​∑(pesoiα​⋅cantidadi​)​)
+
+*/
 function calculateMetroPHI(
     complaints: Complaint[],
-    metroName: string
+    metroName: string,
+    alpha: number = 2.0 // Exponente para penalización no lineal
 ): PHIData {
     // Contar quejas por categoría
     const categoryCount = new Map<string, number>();
@@ -80,43 +86,45 @@ function calculateMetroPHI(
         categoryCount.set(category, (categoryCount.get(category) || 0) + 1);
     });
 
-    // Calcular suma ponderada: Σ(peso × cantidad)
+    // Calcular suma ponderada no lineal: Σ( (peso^α) × cantidad )
     let weightedSum = 0;
     const categoryBreakdown: PHIData["categoryBreakdown"] = [];
 
     categoryCount.forEach((count, category) => {
-        const weight = categorySeverity[category] || 0.5; // peso por defecto 0.5 si no está definido
-        const impact = weight * count;
+        const baseWeight = categorySeverity[category] || 0.5;
+        const nonlinearWeight = Math.pow(baseWeight, alpha);
+        const impact = nonlinearWeight * count;
         weightedSum += impact;
 
         categoryBreakdown.push({
             category,
             count,
-            weight,
+            weight: nonlinearWeight, // ahora mostramos el peso ya elevado
             impact,
         });
     });
 
-    // Ordenar por impacto descendente
+    // Ordenar por impacto
     categoryBreakdown.sort((a, b) => b.impact - a.impact);
 
-    // Normalizar: dividir por total de quejas y multiplicar por 100
-    // Esto nos da el "impacto promedio ponderado" como porcentaje
     const totalComplaints = complaints.length;
-    const normalizedImpact = (weightedSum / totalComplaints) * 100;
 
-    // PHI = 100 - impacto normalizado
-    // Un PHI alto significa mejor salud del sistema (menos impacto de quejas)
-    const phi = Math.max(0, 100 - normalizedImpact);
+    // Media ponderada no lineal
+    const avgImpact = weightedSum / totalComplaints;
+
+    // PHI exponencial
+    let phi = 100 * (1 - avgImpact);
+    phi = Math.max(0, phi); // evitar negativos
 
     return {
         metroName,
-        phi: Math.round(phi * 10) / 10, // Redondear a 1 decimal
+        phi: Math.round(phi * 10) / 10,
         totalComplaints,
         weightedSum: Math.round(weightedSum * 10) / 10,
         categoryBreakdown,
     };
 }
+
 
 /**
  * Calcula el PHI para ambos sistemas de metro

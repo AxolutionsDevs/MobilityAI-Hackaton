@@ -152,7 +152,7 @@ const PHIComparison: React.FC = () => {
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                     <Activity className="w-7 h-7" />
-                    Índice de Salud Pública (PHI) Global
+                    Índice de Felicidad del Pasajero (PHI) Global
                 </h2>
                 <p className="text-blue-100 text-sm">
                     Comparación entre sistemas de metro basada en quejas ponderadas
@@ -160,7 +160,7 @@ const PHIComparison: React.FC = () => {
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-lg p-3">
                     <div className="text-xs text-blue-100 mb-1">Fórmula:</div>
                     <code className="text-sm font-mono">
-                        PHI = 100 - Σ(peso_del_asunto × cantidad) / total_quejas × 100
+                        PHI = 100 - [ Σ( e^(peso_del_asunto) × cantidad ) / total_quejas ] × 100
                     </code>
                 </div>
             </div>
