@@ -1,6 +1,7 @@
 "use client";
 
 import { PALABRAS_CLAVE } from "@/lib/constants";
+import { useCity } from "@/lib/CityContext";
 import { DetectedNode, SVGPath } from "@/types";
 import React, { ChangeEvent, useState } from "react";
 
@@ -9,6 +10,7 @@ interface SVGImporterProps {
 }
 
 const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
+  const { translations } = useCity();
   const [lineName, setLineName] = useState("Nueva Línea");
   const [lineColor, setLineColor] = useState("#e91e8b");
   const [importedSVG, setImportedSVG] = useState<string | null>(null);
@@ -250,25 +252,24 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
         <h2 className="text-base font-semibold flex items-center gap-2 mb-4">
           <span className="text-purple-400">🚇</span>
-          Importar Línea de Transporte
+          {translations.importTransportLine}
         </h2>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-xs text-white/60 mb-1">
-              Nombre de la línea
+              {translations.lineName}
             </label>
             <input
               type="text"
               value={lineName}
               onChange={(e) => setLineName(e.target.value)}
               className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Ej: Línea A - Metrobús"
-            />
-          </div>
+              placeholder={translations.lineNamePlaceholder}
+            /></div>
           <div>
             <label className="block text-xs text-white/60 mb-1">
-              Color de la línea
+              {translations.lineColor}
             </label>
             <div className="flex gap-2">
               <input
@@ -298,10 +299,10 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           <label htmlFor="svg-upload" className="cursor-pointer block mb-3">
             <div className="text-4xl mb-2">📁</div>
             <div className="text-sm font-medium text-white/80">
-              Arrastra un archivo SVG o haz clic
+              {translations.dragSVGFile}
             </div>
             <div className="text-xs text-white/50 mt-1">
-              El sistema detectará automáticamente los nodos
+              {translations.autoDetectNodes}
             </div>
           </label>
 
@@ -310,7 +311,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               <div className="w-full border-t border-white/20"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-slate-900/50 text-white/50">o</span>
+              <span className="px-2 bg-slate-900/50 text-white/50">{translations.or}</span>
             </div>
           </div>
 
@@ -318,14 +319,14 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             onClick={simulateUpload}
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
           >
-            <span>⚡</span> Simular Carga de Ejemplo
+            <span>⚡</span> {translations.simulateLoadExample}
           </button>
         </div>
 
         {isProcessing && (
           <div className="mt-4 text-center">
             <div className="animate-spin inline-block w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full"></div>
-            <p className="text-xs text-white/60 mt-2">Procesando SVG...</p>
+            <p className="text-xs text-white/60 mt-2">{translations.processingSVG}</p>
           </div>
         )}
       </div>
@@ -335,7 +336,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
               <h3 className="text-sm font-semibold mb-3">
-                📝 Editar Estaciones
+                {translations.editStations}
               </h3>
               <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
                 {detectedNodes.map((node, i) => (
@@ -373,11 +374,10 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                       ({Math.round(node.x)}, {Math.round(node.y)})
                     </span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded ${
-                        node.phi >= 50
-                          ? "bg-green-500/20 text-green-400"
-                          : "bg-red-500/20 text-red-400"
-                      }`}
+                      className={`text-[10px] px-1.5 py-0.5 rounded ${node.phi >= 50
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                        }`}
                     >
                       PHI: {node.phi}
                     </span>
@@ -393,25 +393,25 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             </div>
 
             <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30">
-              <h3 className="text-sm font-semibold mb-3">⚡ Acciones</h3>
+              <h3 className="text-sm font-semibold mb-3">{translations.actions}</h3>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={saveToCustomLines}
                   className="px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
-                  <span>✓</span> Guardar
+                  <span>✓</span> {translations.save}
                 </button>
                 <button
                   onClick={exportLine}
                   className="px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
-                  <span>📥</span> Exportar
+                  <span>📥</span> {translations.export}
                 </button>
                 <button
                   onClick={clear}
                   className="px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-medium text-sm hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
                 >
-                  <span>🗑</span> Limpiar
+                  <span>🗑</span> {translations.clean}
                 </button>
               </div>
             </div>
@@ -420,19 +420,18 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold">
-                Vista Previa - Arrastra estaciones para moverlas
+                {translations.preview}
               </h3>
               <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
-                {detectedNodes.length} estaciones
+                {detectedNodes.length} {translations.stations}
               </span>
             </div>
 
             <div className="relative bg-slate-900 rounded-xl overflow-hidden border border-white/10">
               <svg
                 viewBox={svgViewBox}
-                className={`w-full h-auto min-h-[400px] ${
-                  draggingNodeId ? "cursor-grabbing" : "cursor-crosshair"
-                }`}
+                className={`w-full h-auto min-h-[400px] ${draggingNodeId ? "cursor-grabbing" : "cursor-crosshair"
+                  }`}
                 onClick={addManualNode}
                 onMouseMove={handleNodeDrag}
                 onMouseUp={handleNodeDragEnd}
@@ -487,8 +486,8 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                           node.phi >= 70
                             ? "rgba(16,185,129,0.3)"
                             : node.phi >= 50
-                            ? "rgba(245,158,11,0.3)"
-                            : "rgba(239,68,68,0.3)"
+                              ? "rgba(245,158,11,0.3)"
+                              : "rgba(239,68,68,0.3)"
                         }
                         className="transition-all duration-200"
                       />
@@ -563,41 +562,40 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           </div>
 
           <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-            <h3 className="text-sm font-semibold mb-3">📖 Instrucciones</h3>
+            <h3 className="text-sm font-semibold mb-3">{translations.instructions}</h3>
             <div className="grid grid-cols-2 gap-4 text-xs text-white/70">
               <div className="space-y-2">
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">1.</span>
-                  <span>Sube un archivo SVG con el trazo de tu línea</span>
+                  <span>{translations.instruction1}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">2.</span>
-                  <span>El sistema detectará automáticamente los nodos</span>
+                  <span>{translations.instruction2}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">3.</span>
-                  <span>Arrastra las estaciones para reposicionarlas</span>
+                  <span>{translations.instruction3}</span>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">4.</span>
-                  <span>Edita los nombres haciendo clic en cada estación</span>
+                  <span>{translations.instruction4}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">5.</span>
-                  <span>Guarda en el dashboard o exporta como JSON</span>
+                  <span>{translations.instruction5}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">6.</span>
-                  <span>El sistema asignará PHI automáticamente</span>
+                  <span>{translations.instruction6}</span>
                 </div>
               </div>
             </div>
             <div className="mt-4 p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/30">
               <div className="text-xs text-indigo-300">
-                <strong>💡 Tip:</strong> Funciona con cualquier sistema de
-                transporte de cualquier ciudad del mundo.
+                <strong>{translations.tip}</strong> {translations.tipText}
               </div>
             </div>
           </div>
