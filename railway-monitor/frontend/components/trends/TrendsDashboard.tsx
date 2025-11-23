@@ -20,13 +20,13 @@ import {
   TrendingUp, 
   AlertOctagon, 
   Activity, 
-  Calendar,
   Filter,
   Zap
 } from 'lucide-react';
+import rawData from '@/lib/data/complaints_cdmx.json';
 
 // ------------------------------------------------------------------
-// 1. DEFINICIÓN DE TIPOS (Basado en tu Dataset)
+// 1. DEFINICIÓN DE TIPOS
 // ------------------------------------------------------------------
 
 interface Ticket {
@@ -36,7 +36,7 @@ interface Ticket {
   Email_destinatario: string;
   Asunto: string;
   Contenido: string;
-  Fecha: string; // ISO string
+  Fecha: string;
   "Message-ID": string;
   NombredeEstacion: string;
   IdEstacion: string;
@@ -44,82 +44,48 @@ interface Ticket {
 }
 
 // ------------------------------------------------------------------
-// 2. GENERADOR DE DATOS MOCK (Para simular el backend)
-// ------------------------------------------------------------------
-
-const ESTACIONES = [
-  { nombre: "Estación Central", id: "ST-01", linea: "1" },
-  { nombre: "Plaza Norte", id: "ST-02", linea: "1" },
-  { nombre: "Terminal Sur", id: "ST-03", linea: "2" },
-  { nombre: "Centro Cívico", id: "ST-04", linea: "A" },
-  { nombre: "Parque Industrial", id: "ST-05", linea: "B" },
-  { nombre: "Av. Universidad", id: "ST-06", linea: "1" },
-  { nombre: "Mercado Viejo", id: "ST-07", linea: "2" },
-];
-
-const generateMockData = (count: number): Ticket[] => {
-  const data: Ticket[] = [];
-  const now = new Date();
-  
-  for (let i = 0; i < count; i++) {
-    // Random date within last 30 days
-    const date = new Date(now);
-    date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-    date.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
-
-    const estacion = ESTACIONES[Math.floor(Math.random() * ESTACIONES.length)];
-
-    data.push({
-      Nombre_remitente: `Usuario ${i}`,
-      Email_remitente: `user${i}@example.com`,
-      Nombre_destinatario: "Soporte",
-      Email_destinatario: "soporte@railway.com",
-      Asunto: "Reporte de incidente",
-      Contenido: "Descripción del problema...",
-      Fecha: date.toISOString(),
-      "Message-ID": `MSG-${i}`,
-      NombredeEstacion: estacion.nombre,
-      IdEstacion: estacion.id,
-      Linea: estacion.linea
-    });
-  }
-  return data.sort((a, b) => new Date(a.Fecha).getTime() - new Date(b.Fecha).getTime());
-};
-
-// Datos iniciales (simulando fetch)
-const MOCK_RAW_DATA = generateMockData(500);
-
-// ------------------------------------------------------------------
-// 3. COMPONENTE PRINCIPAL
+// 2. COMPONENTE PRINCIPAL
 // ------------------------------------------------------------------
 
 export default function TrendsDashboard() {
-  const [timeRange, setTimeRange] = useState<'24h' | 'week' | 'month'>('week');
+  // "week" por defecto, pero puedes cambiarlo a "month" o "all"
+  const [timeRange, setTimeRange] = useState<'all' | 'month' | 'week'>('all');
 
   // ----------------------------------------------------------------
-  // 4. LÓGICA DE PROCESAMIENTO DE DATOS (ProcessData)
+  // 3. LÓGICA DE PROCESAMIENTO DE DATOS
   // ----------------------------------------------------------------
   
   const processedStats = useMemo(() => {
-    const now = new Date();
-    let filteredData = MOCK_RAW_DATA;
+    // Convertir datos crudos al tipo Ticket (el JSON ya tiene la estructura correcta)
+    const tickets = rawData as unknown as Ticket[];
+    
+    // Encontrar la fecha más reciente en el dataset para usarla como referencia "Hoy"
+    // Esto es importante porque si el dataset es de 2024 y estamos en 2025, "última semana" saldría vacía.
+    const dates = tickets.map(t => new Date(t.Fecha).getTime());
+    const maxDate = new Date(Math.max(...dates));
+    const minDate = new Date(Math.min(...dates));
+    
+    // Referencia de tiempo (usamos la fecha máxima del dataset como "ahora" para la demo)
+    const now = maxDate; 
 
-    // Filtrar por rango de tiempo
-    if (timeRange === '24h') {
-      const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      filteredData = filteredData.filter(d => new Date(d.Fecha) >= cutoff);
-    } else if (timeRange === 'week') {
+    let filteredData = tickets;
+
+    // Filtrar por rango de tiempo relativo a la última fecha del dataset
+    if (timeRange === 'week') {
       const cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       filteredData = filteredData.filter(d => new Date(d.Fecha) >= cutoff);
-    } else { // month
+    } else if (timeRange === 'month') {
       const cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       filteredData = filteredData.filter(d => new Date(d.Fecha) >= cutoff);
     }
+    // 'all' no filtra fecha, muestra todo el dataset
 
     // A. Top Crítico (Ranking Estaciones)
     const stationCounts: Record<string, number> = {};
     filteredData.forEach(d => {
-      stationCounts[d.NombredeEstacion] = (stationCounts[d.NombredeEstacion] || 0) + 1;
+      if (d.NombredeEstacion) {
+        stationCounts[d.NombredeEstacion] = (stationCounts[d.NombredeEstacion] || 0) + 1;
+      }
     });
 
     const topStations = Object.entries(stationCounts)
@@ -130,34 +96,76 @@ export default function TrendsDashboard() {
     // B. Distribución por Línea (Donut)
     const lineCounts: Record<string, number> = {};
     filteredData.forEach(d => {
-      lineCounts[d.Linea] = (lineCounts[d.Linea] || 0) + 1;
+      // Limpiar nombre de línea (a veces viene como int o string)
+      const linea = String(d.Linea || "Desconocida");
+      lineCounts[linea] = (lineCounts[linea] || 0) + 1;
     });
     
     const lineDistribution = Object.entries(lineCounts)
-      .map(([name, value]) => ({ name: `Línea ${name}`, value }));
+      .map(([name, value]) => ({ name: `Línea ${name}`, value }))
+      .sort((a, b) => b.value - a.value); // Ordenar para mejor visualización
 
     // C. Sismógrafo (Timeline)
     const timelineCounts: Record<string, number> = {};
     filteredData.forEach(d => {
       const dateObj = new Date(d.Fecha);
-      // Agrupar por hora si es 24h, por día si es semana/mes
-      const key = timeRange === '24h' 
-        ? `${dateObj.getHours()}:00`
-        : dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      if (isNaN(dateObj.getTime())) return;
+
+      // Agrupación dinámica
+      let key;
+      if (timeRange === 'week' || timeRange === 'month') {
+         // Agrupar por día
+         key = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      } else {
+         // Si es 'all' (muchos datos), agrupar por Mes-Año para no saturar
+         const diffDays = (maxDate.getTime() - minDate.getTime()) / (1000 * 3600 * 24);
+         if (diffDays > 60) {
+             key = dateObj.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+         } else {
+             key = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+         }
+      }
       
       timelineCounts[key] = (timelineCounts[key] || 0) + 1;
     });
 
-    // Asegurar orden cronológico para la gráfica (esto es simplificado para el mock)
-    // En producción usarías librerías como date-fns para rellenar huecos de tiempo
-    const timelineData = Object.entries(timelineCounts)
-      .map(([date, count]) => ({ date, count }));
+    // Ordenar timeline por fecha real (recuperando un ejemplo de fecha del key o usando un map auxiliar)
+    // Método simplificado: crear array y ordenar.
+    // Nota: Para ordenar correctamente strings como "ene 2024", necesitamos lógica extra.
+    // Vamos a simplificar: usar timestamp como key auxiliar para ordenar y luego formatear.
+    
+    const timelineMap = new Map<number, number>();
+    filteredData.forEach(d => {
+        const dateObj = new Date(d.Fecha);
+        if (isNaN(dateObj.getTime())) return;
+        
+        // Normalizar fecha al inicio del periodo (día o mes)
+        const normalizedDate = new Date(dateObj);
+        normalizedDate.setHours(0,0,0,0);
+        if (timeRange === 'all' && (maxDate.getTime() - minDate.getTime()) > (60 * 24 * 3600 * 1000)) {
+            normalizedDate.setDate(1); // Primer día del mes
+        }
+        
+        const timeKey = normalizedDate.getTime();
+        timelineMap.set(timeKey, (timelineMap.get(timeKey) || 0) + 1);
+    });
+
+    const timelineData = Array.from(timelineMap.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([timestamp, count]) => {
+            const date = new Date(timestamp);
+            let label = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+            if (timeRange === 'all' && (maxDate.getTime() - minDate.getTime()) > (60 * 24 * 3600 * 1000)) {
+                 label = date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+            }
+            return { date: label, count, timestamp };
+        });
 
     return { topStations, lineDistribution, timelineData, total: filteredData.length };
   }, [timeRange]);
 
   // Colores para gráficas
-  const COLORS = ['#ef4444', '#f97316', '#eab308', '#3b82f6', '#8b5cf6'];
+  const COLORS = ['#ef4444', '#f97316', '#eab308', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'];
   const BAR_COLORS = ['#ef4444', '#ef4444', '#f97316', '#f97316', '#eab308']; // Rojo -> Amarillo
 
   return (
@@ -171,12 +179,12 @@ export default function TrendsDashboard() {
             Centro de Comando: Tendencias
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Análisis de incidentes en tiempo real y patrones históricos.
+            Análisis de {processedStats.total} reportes reales.
           </p>
         </div>
 
         <div className="flex bg-slate-900/80 p-1 rounded-lg border border-slate-800">
-          {(['24h', 'week', 'month'] as const).map((range) => (
+          {(['all', 'month', 'week'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
@@ -186,7 +194,7 @@ export default function TrendsDashboard() {
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
-              {range === '24h' ? 'Últimas 24h' : range === 'week' ? 'Esta Semana' : 'Este Mes'}
+              {range === 'all' ? 'Histórico' : range === 'week' ? 'Últimos 7 días' : 'Últimos 30 días'}
             </button>
           ))}
         </div>
@@ -206,14 +214,14 @@ export default function TrendsDashboard() {
             </h3>
             <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart layout="vertical" data={processedStats.topStations} margin={{ left: 20, right: 20, bottom: 0 }}>
+                    <BarChart layout="vertical" data={processedStats.topStations} margin={{ left: 40, right: 20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.3} />
                         <XAxis type="number" hide />
                         <YAxis 
                             dataKey="name" 
                             type="category" 
-                            tick={{ fill: '#94a3b8', fontSize: 12 }} 
-                            width={120}
+                            tick={{ fill: '#94a3b8', fontSize: 11 }} 
+                            width={140}
                             interval={0}
                         />
                         <Tooltip 
@@ -245,7 +253,7 @@ export default function TrendsDashboard() {
                             cy="50%"
                             innerRadius={60}
                             outerRadius={80}
-                            paddingAngle={5}
+                            paddingAngle={2}
                             dataKey="value"
                         >
                             {processedStats.lineDistribution.map((entry: { name: string; value: number }, index: number) => (
@@ -256,14 +264,19 @@ export default function TrendsDashboard() {
                             contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
                             itemStyle={{ color: '#e2e8f0' }}
                         />
-                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }}/>
+                        <Legend 
+                            verticalAlign="bottom" 
+                            height={36} 
+                            iconType="circle" 
+                            wrapperStyle={{ fontSize: '10px', color: '#94a3b8' }}
+                        />
                     </PieChart>
                 </ResponsiveContainer>
                 
                 {/* KPI Central en Donut */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-6">
                     <span className="text-3xl font-bold text-white">{processedStats.total}</span>
-                    <span className="text-xs text-slate-400">Quejas</span>
+                    <span className="text-xs text-slate-400">Reportes</span>
                 </div>
             </div>
         </div>
@@ -273,12 +286,8 @@ export default function TrendsDashboard() {
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-emerald-200">
                     <Zap className="w-4 h-4 text-emerald-400" />
-                    Volumen de Quejas (Sismógrafo)
+                    Volumen Histórico (Sismógrafo)
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Actualizado ahora
-                </div>
             </div>
             
             <div className="h-64 w-full">
@@ -294,10 +303,11 @@ export default function TrendsDashboard() {
                         <XAxis 
                             dataKey="date" 
                             stroke="#64748b" 
-                            tick={{ fontSize: 12 }} 
+                            tick={{ fontSize: 10 }} 
                             tickLine={false}
                             axisLine={false}
                             dy={10}
+                            minTickGap={30}
                         />
                         <YAxis 
                             stroke="#64748b" 
@@ -312,10 +322,10 @@ export default function TrendsDashboard() {
                             type="monotone" 
                             dataKey="count" 
                             stroke="#10b981" 
-                            strokeWidth={3}
+                            strokeWidth={2}
                             fillOpacity={1} 
                             fill="url(#colorVolume)" 
-                            animationDuration={1500}
+                            animationDuration={1000}
                         />
                     </AreaChart>
                 </ResponsiveContainer>
@@ -326,4 +336,3 @@ export default function TrendsDashboard() {
     </div>
   );
 }
-
