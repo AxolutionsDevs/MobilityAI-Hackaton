@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚇 RailSense
+# RailSense
 
 **Plataforma AI-Powered para Análisis de Sistemas de Transporte Público**
 
