@@ -47,7 +47,14 @@ export interface StationData {
   tendencia: "up" | "down";
   ejemplos: string[];
   reportCount?: number; // Número de reportes
-  severity?: number; // Gravedad (suma de pesos de categorías)
+  severity?: number; // Gravedad promedio (0-1)
+  complaintIndex?: number; // Índice de quejas en porcentaje (0-100%)
+  topKeywords?: string[]; // Palabras clave más frecuentes
+  recentComments?: Array<{
+    content: string;
+    date: string;
+    subject: string;
+  }>; // Últimos comentarios
 }
 
 export interface StationDataMap {

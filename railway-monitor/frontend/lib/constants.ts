@@ -8,6 +8,10 @@ import {
   Users,
   Wrench,
 } from "lucide-react";
+import {
+  LINE_COMPLAINT_DATA,
+  STATION_COMPLAINT_DATA,
+} from "./data/processComplaints";
 
 export const CATEGORIES: Category[] = [
   {
@@ -63,130 +67,41 @@ export const CATEGORIES: Category[] = [
 
 export const METRO_LINES: MetroLine[] = [];
 
-// Datos simulados de reportes y gravedad por estación
+// Datos reales de reportes de quejas por estación desde complaints_cdmx.json
 // severity: 0.0 = sin gravedad (sin rojo), 1.0 = gravedad máxima (rojo intenso)
+// complaintIndex: porcentaje (0-100%) que representa el índice de quejas
+// topKeywords: palabras más frecuentes en los comentarios de la estación
+// recentComments: últimos 5 comentarios de la estación
 export const STATION_REPORT_DATA: Record<
   string,
-  { reportCount: number; severity: number; recentIssue: string }
-> = {
-  // Línea 2 - Azul (variación de 0.05 a 1.0 para ver toda la gama de colores)
-  cua2: {
-    reportCount: 25,
-    severity: 0.08,
-    recentIssue: "Falta de mapas impresos",
-  },
-  pan2: {
-    reportCount: 65,
-    severity: 0.78,
-    recentIssue: "Acoso sexual constante",
-  },
-  tac2: { reportCount: 92, severity: 1.0, recentIssue: "Robos frecuentes" },
-  col: {
-    reportCount: 12,
-    severity: 0.05,
-    recentIssue: "Pequeñas mejoras pendientes",
-  },
-  nor: { reportCount: 82, severity: 0.88, recentIssue: "Retrasos y asaltos" },
-  smc: { reportCount: 78, severity: 0.85, recentIssue: "Acoso en vagones" },
-  rev: {
-    reportCount: 30,
-    severity: 0.15,
-    recentIssue: "Baja conectividad WiFi",
-  },
-  hid: { reportCount: 88, severity: 0.95, recentIssue: "Asaltos reportados" },
-  bea: {
-    reportCount: 90,
-    severity: 0.92,
-    recentIssue: "Inseguridad y saturación",
-  },
-  all: { reportCount: 22, severity: 0.18, recentIssue: "Falta información" },
-  zoc: { reportCount: 95, severity: 0.98, recentIssue: "Inseguridad grave" },
-  pid2: { reportCount: 82, severity: 0.9, recentIssue: "Carteristas activos" },
-  saa: { reportCount: 75, severity: 0.82, recentIssue: "Peleas frecuentes" },
-  cha2: {
-    reportCount: 70,
-    severity: 0.75,
-    recentIssue: "Vendedores ambulantes",
-  },
-  vip: { reportCount: 28, severity: 0.1, recentIssue: "Señalización antigua" },
-  xol: {
-    reportCount: 20,
-    severity: 0.06,
-    recentIssue: "Pocos asientos libres",
-  },
-  vil: { reportCount: 88, severity: 0.94, recentIssue: "Zona peligrosa" },
-  ntz: {
-    reportCount: 35,
-    severity: 0.22,
-    recentIssue: "Temperatura ambiente alta",
-  },
-  por: {
-    reportCount: 95,
-    severity: 0.96,
-    recentIssue: "Asaltos violentos",
-  },
-  erm: { reportCount: 78, severity: 0.86, recentIssue: "Robos con violencia" },
-  gen: { reportCount: 85, severity: 0.89, recentIssue: "Inseguridad crítica" },
-  tas: { reportCount: 92, severity: 0.93, recentIssue: "Zona de alto riesgo" },
+  {
+    reportCount: number;
+    severity: number;
+    recentIssue: string;
+    lastReportDate: string;
+    complaintIndex: number;
+    topKeywords: string[];
+    recentComments: Array<{
+      content: string;
+      date: string;
+      subject: string;
+    }>;
+  }
+> = STATION_COMPLAINT_DATA;
 
-  // Línea 12 - Dorada (variación continua para transiciones suaves)
-  mix: { reportCount: 87, severity: 0.91, recentIssue: "Robos constantes" },
-  ins12: { reportCount: 85, severity: 0.88, recentIssue: "Robos de celular" },
-  hos: {
-    reportCount: 32,
-    severity: 0.09,
-    recentIssue: "Elevador lento",
-  },
-  zap: {
-    reportCount: 90,
-    severity: 0.92,
-    recentIssue: "Peleas entre pasajeros",
-  },
-  par: { reportCount: 25, severity: 0.07, recentIssue: "Basura en andenes" },
-  eje: {
-    reportCount: 95,
-    severity: 0.97,
-    recentIssue: "Acoso y asaltos",
-  },
-  erm12: { reportCount: 80, severity: 0.84, recentIssue: "Inseguridad grave" },
-  mex: {
-    reportCount: 72,
-    severity: 0.79,
-    recentIssue: "Robos frecuentes",
-  },
-  atl: { reportCount: 98, severity: 0.99, recentIssue: "Zona peligrosa" },
-  cul: { reportCount: 38, severity: 0.14, recentIssue: "Iluminación débil" },
-  sji: {
-    reportCount: 28,
-    severity: 0.11,
-    recentIssue: "Falta personal de ayuda",
-  },
-  lom: { reportCount: 92, severity: 0.95, recentIssue: "Robos y saturación" },
-  cen: { reportCount: 42, severity: 0.16, recentIssue: "Clima templado" },
-  per: {
-    reportCount: 88,
-    severity: 0.91,
-    recentIssue: "Asaltos a mano armada",
-  },
-  teo: {
-    reportCount: 85,
-    severity: 0.87,
-    recentIssue: "Inseguridad constante",
-  },
-  oli: { reportCount: 30, severity: 0.13, recentIssue: "Necesita más mapas" },
-  noe: {
-    reportCount: 35,
-    severity: 0.2,
-    recentIssue: "Sanitarios por mejorar",
-  },
-  zap12: {
-    reportCount: 90,
-    severity: 0.93,
-    recentIssue: "Zona de alto peligro",
-  },
-  tla: { reportCount: 94, severity: 0.96, recentIssue: "Asaltos violentos" },
-  tzi: { reportCount: 88, severity: 0.9, recentIssue: "Asaltos violentos" },
-};
+// Datos de comentarios por línea
+export const LINE_REPORT_DATA: Record<
+  string,
+  {
+    lineName: string;
+    recentComments: Array<{
+      station: string;
+      content: string;
+      date: string;
+      subject: string;
+    }>;
+  }
+> = LINE_COMPLAINT_DATA;
 
 export const PALABRAS_CLAVE: Record<string, string[]> = {
   seguridad: [
