@@ -179,7 +179,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
       {/* Overlay de hover cuando el mapa no está enfocado */}
       {!isMapFocused && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-gray-200 backdrop-blur-[2px] z-20 rounded-2xl cursor-pointer"
+          className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-200/30 to-gray-300/30 backdrop-blur-[2px] z-20 rounded-2xl cursor-pointer"
           onClick={handleMapClick}
         >
           <div className="bg-gray-300 px-6 py-3 rounded-xl border border-gray-400 shadow-2xl">

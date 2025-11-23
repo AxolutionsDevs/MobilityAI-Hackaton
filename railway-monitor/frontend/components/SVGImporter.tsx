@@ -360,7 +360,6 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                       onClick={() => deleteNode(node.id)}
                       className="px-2 py-1 rounded-lg bg-red-500 text-white text-xs font-medium hover:bg-red-600"
                     >
-                      {translations.delete}
                     </button>
                   </div>
                 ))}
