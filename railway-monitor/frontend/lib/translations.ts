@@ -1,5 +1,5 @@
 export type City = "cdmx" | "vienna";
-export type Language = "es" | "de";
+export type Language = "en" | "de";
 
 export interface Translations {
   // Header
@@ -131,6 +131,44 @@ export interface Translations {
   editMode: string;
   editNodes: string;
 
+  // Map and UI Text
+  centerView: string;
+  heatmapIntensity: string;
+  lowSeverity: string;
+  mediumSeverity: string;
+  highSeverity: string;
+  areaSize: string;
+  largerArea: string;
+  noLinesMap: string;
+  startImporting: string;
+  goToImport: string;
+  mainCategories: string;
+  trends: string;
+  lastComments: string;
+  noRecentComments: string;
+  dominantKeywords: string;
+  noData: string;
+  reports: string;
+  index: string;
+  severity: string;
+  noLinesMessage: string;
+  noLinesDescription: string;
+
+  // Import buttons
+  importJSON: string;
+  detectBackend: string;
+
+  // Trends dashboard
+  historical: string;
+  last7Days: string;
+  last30Days: string;
+  unknown: string;
+  top5CriticalStations: string;
+  distributionByLine: string;
+  complaints: string;
+  complaintVolume: string;
+  seismograph: string;
+
   // Footer
   footer: string;
 }
@@ -138,144 +176,181 @@ export interface Translations {
 export const translations: Record<City, Translations> = {
   cdmx: {
     // Header
-    headerTitle: "🚇 Dashboard PHI - Metro CDMX",
-    headerSubtitle: "Sistema de Análisis con NLP",
-    cityName: "Ciudad de México",
+    headerTitle: "🚇 PHI Dashboard - Metro CDMX",
+    headerSubtitle: "NLP Analysis System",
+    cityName: "Mexico City",
 
     // KPIs
-    globalPHI: "PHI Global",
-    positives: "Positivos",
-    alerts: "Alertas",
-    response: "Respuesta",
-    comments: "comentarios",
-    critical: "críticas",
-    average: "Promedio",
+    globalPHI: "Global PHI",
+    positives: "Positive",
+    alerts: "Alerts",
+    response: "Response",
+    comments: "comments",
+    critical: "critical",
+    average: "Average",
 
     // Navigation Tabs
-    heatmap: "Mapa de Calor",
-    importSVG: "Importar",
-    indicators: "Indicadores",
-    predictive: "Predictivo",
-    comparison: "Comparación",
+    heatmap: "Heat Map",
+    importSVG: "Import",
+    indicators: "Indicators",
+    predictive: "Predictive",
+    comparison: "Comparison",
 
     // Heatmap
-    heatmapTitle: "Mapa de Calor PHI",
-    allLines: "Todas las líneas",
-    line: "Línea",
-    intensity: "Intensidad",
+    heatmapTitle: "PHI Heat Map",
+    allLines: "All Lines",
+    line: "Line",
+    intensity: "Intensity",
 
     // Import
-    importedLines: "🚇 Líneas Importadas",
-    stations: "estaciones",
-    active: "Activa",
+    importedLines: "🚇 Imported Lines",
+    stations: "stations",
+    active: "Active",
 
     // Indicators
-    weeklyTrends: "Tendencias Semanales",
-    security: "Seguridad",
-    punctuality: "Puntualidad",
-    cleanliness: "Limpieza",
+    weeklyTrends: "Weekly Trends",
+    security: "Security",
+    punctuality: "Punctuality",
+    cleanliness: "Cleanliness",
 
     // Days of week
-    monday: "Lun",
-    tuesday: "Mar",
-    wednesday: "Mié",
-    thursday: "Jue",
-    friday: "Vie",
-    saturday: "Sáb",
-    sunday: "Dom",
+    monday: "Mon",
+    tuesday: "Tue",
+    wednesday: "Wed",
+    thursday: "Thu",
+    friday: "Fri",
+    saturday: "Sat",
+    sunday: "Sun",
 
     // Predictive
-    predictiveTitle: "Análisis Predictivo de Conflictos (24h)",
-    projectedConflicts: "Conflictos Proyectados",
-    riskLevel: "Nivel de Riesgo",
-    aiRecommendations: "🔴 Recomendaciones de IA",
-    recommendation1: "• Reforzar vigilancia en hora pico (17:00 - 20:00)",
-    recommendation2:
-      "• Aumentar frecuencia de trenes en Línea 1 durante mañana",
-    recommendation3: "• Revisar iluminación en estaciones con bajo PHI",
+    predictiveTitle: "Predictive Conflict Analysis (24h)",
+    projectedConflicts: "Projected Conflicts",
+    riskLevel: "Risk Level",
+    aiRecommendations: "🔴 AI Recommendations",
+    recommendation1: "• Strengthen surveillance during peak hours (17:00 - 20:00)",
+    recommendation2: "• Increase train frequency on Line 1 during morning",
+    recommendation3: "• Review lighting in stations with low PHI",
 
     // Comparison
-    internationalComparison: "Comparación Internacional",
+    internationalComparison: "International Comparison",
     metroCDMX: "Metro CDMX",
-    metroVienna: "Metro Viena",
-    globalAveragePHI: "PHI Promedio Global",
+    metroVienna: "Vienna Metro",
+    globalAveragePHI: "Global Average PHI",
 
     // Station Info
-    stationInfo: "Información de Estación",
-    predominantWord: "🔥 PALABRA PREDOMINANTE",
-    mentions: "menciones",
+    stationInfo: "Station Information",
+    predominantWord: "🔥 DOMINANT KEYWORDS",
+    mentions: "mentions",
 
     // Category Weights
-    categoryWeights: "Pesos de Categorías",
-    nlpWeights: "⚖️ Pesos NLP",
+    categoryWeights: "Category Weights",
+    nlpWeights: "⚖️ NLP Weights",
 
     // Live Feed
-    liveFeed: "Feed en Vivo",
-    liveFeedTitle: "💬 Feed en Vivo",
+    liveFeed: "Live Feed",
+    liveFeedTitle: "💬 Live Feed",
     live: "Live",
 
     // Global PHI
-    globalPHITitle: "PHI Global",
-    good: "Bueno",
-    system: "Sistema",
-    positive: "Positivo",
+    globalPHITitle: "Global PHI",
+    good: "Good",
+    system: "System",
+    positive: "Positive",
     neutral: "Neutral",
-    negative: "Negativo",
+    negative: "Negative",
 
     // SVG Importer
-    importTransportLine: "Importar Línea de Transporte",
-    lineName: "Nombre de la línea",
-    lineNamePlaceholder: "Ej: Línea A - Metrobús",
-    lineColor: "Color de la línea",
-    dragSVGFile: "Arrastra un archivo o haz clic",
-    autoDetectNodes: "El sistema detectará automáticamente los nodos",
-    or: "o",
-    simulateLoadExample: "Simular Carga de Ejemplo",
-    processingSVG: "Procesando SVG...",
-    editStations: "📝 Editar Estaciones",
-    station: "Estación",
-    actions: "⚡ Acciones",
-    save: "Guardar",
-    export: "Exportar",
-    clean: "Limpiar",
-    preview: "Vista Previa - Arrastra estaciones para moverlas",
-    dragStationsToMove: "Arrastra estaciones para moverlas",
-    instructions: "📖 Instrucciones",
-    instruction1: "Sube un archivo SVG con el trazo de tu línea",
-    instruction2: "El sistema detectará automáticamente los nodos",
-    instruction3: "Arrastra las estaciones para reposicionarlas",
-    instruction4: "Edita los nombres haciendo clic en cada estación",
-    instruction5: "Guarda en el dashboard o exporta como JSON",
-    instruction6: "El sistema asignará PHI automáticamente",
+    importTransportLine: "Import Transport Line",
+    lineName: "Line Name",
+    lineNamePlaceholder: "E.g: Line A - Metrobus",
+    lineColor: "Line Color",
+    dragSVGFile: "Drag file or click",
+    autoDetectNodes: "System will automatically detect nodes",
+    or: "or",
+    simulateLoadExample: "Simulate Example Load",
+    processingSVG: "Processing SVG...",
+    editStations: "📝 Edit Stations",
+    station: "Station",
+    actions: "⚡ Actions",
+    save: "Save",
+    export: "Export",
+    clean: "Clean",
+    preview: "Preview - Drag stations to move them",
+    dragStationsToMove: "Drag stations to move them",
+    instructions: "📖 Instructions",
+    instruction1: "Upload an SVG file with your line path",
+    instruction2: "The system will automatically detect nodes",
+    instruction3: "Drag stations to reposition them",
+    instruction4: "Edit names by clicking on each station",
+    instruction5: "Save to dashboard or export as JSON",
+    instruction6: "System will automatically assign PHI",
     tip: "💡 Tip:",
     tipText:
-      "Funciona con cualquier sistema de transporte de cualquier ciudad del mundo.",
+      "Works with any transportation system from any city in the world.",
 
     // Category names
-    categorySeguridad: "Seguridad",
-    categoryPuntualidad: "Puntualidad",
-    categoryLimpieza: "Limpieza",
-    categoryComodidad: "Comodidad",
-    categoryComunicacion: "Comunicación",
-    categoryFallas: "Fallas Técnicas",
-    categorySaturacion: "Saturación",
+    categorySeguridad: "Security",
+    categoryPuntualidad: "Punctuality",
+    categoryLimpieza: "Cleanliness",
+    categoryComodidad: "Comfort",
+    categoryComunicacion: "Communication",
+    categoryFallas: "Technical Failures",
+    categorySaturacion: "Saturation",
 
     // Heatmap Legend
-    intensityPHI: "Intensidad PHI",
-    criticalLevel: "Crítico",
-    alertLevel: "Alerta",
-    optimalLevel: "Óptimo",
-    editMode: "Modo Edición",
-    editNodes: "Editar Nodos",
+    intensityPHI: "PHI Intensity",
+    criticalLevel: "Critical",
+    alertLevel: "Alert",
+    optimalLevel: "Optimal",
+    editMode: "Edit Mode",
+    editNodes: "Edit Nodes",
+
+    // Map and UI Text
+    centerView: "Center View",
+    heatmapIntensity: "Intensity of color:",
+    lowSeverity: "Low severity",
+    mediumSeverity: "Medium severity",
+    highSeverity: "High severity",
+    areaSize: "Area size:",
+    largerArea: "Larger area = more reports",
+    noLinesMap: "No lines on the map",
+    startImporting: "Start by importing an SVG or JSON file with metro lines",
+    goToImport: "Go to Import Map",
+    mainCategories: "Main Categories",
+    trends: "Trends",
+    lastComments: "Latest Comments (Station):",
+    noRecentComments: "No recent comments",
+    dominantKeywords: "Dominant Keywords",
+    noData: "No data",
+    reports: "Reports",
+    index: "Index",
+    severity: "Severity",
+    noLinesMessage: "No lines on the map",
+    noLinesDescription: "Start by importing an SVG or JSON file with metro lines",
+
+    // Import buttons
+    importJSON: "Import JSON",
+    detectBackend: "Detect (Backend)",
+
+    // Trends dashboard
+    historical: "Historical",
+    last7Days: "Last 7 days",
+    last30Days: "Last 30 days",
+    unknown: "Unknown",
+    top5CriticalStations: "Top 5 Critical Stations",
+    distributionByLine: "Distribution by Line",
+    complaints: "Complaints",
+    complaintVolume: "Complaint Volume (Seismograph)",
+    seismograph: "Seismograph",
 
     // Footer
     footer:
-      "Dashboard PHI v3.0 • Análisis Predictivo • Comparación Internacional • NLP en tiempo real",
+      "PHI Dashboard v3.0 • Predictive Analysis • International Comparison • Real-time NLP",
   },
 
   vienna: {
     // Header
-    headerTitle: "🚇 PHI Dashboard - U-Bahn Wien",
+    headerTitle: "🚇 PHI-Dashboard - U-Bahn Wien",
     headerSubtitle: "NLP-Analysesystem",
     cityName: "Wien",
 
@@ -289,14 +364,14 @@ export const translations: Record<City, Translations> = {
     average: "Durchschnitt",
 
     // Navigation Tabs
-    heatmap: "Heatmap",
-    importSVG: "SVG Importieren",
+    heatmap: "Wärmekarte",
+    importSVG: "Importieren",
     indicators: "Indikatoren",
     predictive: "Prädiktiv",
     comparison: "Vergleich",
 
     // Heatmap
-    heatmapTitle: "PHI Heatmap",
+    heatmapTitle: "PHI Wärmekarte",
     allLines: "Alle Linien",
     line: "Linie",
     intensity: "Intensität",
@@ -313,13 +388,13 @@ export const translations: Record<City, Translations> = {
     cleanliness: "Sauberkeit",
 
     // Days of week
-    monday: "Mon",
-    tuesday: "Die",
-    wednesday: "Mit",
-    thursday: "Don",
-    friday: "Fre",
-    saturday: "Sam",
-    sunday: "Son",
+    monday: "Mo",
+    tuesday: "Di",
+    wednesday: "Mi",
+    thursday: "Do",
+    friday: "Fr",
+    saturday: "Sa",
+    sunday: "So",
 
     // Predictive
     predictiveTitle: "Prädiktive Konfliktanalyse (24h)",
@@ -338,7 +413,7 @@ export const translations: Record<City, Translations> = {
 
     // Station Info
     stationInfo: "Stationsinformationen",
-    predominantWord: "🔥 VORHERRSCHENDES WORT",
+    predominantWord: "🔥 DOMINANTE SCHLÜSSELWÖRTER",
     mentions: "Erwähnungen",
 
     // Category Weights
@@ -403,9 +478,47 @@ export const translations: Record<City, Translations> = {
     editMode: "Bearbeitungsmodus",
     editNodes: "Knoten Bearbeiten",
 
+    // Map and UI Text
+    centerView: "Ansicht Zentrieren",
+    heatmapIntensity: "Farbintensität:",
+    lowSeverity: "Geringe Schweregrad",
+    mediumSeverity: "Mittlerer Schweregrad",
+    highSeverity: "Hoher Schweregrad",
+    areaSize: "Gebietsgröße:",
+    largerArea: "Größeres Gebiet = mehr Berichte",
+    noLinesMap: "Keine Linien auf der Karte",
+    startImporting: "Beginnen Sie mit dem Importieren einer SVG- oder JSON-Datei mit U-Bahn-Linien",
+    goToImport: "Zur Karteneinfuhr gehen",
+    mainCategories: "Hauptkategorien",
+    trends: "Trends",
+    lastComments: "Neueste Kommentare (Station):",
+    noRecentComments: "Keine aktuellen Kommentare",
+    dominantKeywords: "Dominante Schlüsselwörter",
+    noData: "Keine Daten",
+    reports: "Berichte",
+    index: "Index",
+    severity: "Schweregrad",
+    noLinesMessage: "Keine Linien auf der Karte",
+    noLinesDescription: "Beginnen Sie mit dem Importieren einer SVG- oder JSON-Datei mit U-Bahn-Linien",
+
+    // Import buttons
+    importJSON: "JSON importieren",
+    detectBackend: "Erkennen (Backend)",
+
+    // Trends dashboard
+    historical: "Historisch",
+    last7Days: "Letzte 7 Tage",
+    last30Days: "Letzte 30 Tage",
+    unknown: "Unbekannt",
+    top5CriticalStations: "Top 5 kritische Stationen",
+    distributionByLine: "Verteilung nach Linie",
+    complaints: "Beschwerden",
+    complaintVolume: "Beschwerdevolumen (Seismograph)",
+    seismograph: "Seismograph",
+
     // Footer
     footer:
-      "PHI Dashboard v3.0 • Prädiktive Analyse • Internationaler Vergleich • Echtzeit-NLP",
+      "PHI-Dashboard v3.0 • Prädiktive Analyse • Internationaler Vergleich • Echtzeit-NLP",
   },
 };
 

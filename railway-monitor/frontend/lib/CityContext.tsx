@@ -8,6 +8,7 @@ interface CityContextType {
     language: Language;
     translations: Translations;
     toggleCity: () => void;
+    toggleLanguage: () => void;
 }
 
 const CityContext = createContext<CityContextType | undefined>(undefined);
@@ -15,15 +16,19 @@ const CityContext = createContext<CityContextType | undefined>(undefined);
 export const CityProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [city, setCity] = useState<City>('cdmx');
 
-    const language: Language = city === 'cdmx' ? 'es' : 'de';
+    const language: Language = city === 'cdmx' ? 'en' : 'de';
     const translations = getTranslations(city);
 
     const toggleCity = () => {
         setCity(prevCity => prevCity === 'cdmx' ? 'vienna' : 'cdmx');
     };
 
+    const toggleLanguage = () => {
+        setCity(prevCity => prevCity === 'cdmx' ? 'vienna' : 'cdmx');
+    };
+
     return (
-        <CityContext.Provider value={{ city, language, translations, toggleCity }}>
+        <CityContext.Provider value={{ city, language, translations, toggleCity, toggleLanguage }}>
             {children}
         </CityContext.Provider>
     );

@@ -132,7 +132,7 @@ const PHIComparison: React.FC = () => {
                                 {/* Progress bar */}
                                 <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                                        className="h-full bg-blue-500"
                                         style={{
                                             width: `${(cat.impact / data.categoryBreakdown[0].impact) * 100}%`,
                                         }}
@@ -149,7 +149,7 @@ const PHIComparison: React.FC = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
+            <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                     <Activity className="w-7 h-7" />
                     Índice de Felicidad del Pasajero (PHI) Global
@@ -166,7 +166,7 @@ const PHIComparison: React.FC = () => {
             </div>
 
             {/* Comparison Summary */}
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200">
+            <div className="bg-gray-100 rounded-2xl p-6 border-2 border-gray-200">
                 <div className="flex items-center justify-center gap-4">
                     <div className="text-center">
                         <div className="text-sm text-gray-600 mb-1">Diferencia</div>
