@@ -146,7 +146,6 @@ def find_best_match(detected_name: str, station_map: dict, threshold: float = 0.
 from difflib import SequenceMatcher
 from typing import Dict, List, Optional, Tuple
 
-
 def similarity_ratio(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
