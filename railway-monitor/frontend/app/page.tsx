@@ -245,46 +245,175 @@ function DashboardContent() {
           <div className="space-y-6">
             <StationInfo station={selectedStation} />
 
-            {!selectedStation && (
-              <>
-                {/* Categorías de incidentes */}
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
-                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-purple-600" />
-                    {translations.mainCategories}
-                  </h3>
-                  <div className="space-y-3">
-                    {CATEGORIES.slice(0, 5).map((category, idx) => (
-                      <div key={category.id} className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <category.icon
-                              className="w-3 h-3"
-                              style={{ color: category.color }}
-                            />
-                            <span className="text-xs text-gray-700 font-medium">
-                              {getCategoryName(category.id)}
-                            </span>
+            <>
+              {/* Sección de Recomendaciones Inteligentes */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 shadow-sm">
+                {(() => {
+                  // 1. Lógica para encontrar la categoría con mayor porcentaje de incidentes
+                  const maxPercentage = Math.max(...categoryPercentages);
+                  const maxIndex = categoryPercentages.indexOf(maxPercentage);
+                  const topCategory = CATEGORIES[maxIndex];
+                  {/* Sección de Recomendaciones Inteligentes */ }
+                  <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 shadow-sm">
+                    {(() => {
+                      // Guardia de seguridad para carga inicial
+                      if (!categoryPercentages || !categoryPercentages.length) {
+                        return <div className="animate-pulse h-24 bg-purple-50/50 rounded-xl"></div>;
+                      }
+
+                      const maxPercentage = Math.max(...categoryPercentages);
+                      const maxIndex = categoryPercentages.indexOf(maxPercentage);
+                      const topCategory = CATEGORIES[maxIndex];
+
+                      if (!topCategory) return null;
+
+                      // CORRECCIÓN AQUÍ: Definimos explícitamente el tipo Record<string, ...>
+                      // Esto permite que 'topCategory.id' pueda usarse como índice sin errores.
+                      const RECOMMENDATIONS: Record<string, { title: string; text: string }> = {
+                        security: {
+                          title: "Reforzar la Seguridad",
+                          text: "Se detectó un alto índice de incidentes de seguridad. Se recomienda aumentar la vigilancia, revisar cámaras y mejorar la iluminación en zonas críticas."
+                        },
+                        punctuality: {
+                          title: "Optimización de Tiempos",
+                          text: "La puntualidad es el mayor problema actual. Se sugiere revisar la planificación de rutas, tiempos de despacho y posibles cuellos de botella."
+                        },
+                        cleanliness: {
+                          title: "Protocolo de Limpieza",
+                          text: "Los reportes indican problemas de higiene. Se recomienda incrementar la frecuencia de limpieza y auditar el estado de las unidades."
+                        },
+                        comfort: {
+                          title: "Mejora de Confort",
+                          text: "Los usuarios reportan incomodidad. Revisar el estado de los asientos, aire acondicionado y ergonomía general."
+                        },
+                        communication: {
+                          title: "Canales de Comunicación",
+                          text: "Fallas en la comunicación detectadas. Es necesario capacitar al personal en atención al cliente y verificar canales."
+                        },
+                        default: {
+                          title: "Análisis General Requerido",
+                          text: "Se recomienda realizar una auditoría general para identificar puntos de mejora específicos."
+                        }
+                      };
+
+                      // Ahora TypeScript aceptará cualquier string o 'any' como índice
+                      const currentRec = RECOMMENDATIONS[topCategory.id] || RECOMMENDATIONS.default;
+
+                      return (
+                        <div className="space-y-4">
+                          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                              <topCategory.icon
+                                className="w-5 h-5"
+                                style={{ color: topCategory.color }}
+                              />
+                            </div>
+                            <span>Recomendación Prioritaria: {getCategoryName(topCategory.id)}</span>
+                          </h3>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-purple-100">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-1">
+                                <h4 className="text-sm font-bold text-gray-800 mb-1">
+                                  {currentRec.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  {currentRec.text}
+                                </p>
+                              </div>
+                              <div className="flex flex-col items-center justify-center bg-white px-3 py-2 rounded-lg border border-gray-100 shadow-sm">
+                                <span className="text-lg font-bold" style={{ color: topCategory.color }}>
+                                  {maxPercentage}%
+                                </span>
+                                <span className="text-[10px] text-gray-400 uppercase font-bold">Crítico</span>
+                              </div>
+                            </div>
                           </div>
-                          <span className="text-xs font-bold text-gray-900">
-                            {categoryPercentages[idx] || 0}%
-                          </span>
+
+                          <button className="w-full py-2 text-xs font-medium text-purple-700 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors">
+                            Ver detalles de {getCategoryName(topCategory.id)}
+                          </button>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="h-2 rounded-full transition-all"
-                            style={{
-                              width: `${categoryPercentages[idx] || 0}%`,
-                              backgroundColor: category.color,
-                            }}
+                      );
+                    })()}
+                  </div>
+                  // 2. Diccionario de recomendaciones según la categoría (puedes editar los textos aquí)
+                  const RECOMMENDATIONS = {
+                    security: {
+                      title: "Reforzar la Seguridad",
+                      text: "Se detectó un alto índice de incidentes de seguridad. Se recomienda aumentar la vigilancia, revisar cámaras y mejorar la iluminación en zonas críticas."
+                    },
+                    punctuality: {
+                      title: "Optimización de Tiempos",
+                      text: "La puntualidad es el mayor problema actual. Se sugiere revisar la planificación de rutas, tiempos de despacho y posibles cuellos de botella en la operación."
+                    },
+                    cleanliness: {
+                      title: "Protocolo de Limpieza",
+                      text: "Los reportes indican problemas de higiene. Se recomienda incrementar la frecuencia de limpieza y auditar el estado de las unidades o instalaciones."
+                    },
+                    comfort: {
+                      title: "Mejora de Confort",
+                      text: "Los usuarios reportan incomodidad. Revisar el estado de los asientos, aire acondicionado y ergonomía general del servicio."
+                    },
+                    communication: {
+                      title: "Canales de Comunicación",
+                      text: "Fallas en la comunicación detectadas. Es necesario capacitar al personal en atención al cliente y verificar los canales de reporte."
+                    },
+                    // Fallback por defecto si el ID no coincide
+                    default: {
+                      title: "Análisis General Requerido",
+                      text: "Se recomienda realizar una auditoría general para identificar puntos de mejora específicos."
+                    }
+                  };
+
+                  // 3. Obtener la recomendación actual basada en el ID de la categoría top
+                  // Asegúrate de que tus CATEGORIES tengan ids como 'security', 'punctuality', etc.
+                  // Si usan otros IDs, ajusta las claves del objeto RECOMMENDATIONS arriba.
+                  const currentRec = RECOMMENDATIONS[topCategory?.id] || RECOMMENDATIONS.default;
+
+                  return (
+                    <div className="space-y-4">
+                      {/* Encabezado */}
+                      <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                          <topCategory.icon
+                            className="w-5 h-5"
+                            style={{ color: topCategory.color }}
                           />
                         </div>
+                        <span>Recomendación Prioritaria: {getCategoryName(topCategory.id)}</span>
+                      </h3>
+
+                      {/* Tarjeta de Acción */}
+                      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-purple-100">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-1">
+                            <h4 className="text-sm font-bold text-gray-800 mb-1">
+                              {currentRec.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              {currentRec.text}
+                            </p>
+                          </div>
+                          {/* Indicador de porcentaje circular pequeño */}
+                          <div className="flex flex-col items-center justify-center bg-white px-3 py-2 rounded-lg border border-gray-100 shadow-sm">
+                            <span className="text-lg font-bold" style={{ color: topCategory.color }}>
+                              {maxPercentage}%
+                            </span>
+                            <span className="text-[10px] text-gray-400 uppercase font-bold">Crítico</span>
+                          </div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
+
+                      {/* Botón de acción sugerido (Opcional) */}
+                      <button className="w-full py-2 text-xs font-medium text-purple-700 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors">
+                        Ver detalles de {getCategoryName(topCategory.id)}
+                      </button>
+                    </div>
+                  );
+                })()}
+              </div>
+            </>
           </div>
         </div>
 
