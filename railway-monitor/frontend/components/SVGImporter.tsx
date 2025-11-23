@@ -313,10 +313,13 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       } else {
         throw new Error("Formato de respuesta inválido");
       }
-
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert(`Error al procesar la imagen: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      alert(
+        `Error al procesar la imagen: ${
+          error instanceof Error ? error.message : "Error desconocido"
+        }`
+      );
     } finally {
       setIsProcessing(false);
       // Limpiar input para permitir subir el mismo archivo de nuevo si falla
@@ -721,58 +724,21 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           {translations.importTransportLine}
         </h2>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-xs text-gray-600 mb-1">
-              {translations.lineName}
-            </label>
-            <input
-              type="text"
-              value={lineName}
-              onChange={(e) => setLineName(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-300 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder={translations.lineNamePlaceholder}
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-600 mb-1">
-              {translations.lineColor}
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="color"
-                value={lineColor}
-                onChange={(e) => setLineColor(e.target.value)}
-                className="w-12 h-9 rounded cursor-pointer border border-gray-300"
-              />
-              <input
-                type="text"
-                value={lineColor}
-                onChange={(e) => setLineColor(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-gray-100 border border-gray-300 text-sm text-gray-900"
-              />
-            </div>
-          </div>
-        </div>
-
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-500 transition-colors">
           <input
             type="file"
-            accept=".svg"
             onChange={handleFileUpload}
             className="hidden"
             id="svg-upload"
           />
           <input
             type="file"
-            accept=".json"
             onChange={handleJSONUpload}
             className="hidden"
             id="json-upload"
           />
           <input
             type="file"
-            accept=".png,.jpg,.jpeg"
             onChange={handleImageUpload}
             className="hidden"
             id="image-upload"
@@ -805,7 +771,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             >
               <span>📥</span> Importar JSON
             </label>
-            
+
             <label
               htmlFor="image-upload"
               className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"

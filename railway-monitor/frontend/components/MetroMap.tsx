@@ -236,7 +236,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mx-auto"
               >
                 <span className="text-lg">📁</span>
-                Ir a Importar SVG
+                Ir a Importar el mapa
               </button>
             )}
           </div>

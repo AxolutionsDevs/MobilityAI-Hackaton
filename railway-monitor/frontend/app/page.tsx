@@ -15,16 +15,12 @@ import {
   Globe,
   Map,
   ThumbsUp,
-  TrendingUp,
   Upload,
   Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
-  CartesianGrid,
   Legend,
-  Line,
-  LineChart,
   PolarAngleAxis,
   PolarGrid,
   PolarRadiusAxis,
@@ -32,8 +28,6 @@ import {
   RadarChart,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
 } from "recharts";
 
 function DashboardContent() {
@@ -42,7 +36,7 @@ function DashboardContent() {
   const [customLines, setCustomLines] = useState<CustomLine[]>([]);
   const [selectedStation, setSelectedStation] = useState<any>(null);
   const [activeView, setActiveView] = useState<
-    "heatmap" | "import" | "indicators" | "predictive" | "comparison" | "trends"
+    "heatmap" | "import" | "indicators" | "comparison" | "trends"
   >("heatmap");
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
@@ -138,7 +132,6 @@ function DashboardContent() {
   // Radar chart data for category comparison
   const [radarData, setRadarData] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
-  const [predictiveData, setPredictiveData] = useState<any[]>([]);
   const [categoryPercentages, setCategoryPercentages] = useState<number[]>([]);
 
   useEffect(() => {
@@ -169,17 +162,6 @@ function DashboardContent() {
       }))
     );
 
-    // Initialize predictive data
-    setPredictiveData(
-      Array.from({ length: 24 }, (_, i) => ({
-        hour: `${i}:00`,
-        conflictos: Math.floor(
-          Math.random() * 30 + (i > 7 && i < 20 ? 40 : 10)
-        ),
-        riesgo: Math.floor(Math.random() * 20 + (i > 7 && i < 20 ? 50 : 20)),
-      }))
-    );
-
     // Initialize category percentages for dashboard
     setCategoryPercentages(
       CATEGORIES.map(() => Math.floor(Math.random() * 30 + 10))
@@ -190,7 +172,6 @@ function DashboardContent() {
     () => [
       { id: "heatmap", label: translations.heatmap, icon: Map },
       { id: "import", label: translations.importSVG, icon: Upload },
-      { id: "predictive", label: translations.predictive, icon: TrendingUp },
       { id: "comparison", label: translations.comparison, icon: Globe },
       { id: "trends", label: "Tendencias", icon: Activity },
     ],
@@ -264,56 +245,6 @@ function DashboardContent() {
 
             {activeView === "import" && (
               <SVGImporter onSave={handleSaveCustomLine} />
-            )}
-
-            {activeView === "predictive" && (
-              <div className="p-6 rounded-2xl bg-gray-100 border border-gray-300">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  {translations.predictiveTitle}
-                </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={predictiveData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
-                    <XAxis dataKey="hour" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="conflictos"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={{ fill: "#ef4444", r: 4 }}
-                      name={translations.projectedConflicts}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="riesgo"
-                      stroke="#f59e0b"
-                      strokeWidth={2}
-                      dot={{ fill: "#f59e0b", r: 4 }}
-                      name={translations.riskLevel}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-                <div className="mt-4 p-4 rounded-xl bg-red-100 border border-red-300">
-                  <h4 className="text-sm font-semibold text-red-600 mb-2">
-                    {translations.aiRecommendations}
-                  </h4>
-                  <ul className="text-xs text-gray-700 space-y-1">
-                    <li>{translations.recommendation1}</li>
-                    <li>{translations.recommendation2}</li>
-                    <li>{translations.recommendation3}</li>
-                  </ul>
-                </div>
-              </div>
             )}
 
             {activeView === "comparison" && (

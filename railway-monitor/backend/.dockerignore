@@ -1,0 +1,47 @@
+# Archivos de Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist
+build
+
+# Entornos virtuales
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Imágenes grandes (si las tienes, déjalas fuera o cópialas solo si es necesario)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+# Git
+.git
+.gitignore
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# Documentación
+README.md
+*.md
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+.cache/
