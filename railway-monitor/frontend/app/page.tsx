@@ -1,6 +1,7 @@
 "use client";
 
 import MetroMap from "@/components/MetroMap";
+import ComparisonView from "@/components/comparison/ComparisonView";
 import Header from "@/components/sections/Header";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
@@ -21,11 +22,6 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import {
   Legend,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
@@ -130,20 +126,10 @@ function DashboardContent() {
   };
 
   // Radar chart data for category comparison
-  const [radarData, setRadarData] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
   const [categoryPercentages, setCategoryPercentages] = useState<number[]>([]);
 
   useEffect(() => {
-    // Initialize radar data
-    setRadarData(
-      CATEGORIES.map((cat) => ({
-        category: getCategoryName(cat.id),
-        mexico: Math.floor(Math.random() * 40 + 50),
-        austria: Math.floor(Math.random() * 30 + 65),
-      }))
-    );
-
     // Initialize trend data
     setTrendData(
       Array.from({ length: 7 }, (_, i) => ({
@@ -189,11 +175,10 @@ function DashboardContent() {
             <button
               key={tab.id}
               onClick={() => setActiveView(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl transition-all ${
-                activeView === tab.id
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900"
-              }`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl transition-all ${activeView === tab.id
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900"
+                }`}
             >
               <tab.icon className="w-5 h-5" />
               <span className="text-sm font-semibold">{tab.label}</span>
@@ -247,60 +232,7 @@ function DashboardContent() {
               <SVGImporter onSave={handleSaveCustomLine} />
             )}
 
-            {activeView === "comparison" && (
-              <div className="p-6 rounded-2xl bg-gray-100 border border-gray-300">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                  <Globe className="w-5 h-5 text-blue-600" />
-                  {translations.internationalComparison}
-                </h3>
-                <ResponsiveContainer width="100%" height={350}>
-                  <RadarChart data={radarData}>
-                    <PolarGrid stroke="#d1d5db" />
-                    <PolarAngleAxis
-                      dataKey="category"
-                      tick={{ fill: "#6b7280", fontSize: 11 }}
-                    />
-                    <PolarRadiusAxis angle={90} domain={[0, 100]} />
-                    <Radar
-                      name={translations.metroCDMX}
-                      dataKey="mexico"
-                      stroke="#e91e8b"
-                      fill="#e91e8b"
-                      fillOpacity={0.6}
-                    />
-                    <Radar
-                      name={translations.metroVienna}
-                      dataKey="austria"
-                      stroke="#10b981"
-                      fill="#10b981"
-                      fillOpacity={0.6}
-                    />
-                    <Legend />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="p-3 rounded-xl bg-pink-100 border border-pink-300">
-                    <div className="text-xs text-gray-600 mb-1">
-                      🇲🇽 {translations.metroCDMX}
-                    </div>
-                    <div className="text-2xl font-bold text-pink-600">--</div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-green-100 border border-green-300">
-                    <div className="text-xs text-gray-600 mb-1">
-                      🇦🇹 {translations.metroVienna}
-                    </div>
-                    <div className="text-2xl font-bold text-green-600">--</div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {activeView === "comparison" && <ComparisonView />}
 
             {activeView === "trends" && <TrendsDashboard />}
           </div>
