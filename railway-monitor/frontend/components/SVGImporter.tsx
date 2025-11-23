@@ -276,6 +276,54 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
     }
   };
 
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar que sea imagen
+    if (!file.type.startsWith("image/")) {
+      alert("Por favor selecciona un archivo de imagen válido.");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("http://localhost:8000/detect-stations", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Error en el servidor");
+      }
+
+      const data = await response.json();
+      console.log("Respuesta del backend:", data);
+
+      if (data.success && Array.isArray(data.lines)) {
+        // Adaptar respuesta del backend al formato esperado por importMultipleLinesFromJSON
+        // El backend devuelve 'lines' con 'stations' que tienen x, y, name
+        // No devuelve 'paths' ni 'viewBox' explícito, se calculará
+        importMultipleLinesFromJSON(data.lines);
+        alert(data.message || "Detección completada exitosamente");
+      } else {
+        throw new Error("Formato de respuesta inválido");
+      }
+
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert(`Error al procesar la imagen: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    } finally {
+      setIsProcessing(false);
+      // Limpiar input para permitir subir el mismo archivo de nuevo si falla
+      e.target.value = "";
+    }
+  };
+
   const importMultipleLinesFromJSON = (linesData: any[]) => {
     setIsProcessing(true);
     try {
@@ -722,6 +770,13 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             className="hidden"
             id="json-upload"
           />
+          <input
+            type="file"
+            accept=".png,.jpg,.jpeg"
+            onChange={handleImageUpload}
+            className="hidden"
+            id="image-upload"
+          />
           <label htmlFor="svg-upload" className="cursor-pointer block mb-3">
             <div className="text-4xl mb-2">📁</div>
             <div className="text-sm font-medium text-gray-700">
@@ -743,12 +798,21 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             </div>
           </div>
 
-          <label
-            htmlFor="json-upload"
-            className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto w-fit"
-          >
-            <span>📥</span> Importar JSON
-          </label>
+          <div className="flex justify-center gap-2">
+            <label
+              htmlFor="json-upload"
+              className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+            >
+              <span>📥</span> Importar JSON
+            </label>
+            
+            <label
+              htmlFor="image-upload"
+              className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+            >
+              <span>🖼️</span> Detectar (Backend)
+            </label>
+          </div>
         </div>
 
         {isProcessing && (

@@ -163,7 +163,7 @@
     },
     {
         "id": 18,
-        "nombre": "Lomas Estrell:",
+        "nombre": "Lomas Estrella",
         "coords": {
             "x": 1952,
             "y": 2700
@@ -1375,5 +1375,14 @@
             "y": 2306
         },
         "radio": 11
+    },
+    {
+        "nombre": "Cerro de la Estrella",
+        "coords": {
+            "x": 800,
+            "y": 959.33
+        },
+        "radio": 10,
+        "id": 153
     }
 ]
