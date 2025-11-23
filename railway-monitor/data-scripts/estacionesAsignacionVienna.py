@@ -2,7 +2,7 @@ import pandas as pd
 import random
 
 # ================= CONFIGURACIÓN DE ARCHIVOS =================
-archivo_entrada = 'datasets/customer-Emails_Espanol_5000.xlsx'
+archivo_entrada = 'datasets/Kundenemails-deutsch_5000.xlsx'
 archivo_salida = 'datasets/Dataset_Vienna_Final.xlsx'
 
 print(f"--- Iniciando proceso para Metro de Viena (U-Bahn) ---")
@@ -58,34 +58,98 @@ metro_vienna_map = {
 # Las CLAVES están en Alemán (para que el reporte salga en alemán).
 # Los VALORES incluyen palabras en Español (para detectar en tus emails) y Alemán.
 reglas_detalle = {
-    "Diebstahl (Robo)": ["robo", "asalto", "cartera", "celular", "ladrón", "quitaron", "bolsearon", "sustrajeron", "diebstahl", "taschendieb", "gestohlen"],
-    "Belästigung (Acoso)": ["acoso", "tocamiento", "mirbos", "morboso", "mujer", "insegura", "perseguir","agresivo","piropos", "belästigung", "verfolgt", "unsicher"],
-    "Vandalismus (Vandalismo)": ["vandalismo", "graffiti", "rayado", "vidrio roto", "destrucción", "daño", "vandalismus", "beschädigung", "zerstört"],
-    "Mangelnde Sicherheit (Seguridad)": ["vigilancia", "policia", "guardia", "seguridad", "solos", "nadie cuida","reservado","discapacidad","sospechoso","respuesta", "sicherheit", "polizei"],
-    
-    "Defekte Aufzüge/Rolltreppen": ["escalera", "electrica", "no sirve", "subir", "bajar", "descompuesta", "rampa", "aufzug", "lift", "rolltreppe", "defekt"],
-    "Verschmutzung (Suciedad)": ["basura", "sucio", "cochino", "limpieza", "desperdicio", "mancha", "mugre", "schmutzig", "müll", "dreckig"],
-    "Wasserschaden (Fugas)": ["fuga", "agua", "goteo", "charco", "mojado", "inundado", "lluvia", "wasser", "undicht"],
-    "Beleuchtungsausfall (Iluminación)": ["iluminacion", "luz", "oscuro", "foco", "lampara", "alumbrado", "apagado", "licht", "dunkel", "beleuchtung"],
-    "Entwerter Probleme (Validadores)": ["torniquete", "acceso", "tarjeta", "validador", "entrada", "no lee", "entwerter", "ticket", "fahrschein"],
-    
-    "Verspätung (Retrasos)": ["retraso", "tarde", "hora", "demora", "tiempo", "espera", "llegar", "cancelación", "meteorológicas", "verspätung", "spät", "warten"],
-    "Langsame Fahrt (Tren lento)": ["lento", "parado", "no avanza", "tortuga", "detenido", "velocidad","climático", "langsam", "steht"],
-    "Überfüllung (Saturación)": ["saturación", "lleno", "gente", "empujones", "caber", "apretados", "full","cancelación", "voll", "überfüllt", "gedränge"],
-    "Ruppige Fahrweise (Conducción)": ["brusca", "frenón", "golpe", "jalón", "conductor", "maneja mal", "bremsen", "fahrer"],
-    
-    "Hitze (Calor)": ["calor", "horno", "sudor", "temperatura", "infierno", "caliente","meteorológicas", "heiß", "hitze", "warm"],
-    "Schlechte Belüftung (Aire)": ["aire", "asfixia", "respirar", "ventilación", "ahogo", "sofocado","meteorológicas", "luft", "atmen", "stickig"],
-    "Geruchsbelästigung (Mal olor)": ["olor", "peste", "huele", "apesta", "podrido", "hedor","suciedad","papeleras", "stinkt", "geruch"],
-    "Lärm (Ruido)": ["ruido", "bocina", "gritos", "fuerte", "escándalo", "sonido", "laut", "lärm", "geräusch"],
-    
-    "Unfreundliches Personal": ["grosero", "actitud", "déspota", "trato", "malo", "gritó", "educación","reembolso", "personal", "unfreundlich", "mitarbeiter"],
-    "Geschlossene Schalter": ["taquilla", "cerrada", "boleto", "nadie atiende", "venta","billete", "schalter", "geschlossen"],
-    "Automaten defekt": ["máquina", "recarga", "traga", "moneda", "dinero", "servicio", "automat", "kaputt", "funktioniert nicht"],
-    "Fehlende Beschilderung": ["señalización", "letrero", "mapa", "perderse", "indicación","asignado","informacion","informativos","anuncios","guías", "schild", "orientierung"],
-    "Allgemeine Beschwerde": ["comprado", "perdido","accidental", "queja", "problema"]
+    "Diebstahl (Robo)": [
+        "diebstahl", "raub", "überfall", "brieftasche", "geldbörse", "portemonnaie", 
+        "handy", "smartphone", "dieb", "weggenommen", "bestohlen", "entwendet", 
+        "taschendieb", "gestohlen", "geklaut"
+    ],
+    "Belästigung (Acoso)": [
+        "belästigung", "anfassen", "berührung", "angrabschen", "anstarren", "gaffen", 
+        "lüstern", "obszön", "frau", "unsicher", "verfolgen", "verfolgt", "aggressiv", 
+        "anmache", "aufdringlich"
+    ],
+    "Vandalismus (Vandalismo)": [
+        "vandalismus", "graffiti", "geschmiere", "zerkratzt", "glasbruch", "scheibe kaputt", 
+        "zerstörung", "schaden", "beschädigung", "zerstört", "randale"
+    ],
+    "Mangelnde Sicherheit (Seguridad)": [
+        "überwachung", "polizei", "wachmann", "sicherheitsdienst", "sicherheit", "alleine", 
+        "unbewacht", "niemand da", "reserviert", "behinderung", "verdächtig", 
+        "reaktion", "hilfe", "schutz"
+    ],
+    "Defekte Aufzüge/Rolltreppen": [
+        "rolltreppe", "aufzug", "fahrstuhl", "lift", "funktioniert nicht", "außer betrieb", 
+        "hochfahren", "runterfahren", "kaputt", "rampe", "defekt", "störung"
+    ],
+    "Verschmutzung (Suciedad)": [
+        "abfall", "müll", "schmutzig", "dreckig", "sauberkeit", "reinigung", 
+        "verschwendung", "fleck", "dreck", "verunreinigung", "eklig"
+    ],
+    "Wasserschaden (Fugas)": [
+        "leck", "wasser", "tropfen", "pfütze", "nass", "überschwemmung", 
+        "überflutet", "regen", "undicht", "feucht", "rohrbruch"
+    ],
+    "Beleuchtungsausfall (Iluminación)": [
+        "beleuchtung", "licht", "dunkel", "birne", "glühbirne", "lampe", 
+        "laterne", "ausgeschaltet", "aus", "dunkelheit", "finsternis"
+    ],
+    "Entwerter Probleme (Validadores)": [
+        "drehkreuz", "sperre", "zugang", "karte", "ticket", "fahrschein", 
+        "entwerter", "lesegerät", "eingang", "liest nicht", "lesefehler", "ungültig"
+    ],
+    "Verspätung (Retrasos)": [
+        "verspätung", "zu spät", "uhrzeit", "verzögerung", "dauer", "zeit", 
+        "wartezeit", "ankunft", "ausfall", "stornierung", "wetter", "warten"
+    ],
+    "Langsame Fahrt (Tren lento)": [
+        "langsam", "steht", "bewegt sich nicht", "schneckentempo", "angehalten", 
+        "geschwindigkeit", "bummelzug", "stau", "stockend"
+    ],
+    "Überfüllung (Saturación)": [
+        "überfüllung", "saturierung", "voll", "menschen", "leute", "gedränge", 
+        "schubsen", "reinpassen", "eingequetscht", "kein platz", "überfüllt"
+    ],
+    "Ruppige Fahrweise (Conducción)": [
+        "ruppig", "bremsen", "vollbremsung", "stoß", "ruck", "fahrer", 
+        "fährt schlecht", "schlechter fahrstil", "wackelig"
+    ],
+    "Hitze (Calor)": [
+        "hitze", "heiß", "warm", "backofen", "schweiß", "schwitzen", 
+        "temperatur", "hölle", "sauna", "klima"
+    ],
+    "Schlechte Belüftung (Aire)": [
+        "luft", "ersticken", "atmen", "lüftung", "ventilation", "atemnot", 
+        "erstickt", "stickig", "schlechte luft"
+    ],
+    "Geruchsbelästigung (Mal olor)": [
+        "geruch", "gestank", "stinkt", "riecht", "mief", "verfault", 
+        "übel", "mülleimer", "abfalleimer"
+    ],
+    "Lärm (Ruido)": [
+        "lärm", "ruido", "hupe", "geschrei", "schreie", "laut", 
+        "skandal", "krach", "geräusch", "lautsprecher"
+    ],
+    "Unfreundliches Personal": [
+        "unfreundlich", "grob", "unhöflich", "einstellung", "verhalten", "herrisch", 
+        "behandlung", "schlecht", "geschrien", "erziehung", "rückerstattung", "mitarbeiter", "personal"
+    ],
+    "Geschlossene Schalter": [
+        "schalter", "kasse", "geschlossen", "zu", "ticketverkauf", "niemand bedient", 
+        "verkauf", "fahrkarte", "nicht besetzt"
+    ],
+    "Automaten defekt": [
+        "automat", "fahrkartenautomat", "aufladung", "schluckt", "münze", 
+        "geld", "service", "kaputt", "funktioniert nicht", "außer betrieb"
+    ],
+    "Fehlende Beschilderung": [
+        "beschilderung", "schild", "netzplan", "karte", "verlaufen", "orientierung", 
+        "hinweis", "information", "durchsage", "ansage", "wegweiser", "anzeige"
+    ],
+    "Allgemeine Beschwerde": [
+        "gekauft", "verloren", "versehentlich", "unfall", "beschwerde", 
+        "reklamation", "problem", "allgemein"
+    ]
 }
-
 print("Procesando filas (Asignando Estaciones de Viena + Analizando Asunto)...")
 
 nombres_est = []

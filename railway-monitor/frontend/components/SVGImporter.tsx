@@ -1,7 +1,7 @@
 "use client";
 
 import { useCity } from "@/lib/CityContext";
-import { PALABRAS_CLAVE } from "@/lib/constants";
+import { getKeywords } from "@/lib/constants";
 import { DetectedNode, SVGPath } from "@/types";
 import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
 
@@ -132,7 +132,7 @@ interface SVGImporterProps {
 }
 
 const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
-  const { translations } = useCity();
+  const { translations, city } = useCity();
   const [lineName, setLineName] = useState("Nueva Línea");
   const [lineColor, setLineColor] = useState("#e91e8b");
   const [importedSVG, setImportedSVG] = useState<string | null>(null);
@@ -142,6 +142,9 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
   const [svgViewBox, setSvgViewBox] = useState("0 0 800 600");
   const [svgPaths, setSvgPaths] = useState<SVGPath[]>([]);
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+
+  // Obtener palabras clave según la ciudad
+  const palabrasClave = getKeywords(city);
 
   // Estados para zoom y pan
   const [zoom, setZoom] = useState(1);
@@ -193,14 +196,14 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           c.getAttribute("cy") || c.getAttribute("y") || "0"
         );
         const randomCatKey =
-          Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
+          Object.keys(palabrasClave)[Math.floor(Math.random() * 7)];
         nodes.push({
           id: `node-${i}`,
           x: cx,
           y: cy,
           name: `Estación ${i + 1}`,
           phi: Math.floor(Math.random() * 50) + 35,
-          palabraClave: PALABRAS_CLAVE[randomCatKey][0],
+          palabraClave: palabrasClave[randomCatKey][0],
           categoria: randomCatKey,
         });
       });
@@ -214,14 +217,14 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             const nums = cmd.match(/[\d.-]+/g);
             if (nums && nums.length >= 2) {
               const randomCatKey =
-                Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
+                Object.keys(palabrasClave)[Math.floor(Math.random() * 7)];
               nodes.push({
                 id: `node-${nodes.length}`,
                 x: parseFloat(nums[0]),
                 y: parseFloat(nums[1]),
                 name: `Estación ${nodes.length + 1}`,
                 phi: Math.floor(Math.random() * 50) + 35,
-                palabraClave: PALABRAS_CLAVE[randomCatKey][0],
+                palabraClave: palabrasClave[randomCatKey][0],
                 categoria: randomCatKey,
               });
             }
@@ -380,7 +383,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             }
 
             const randomCatKey =
-              Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
+              Object.keys(palabrasClave)[Math.floor(Math.random() * 7)];
 
             return {
               id: station.id || `node-${lineIndex}-${i}`,
@@ -388,7 +391,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               y: isNaN(y) ? 0 : y,
               name: station.name || `Estación ${i + 1}`,
               phi: Math.floor(Math.random() * 50) + 35,
-              palabraClave: PALABRAS_CLAVE[randomCatKey][0],
+              palabraClave: palabrasClave[randomCatKey][0],
               categoria: randomCatKey,
               color: lineColor, // Add color property
             };
@@ -472,7 +475,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
         const nodes: DetectedNode[] = lineData.stations.map(
           (station: any, i: number) => {
             const randomCatKey =
-              Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
+              Object.keys(palabrasClave)[Math.floor(Math.random() * 7)];
 
             // Ensure coordinates are numbers
             const x =
@@ -490,7 +493,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               y: isNaN(y) ? 0 : y,
               name: station.name || `Estación ${i + 1}`,
               phi: Math.floor(Math.random() * 50) + 35,
-              palabraClave: PALABRAS_CLAVE[randomCatKey][0],
+              palabraClave: palabrasClave[randomCatKey][0],
               categoria: randomCatKey,
             };
           }

@@ -1,19 +1,20 @@
-// Process complaints data from JSON
-import { categorySeverityCDMX } from "./categorySeverityMaps";
-import complaintsData from "./complaints_cdmx.json";
+// Process complaints data from Vienna JSON
+import { categorySeverityVienna } from "./categorySeverityMaps";
+import complaintsData from "./complaints_vienna.json";
 
 interface Complaint {
-  Nombre_remitente: string;
-  Email_remitente: string;
-  Nombre_destinatario: string;
-  Email_destinatario: string;
-  Asunto: string;
+  "Absender-Name": string;
+  "Absender-E-Mail": string;
+  "Empfänger-Name": string;
+  "Empfänger-E-Mail": string;
+  Betreff: string;
   Contenido: string;
   Fecha: string;
   "Message-ID": string;
   NombredeEstacion: string;
   IdEstacion: string;
   Linea: string;
+  Asunto: string; // Esta es la categoría
 }
 
 interface StationData {
@@ -40,152 +41,161 @@ interface LineData {
   }>; // Últimos 5 comentarios de la línea
 }
 
-// Palabras comunes a ignorar (stopwords en español)
-const STOPWORDS = new Set([
-  "el",
-  "la",
-  "de",
-  "que",
-  "y",
-  "a",
-  "en",
-  "un",
-  "ser",
-  "se",
-  "no",
-  "haber",
-  "por",
-  "con",
-  "su",
-  "para",
-  "como",
-  "estar",
-  "tener",
-  "le",
-  "lo",
-  "todo",
-  "pero",
-  "más",
-  "hacer",
-  "o",
-  "poder",
-  "decir",
-  "este",
-  "ir",
-  "otro",
-  "ese",
-  "si",
-  "me",
-  "ya",
-  "ver",
-  "porque",
-  "dar",
-  "cuando",
-  "él",
-  "muy",
-  "sin",
-  "vez",
-  "mucho",
-  "saber",
-  "qué",
-  "sobre",
-  "mi",
-  "alguno",
-  "mismo",
-  "yo",
-  "también",
-  "hasta",
-  "año",
-  "dos",
-  "querer",
-  "entre",
-  "así",
-  "primero",
-  "desde",
-  "grande",
-  "eso",
-  "ni",
-  "nos",
-  "llegar",
-  "pasar",
-  "tiempo",
-  "ella",
-  "sí",
-  "día",
-  "uno",
-  "bien",
-  "poco",
-  "deber",
-  "entonces",
-  "poner",
-  "cosa",
-  "tanto",
-  "hombre",
-  "parecer",
-  "nuestro",
-  "tan",
-  "donde",
-  "ahora",
-  "parte",
-  "después",
-  "vida",
-  "quedar",
-  "siempre",
-  "creer",
-  "hablar",
-  "llevar",
-  "dejar",
-  "nada",
-  "cada",
-  "seguir",
-  "menos",
-  "nuevo",
-  "encontrar",
-  "algo",
-  "solo",
-  "decir",
-  "casa",
-  "usar",
-  "uno",
-  "buen",
-  "saber",
-  "hacer",
-  "tiempo",
-  "año",
-  "estar",
-  "mismo",
-  "otro",
-  "haber",
-  "tener",
-  "más",
-  "fue",
-  "era",
-  "sido",
-  "las",
-  "los",
-  "una",
-  "del",
-  "al",
+// Palabras comunes a ignorar (stopwords en alemán)
+const STOPWORDS_GERMAN = new Set([
+  // Artículos
+  "der",
+  "die",
+  "das",
+  "des",
+  "dem",
+  "den",
+  "ein",
+  "eine",
+  "einer",
+  "einen",
+  "einem",
+  "eines",
+  // Pronombres
+  "ich",
+  "du",
+  "er",
+  "sie",
   "es",
-  "por",
-  "ante",
-  "bajo",
-  "cabe",
-  "con",
-  "contra",
-  "desde",
-  "durante",
-  "mediante",
-  "para",
-  "según",
-  "sin",
-  "sobre",
-  "tras",
-  "versus",
-  "vía",
+  "wir",
+  "ihr",
+  "sich",
+  "mich",
+  "dich",
+  "mir",
+  "dir",
+  "ihm",
+  "ihr",
+  "ihn",
+  "uns",
+  "euch",
+  "ihnen",
+  // Preposiciones
+  "in",
+  "an",
+  "auf",
+  "aus",
+  "bei",
+  "mit",
+  "nach",
+  "von",
+  "zu",
+  "über",
+  "unter",
+  "vor",
+  "hinter",
+  "neben",
+  "zwischen",
+  "durch",
+  "für",
+  "gegen",
+  "ohne",
+  "um",
+  // Conjunciones
+  "und",
+  "oder",
+  "aber",
+  "denn",
+  "sondern",
+  "wenn",
+  "weil",
+  "dass",
+  "ob",
+  "als",
+  "wie",
+  "da",
+  "bis",
+  // Verbos auxiliares y comunes
+  "sein",
+  "haben",
+  "werden",
+  "können",
+  "müssen",
+  "sollen",
+  "wollen",
+  "dürfen",
+  "mögen",
+  "ist",
+  "sind",
+  "war",
+  "waren",
+  "hat",
+  "haben",
+  "wird",
+  "wurde",
+  "wurden",
+  // Adverbios
+  "auch",
+  "nicht",
+  "nur",
+  "sehr",
+  "noch",
+  "schon",
+  "mehr",
+  "dann",
+  "hier",
+  "dort",
+  "heute",
+  "jetzt",
+  "immer",
+  "nie",
+  "oft",
+  "manchmal",
+  "wieder",
+  "etwa",
+  // Otros
+  "man",
+  "alle",
+  "viel",
+  "viele",
+  "einige",
+  "manche",
+  "jeder",
+  "jede",
+  "jedes",
+  "dieser",
+  "diese",
+  "dieses",
+  "welcher",
+  "welche",
+  "welches",
+  "kein",
+  "keine",
+  "keiner",
+  "etwas",
+  "nichts",
+  "alles",
+  "was",
+  "wer",
+  "wo",
+  "wann",
+  "warum",
+  "wie",
+  // Palabras adicionales comunes en quejas
+  "hatte",
+  "gibt",
+  "kam",
+  "kam",
+  "gab",
+  "ging",
+  "muss",
+  "soll",
+  "kann",
+  "möchte",
+  "während",
+  "beim",
+  "beim",
+  "zur",
+  "zum",
+  "habe",
 ]);
 
-// Función para extraer palabras clave del contenido
+// Función para extraer palabras clave del contenido en alemán
 function extractKeywords(complaints: Complaint[], topN: number = 5): string[] {
   const wordFrequency = new Map<string, number>();
 
@@ -193,11 +203,11 @@ function extractKeywords(complaints: Complaint[], topN: number = 5): string[] {
     // Combinar asunto y contenido
     const text = `${complaint.Asunto} ${complaint.Contenido}`.toLowerCase();
 
-    // Extraer palabras (solo letras, mínimo 4 caracteres)
-    const words = text.match(/[a-záéíóúüñ]{4,}/g) || [];
+    // Extraer palabras (incluye letras alemanas: ä, ö, ü, ß, mínimo 4 caracteres)
+    const words = text.match(/[a-zäöüß]{4,}/g) || [];
 
     words.forEach((word) => {
-      if (!STOPWORDS.has(word)) {
+      if (!STOPWORDS_GERMAN.has(word)) {
         wordFrequency.set(word, (wordFrequency.get(word) || 0) + 1);
       }
     });
@@ -210,7 +220,7 @@ function extractKeywords(complaints: Complaint[], topN: number = 5): string[] {
     .map(([word]) => word);
 }
 
-export function processComplaintsData(): Record<string, StationData> {
+export function processComplaintsDataVienna(): Record<string, StationData> {
   const stationMap = new Map<
     string,
     {
@@ -237,7 +247,7 @@ export function processComplaintsData(): Record<string, StationData> {
     station.complaints.push(complaint);
 
     // Calcular severidad basada en el asunto
-    const severity = categorySeverityCDMX[complaint.Asunto] || 0.5;
+    const severity = categorySeverityVienna[complaint.Asunto] || 0.5;
     station.totalSeverity += severity;
   });
 
@@ -281,7 +291,7 @@ export function processComplaintsData(): Record<string, StationData> {
   });
 
   // Debug: Mostrar primeras estaciones procesadas
-  console.log("=== STATION_COMPLAINT_DATA ===");
+  console.log("=== STATION_COMPLAINT_DATA_VIENNA ===");
   console.log("Total estaciones:", Object.keys(result).length);
   console.log("Primeras 10 estaciones:", Object.keys(result).slice(0, 10));
   console.log("Ejemplo de datos:", result[Object.keys(result)[0]]);
@@ -290,7 +300,7 @@ export function processComplaintsData(): Record<string, StationData> {
 }
 
 // Función para procesar comentarios por línea
-export function processComplaintsByLine(): Record<string, LineData> {
+export function processComplaintsByLineVienna(): Record<string, LineData> {
   const lineMap = new Map<
     string,
     {
@@ -335,7 +345,7 @@ export function processComplaintsByLine(): Record<string, LineData> {
     };
   });
 
-  console.log("=== LINE_COMPLAINT_DATA ===");
+  console.log("=== LINE_COMPLAINT_DATA_VIENNA ===");
   console.log("Total líneas:", Object.keys(result).length);
   console.log("Líneas:", Object.keys(result));
 
@@ -343,5 +353,38 @@ export function processComplaintsByLine(): Record<string, LineData> {
 }
 
 // Export processed data
-export const STATION_COMPLAINT_DATA = processComplaintsData();
-export const LINE_COMPLAINT_DATA = processComplaintsByLine();
+console.log(
+  "[processComplaintsVienna] ========== INICIO PROCESAMIENTO =========="
+);
+console.log(
+  "[processComplaintsVienna] Total quejas en JSON:",
+  (complaintsData as Complaint[]).length
+);
+console.log(
+  "[processComplaintsVienna] Primera queja:",
+  (complaintsData as Complaint[])[0]
+);
+
+export const STATION_COMPLAINT_DATA_VIENNA = processComplaintsDataVienna();
+export const LINE_COMPLAINT_DATA_VIENNA = processComplaintsByLineVienna();
+
+console.log("[processComplaintsVienna] ========== DATOS EXPORTADOS ==========");
+console.log(
+  "[processComplaintsVienna] Estaciones procesadas:",
+  Object.keys(STATION_COMPLAINT_DATA_VIENNA).length
+);
+console.log(
+  "[processComplaintsVienna] Líneas procesadas:",
+  Object.keys(LINE_COMPLAINT_DATA_VIENNA).length
+);
+console.log(
+  "[processComplaintsVienna] Primeras 10 estaciones:",
+  Object.keys(STATION_COMPLAINT_DATA_VIENNA).slice(0, 10)
+);
+console.log(
+  "[processComplaintsVienna] Ejemplo de datos de estación:",
+  STATION_COMPLAINT_DATA_VIENNA[Object.keys(STATION_COMPLAINT_DATA_VIENNA)[0]]
+);
+console.log(
+  "[processComplaintsVienna] =========================================="
+);

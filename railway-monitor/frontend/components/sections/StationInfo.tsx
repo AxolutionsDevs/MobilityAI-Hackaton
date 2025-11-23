@@ -1,7 +1,7 @@
 "use client";
 
 import { useCity } from "@/lib/CityContext";
-import { LINE_REPORT_DATA, STATION_REPORT_DATA } from "@/lib/constants";
+import { getLineReportData, getStationReportData } from "@/lib/constants";
 import { StationData } from "@/types";
 import React from "react";
 
@@ -15,20 +15,23 @@ interface StationInfoProps {
 }
 
 const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
-  const { translations } = useCity();
+  const { translations, city } = useCity();
 
   // Si no hay estación seleccionada, no mostrar nada
   if (!station) {
     return null;
   }
 
-  // Obtener datos reales de la estación
-  const stationData = STATION_REPORT_DATA[station.name];
+  // Obtener datos reales de la estación según la ciudad
+  const stationReportData = getStationReportData(city);
+  const lineReportData = getLineReportData(city);
+
+  const stationData = stationReportData[station.name];
   const topKeywords = stationData?.topKeywords || [];
   const recentComments = stationData?.recentComments || [];
 
   // Obtener comentarios de la línea
-  const lineData = LINE_REPORT_DATA[station.line];
+  const lineData = lineReportData[station.line];
   const lineComments = lineData?.recentComments || [];
 
   return (
@@ -61,7 +64,9 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
                 </span>
               ))
             ) : (
-              <span className="text-base text-gray-500">{translations.noData}</span>
+              <span className="text-base text-gray-500">
+                {translations.noData}
+              </span>
             )}
           </div>
         </div>

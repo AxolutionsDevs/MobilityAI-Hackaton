@@ -1,7 +1,7 @@
 "use client";
 
 import { useCity } from "@/lib/CityContext";
-import { METRO_LINES, STATION_REPORT_DATA } from "@/lib/constants";
+import { getMetroLines, getStationReportData } from "@/lib/constants";
 import { CustomLine, StationData } from "@/types";
 import React, { useState } from "react";
 
@@ -26,7 +26,10 @@ const MetroMap: React.FC<MetroMapProps> = ({
   onUpdateCustomLine,
   onNavigateToImport,
 }) => {
-  const { translations } = useCity();
+  const { translations, city } = useCity();
+
+  // Obtener líneas según la ciudad
+  const METRO_LINES = getMetroLines(city);
 
   // Calcular dimensiones reales del mapa y zoom automático
   const calculateMapBoundsAndZoom = () => {
@@ -495,23 +498,33 @@ const MetroMap: React.FC<MetroMapProps> = ({
           <g className="heatmap-layer" filter="url(#heatmap-blur)">
             {filteredLines.map((line) =>
               line.stations.map((station) => {
-                const reportData = STATION_REPORT_DATA[station.name] || {
+                const stationReportData = getStationReportData(city);
+                const reportData = stationReportData[station.name] || {
                   reportCount: 0,
                   severity: 0.05,
                   recentIssue: "Todo en orden",
                 };
                 const { reportCount, severity } = reportData;
 
-                // Debug log
-                if (station.name === "Ciudad Azteca" || reportCount > 0) {
+                // Debug log mejorado
+                if (reportCount > 0 || city === "vienna") {
                   console.log(
-                    "Heatmap - Station:",
-                    station.name,
-                    "Reports:",
-                    reportCount,
-                    "Severity:",
-                    severity
+                    `[Heatmap] City: ${city}, Station: "${
+                      station.name
+                    }", Reports: ${reportCount}, Severity: ${severity}, Found: ${!!stationReportData[
+                      station.name
+                    ]}`
                   );
+                  if (reportCount === 0 && city === "vienna") {
+                    // Mostrar las primeras 3 estaciones disponibles en los datos
+                    const availableStations = Object.keys(
+                      stationReportData
+                    ).slice(0, 3);
+                    console.log(
+                      `[Heatmap] Available stations sample:`,
+                      availableStations
+                    );
+                  }
                 }
 
                 // Radio del blur basado en número de reportes (más reportes = blur más grande)
@@ -551,7 +564,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
           <g className="heatmap-layer-custom" filter="url(#heatmap-blur)">
             {customLines.map((line) =>
               line.stations.map((station) => {
-                const reportData = STATION_REPORT_DATA[station.name] || {
+                const stationReportData = getStationReportData(city);
+                const reportData = stationReportData[station.name] || {
                   reportCount: 0,
                   severity: 0.05,
                   recentIssue: "Todo en orden",
@@ -664,7 +678,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
           {filteredLines.map((line) =>
             line.stations.map((station) => {
               const data = stationData[station.id];
-              const reportData = STATION_REPORT_DATA[station.name] || {
+              const stationReportData = getStationReportData(city);
+              const reportData = stationReportData[station.name] || {
                 reportCount: 0,
                 severity: 0.05,
                 recentIssue: "Todo en orden",
@@ -869,7 +884,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
               const isHovered = hoveredStation === stationKey;
 
               // Obtener datos reales de quejas
-              const reportData = STATION_REPORT_DATA[station.name] || {
+              const stationReportData = getStationReportData(city);
+              const reportData = stationReportData[station.name] || {
                 reportCount: 0,
                 severity: 0.05,
                 recentIssue: "Todo en orden",
@@ -1017,7 +1033,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                 if (!isHovered || isSelected) return null;
 
-                const reportData = STATION_REPORT_DATA[station.name] || {
+                const stationReportData = getStationReportData(city);
+                const reportData = stationReportData[station.name] || {
                   reportCount: 0,
                   severity: 0.05,
                   recentIssue: "Todo en orden",
@@ -1101,7 +1118,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                 if (!isHovered) return null;
 
-                const reportData = STATION_REPORT_DATA[station.name] || {
+                const stationReportData = getStationReportData(city);
+                const reportData = stationReportData[station.name] || {
                   reportCount: 0,
                   severity: 0.05,
                   recentIssue: "Todo en orden",
