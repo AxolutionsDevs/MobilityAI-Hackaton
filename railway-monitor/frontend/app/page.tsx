@@ -8,12 +8,14 @@ import LiveFeed from "@/components/sections/LiveFeed";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
 import KPICard from "@/components/ui/KPICard";
+import TrendsDashboard from "@/components/trends/TrendsDashboard";
 import { CATEGORIES } from "@/lib/constants";
 import { calculateGlobalPHI, generateStationPHI } from "@/lib/utils";
 import { CityProvider, useCity } from "@/lib/CityContext";
 import { Comment, CustomLine } from "@/types";
 import {
   AlertTriangle,
+  Activity,
   BarChart3,
   Globe,
   Map,
@@ -47,7 +49,7 @@ function DashboardContent() {
   const [customLines, setCustomLines] = useState<CustomLine[]>([]);
   const [selectedStation, setSelectedStation] = useState<any>(null);
   const [activeView, setActiveView] = useState<
-    "heatmap" | "import" | "indicators" | "predictive" | "comparison"
+    "heatmap" | "import" | "indicators" | "predictive" | "comparison" | "trends"
   >("heatmap");
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
@@ -157,6 +159,7 @@ function DashboardContent() {
     { id: "indicators", label: translations.indicators, icon: BarChart3 },
     { id: "predictive", label: translations.predictive, icon: TrendingUp },
     { id: "comparison", label: translations.comparison, icon: Globe },
+    { id: "trends", label: "Tendencias", icon: Activity },
   ], [translations]);
 
   return (
@@ -499,6 +502,10 @@ function DashboardContent() {
                   </div>
                 </div>
               </div>
+            )}
+
+            {activeView === "trends" && (
+              <TrendsDashboard />
             )}
           </div>
 
