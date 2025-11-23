@@ -7,15 +7,15 @@ import Header from "@/components/sections/Header";
 import LiveFeed from "@/components/sections/LiveFeed";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
-import KPICard from "@/components/ui/KPICard";
 import TrendsDashboard from "@/components/trends/TrendsDashboard";
+import KPICard from "@/components/ui/KPICard";
+import { CityProvider, useCity } from "@/lib/CityContext";
 import { CATEGORIES } from "@/lib/constants";
 import { calculateGlobalPHI, generateStationPHI } from "@/lib/utils";
-import { CityProvider, useCity } from "@/lib/CityContext";
 import { Comment, CustomLine } from "@/types";
 import {
-  AlertTriangle,
   Activity,
+  AlertTriangle,
   BarChart3,
   Globe,
   Map,
@@ -60,7 +60,7 @@ function DashboardContent() {
   );
 
   const sampleComments: Comment[] = useMemo(() => {
-    if (city === 'cdmx') {
+    if (city === "cdmx") {
       return [
         { text: "El metro llegó 15 minutos tarde", sentiment: "negative" },
         { text: "Excelente servicio, muy limpio", sentiment: "positive" },
@@ -72,24 +72,45 @@ function DashboardContent() {
       return [
         { text: "Die U-Bahn kam 15 Minuten zu spät", sentiment: "negative" },
         { text: "Ausgezeichneter Service, sehr sauber", sentiment: "positive" },
-        { text: "Mein Handy wurde zur Hauptverkehrszeit gestohlen", sentiment: "negative" },
+        {
+          text: "Mein Handy wurde zur Hauptverkehrszeit gestohlen",
+          sentiment: "negative",
+        },
         { text: "Heute guter Service", sentiment: "positive" },
         { text: "Wie immer durchschnittlich", sentiment: "neutral" },
       ];
     }
   }, [city]);
 
-  const kpiData = useMemo(() => [
-    { icon: Globe, label: translations.globalPHI, value: globalPHI, sub: "+2.3%" },
-    {
-      icon: ThumbsUp,
-      label: translations.positives,
-      value: "35%",
-      sub: `4,521 ${translations.comments}`,
-    },
-    { icon: AlertTriangle, label: translations.alerts, value: "12", sub: `3 ${translations.critical}` },
-    { icon: Zap, label: translations.response, value: "2.4h", sub: translations.average },
-  ], [translations, globalPHI]);
+  const kpiData = useMemo(
+    () => [
+      {
+        icon: Globe,
+        label: translations.globalPHI,
+        value: globalPHI,
+        sub: "+2.3%",
+      },
+      {
+        icon: ThumbsUp,
+        label: translations.positives,
+        value: "35%",
+        sub: `4,521 ${translations.comments}`,
+      },
+      {
+        icon: AlertTriangle,
+        label: translations.alerts,
+        value: "12",
+        sub: `3 ${translations.critical}`,
+      },
+      {
+        icon: Zap,
+        label: translations.response,
+        value: "2.4h",
+        sub: translations.average,
+      },
+    ],
+    [translations, globalPHI]
+  );
 
   const handleSaveCustomLine = (lineData: CustomLine) => {
     setCustomLines((prev) => [...prev, lineData]);
@@ -132,7 +153,15 @@ function DashboardContent() {
   const trendData = useMemo(
     () =>
       Array.from({ length: 7 }, (_, i) => ({
-        day: [translations.monday, translations.tuesday, translations.wednesday, translations.thursday, translations.friday, translations.saturday, translations.sunday][i],
+        day: [
+          translations.monday,
+          translations.tuesday,
+          translations.wednesday,
+          translations.thursday,
+          translations.friday,
+          translations.saturday,
+          translations.sunday,
+        ][i],
         seguridad: Math.floor(Math.random() * 20 + 60),
         puntualidad: Math.floor(Math.random() * 20 + 65),
         limpieza: Math.floor(Math.random() * 20 + 70),
@@ -153,14 +182,17 @@ function DashboardContent() {
     []
   );
 
-  const tabs = useMemo(() => [
-    { id: "heatmap", label: translations.heatmap, icon: Map },
-    { id: "import", label: translations.importSVG, icon: Upload },
-    { id: "indicators", label: translations.indicators, icon: BarChart3 },
-    { id: "predictive", label: translations.predictive, icon: TrendingUp },
-    { id: "comparison", label: translations.comparison, icon: Globe },
-    { id: "trends", label: "Tendencias", icon: Activity },
-  ], [translations]);
+  const tabs = useMemo(
+    () => [
+      { id: "heatmap", label: translations.heatmap, icon: Map },
+      { id: "import", label: translations.importSVG, icon: Upload },
+      { id: "indicators", label: translations.indicators, icon: BarChart3 },
+      { id: "predictive", label: translations.predictive, icon: TrendingUp },
+      { id: "comparison", label: translations.comparison, icon: Globe },
+      { id: "trends", label: "Tendencias", icon: Activity },
+    ],
+    [translations]
+  );
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-5">
@@ -180,10 +212,11 @@ function DashboardContent() {
             <button
               key={tab.id}
               onClick={() => setActiveView(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all ${activeView === tab.id
-                ? "bg-purple-600 text-white"
-                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
-                }`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all ${
+                activeView === tab.id
+                  ? "bg-purple-600 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
             >
               <tab.icon className="w-4 h-4" />
               <span className="text-sm font-semibold">{tab.label}</span>
@@ -432,9 +465,7 @@ function DashboardContent() {
                   </h4>
                   <ul className="text-xs text-white/70 space-y-1">
                     <li>{translations.recommendation1}</li>
-                    <li>
-                      {translations.recommendation2}
-                    </li>
+                    <li>{translations.recommendation2}</li>
                     <li>{translations.recommendation3}</li>
                   </ul>
                 </div>
@@ -504,9 +535,7 @@ function DashboardContent() {
               </div>
             )}
 
-            {activeView === "trends" && (
-              <TrendsDashboard />
-            )}
+            {activeView === "trends" && <TrendsDashboard />}
           </div>
 
           {/* Right Column - Analytics */}

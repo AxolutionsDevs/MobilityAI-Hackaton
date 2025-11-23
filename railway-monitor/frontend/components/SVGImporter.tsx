@@ -1,9 +1,129 @@
 "use client";
 
-import { PALABRAS_CLAVE } from "@/lib/constants";
 import { useCity } from "@/lib/CityContext";
+import { PALABRAS_CLAVE } from "@/lib/constants";
 import { DetectedNode, SVGPath } from "@/types";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
+
+// Componente memoizado para los paths de fondo
+const BackgroundPaths = React.memo(
+  ({ paths, lineColor }: { paths: SVGPath[]; lineColor: string }) => {
+    return (
+      <>
+        {paths.map((path) => (
+          <path
+            key={path.id}
+            d={path.d}
+            fill="none"
+            stroke={path.stroke || lineColor}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity="0.3"
+            points={path.points}
+          />
+        ))}
+      </>
+    );
+  }
+);
+BackgroundPaths.displayName = "BackgroundPaths";
+
+// Componente memoizado para cada nodo/estación
+const StationNode = React.memo(
+  ({
+    node,
+    lineColor,
+    isBeingDragged,
+    onDragStart,
+    onEdit,
+    onDelete,
+  }: {
+    node: DetectedNode;
+    lineColor: string;
+    isBeingDragged: boolean;
+    onDragStart: (e: React.MouseEvent, id: string) => void;
+    onEdit: (id: string) => void;
+    onDelete: (id: string) => void;
+  }) => {
+    return (
+      <g className={isBeingDragged ? "cursor-grabbing" : "cursor-grab"}>
+        <circle
+          cx={node.x}
+          cy={node.y}
+          r={isBeingDragged ? 35 : 30}
+          fill={(node as any).color || lineColor}
+          opacity="0.3"
+          className="transition-all duration-200"
+        />
+        <circle
+          cx={node.x}
+          cy={node.y}
+          r={isBeingDragged ? 14 : 12}
+          fill="#1e1b4b"
+          stroke={
+            (node as any).color || (isBeingDragged ? "#a78bfa" : lineColor)
+          }
+          strokeWidth={isBeingDragged ? 4 : 3}
+          className="transition-all duration-200"
+          onMouseDown={(e) => onDragStart(e, node.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(node.id);
+          }}
+        />
+        <text
+          x={node.x}
+          y={node.y + 4}
+          textAnchor="middle"
+          className="text-[8px] font-bold fill-white pointer-events-none"
+        >
+          {node.phi}
+        </text>
+        {!isBeingDragged && (
+          <g transform={`translate(${node.x}, ${node.y - 20})`}>
+            <rect
+              x="-35"
+              y="-10"
+              width="70"
+              height="16"
+              rx="3"
+              fill="rgba(0,0,0,0.8)"
+            />
+            <text
+              x="0"
+              y="2"
+              textAnchor="middle"
+              className="text-[7px] fill-white pointer-events-none"
+            >
+              {node.name}
+            </text>
+          </g>
+        )}
+        <g
+          transform={`translate(${node.x + 15}, ${node.y - 15})`}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(node.id);
+          }}
+          className="cursor-pointer"
+        >
+          <circle r="8" fill="#ef4444" />
+          <text
+            x="0"
+            y="3"
+            textAnchor="middle"
+            className="text-[8px] fill-white font-bold pointer-events-none"
+          >
+            ×
+          </text>
+        </g>
+      </g>
+    );
+  }
+);
+StationNode.displayName = "StationNode";
 
 interface SVGImporterProps {
   onSave: (lineData: any) => void;
@@ -20,6 +140,24 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
   const [svgViewBox, setSvgViewBox] = useState("0 0 800 600");
   const [svgPaths, setSvgPaths] = useState<SVGPath[]>([]);
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+
+  // Estados para zoom y pan
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [isMapFocused, setIsMapFocused] = useState(false);
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // Ref para optimizar el drag
+  const dragRef = React.useRef<{
+    svgRect: DOMRect | null;
+    viewBoxParts: number[];
+  }>({
+    svgRect: null,
+    viewBoxParts: [],
+  });
 
   const parseSVG = (svgContent: string) => {
     setIsProcessing(true);
@@ -110,55 +248,217 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
     }
   };
 
-  const simulateUpload = () => {
-    const exampleSVG = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
-  <path d="M 50 200 L 150 200 L 250 180 L 350 180 L 450 200 L 550 220 L 650 220 L 750 200" 
-        stroke="#FF6B35" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <circle cx="50" cy="200" r="8" fill="#FF6B35"/>
-  <circle cx="150" cy="200" r="8" fill="#FF6B35"/>
-  <circle cx="250" cy="180" r="8" fill="#FF6B35"/>
-  <circle cx="350" cy="180" r="8" fill="#FF6B35"/>
-  <circle cx="450" cy="200" r="8" fill="#FF6B35"/>
-  <circle cx="550" cy="220" r="8" fill="#FF6B35"/>
-  <circle cx="650" cy="220" r="8" fill="#FF6B35"/>
-  <circle cx="750" cy="200" r="8" fill="#FF6B35"/>
-</svg>`;
-
-    setLineName("Metrobús Línea 1");
-    setLineColor("#FF6B35");
-    parseSVG(exampleSVG);
+  const handleJSONUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "application/json") {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          try {
+            const jsonData = JSON.parse(ev.target.result as string);
+            // Check if it's an array of lines or a single line
+            if (Array.isArray(jsonData)) {
+              // Import multiple lines
+              importMultipleLinesFromJSON(jsonData);
+            } else {
+              // Import single line
+              importLineFromJSON(jsonData);
+            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            alert("Error al importar el JSON. Verifica el formato.");
+          }
+        }
+      };
+      reader.readAsText(file);
+    }
   };
 
-  const addManualNode = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (draggingNodeId) return; // Don't add nodes while dragging
-    if (
-      e.target instanceof SVGSVGElement ||
-      (e.target instanceof SVGElement && e.target.tagName === "rect")
-    ) {
-      const svg = e.currentTarget;
-      const rect = svg.getBoundingClientRect();
-      const viewBoxParts = svgViewBox.split(" ").map(Number);
-      const scaleX = viewBoxParts[2] / rect.width;
-      const scaleY = viewBoxParts[3] / rect.height;
-      const x = (e.clientX - rect.left) * scaleX + viewBoxParts[0];
-      const y = (e.clientY - rect.top) * scaleY + viewBoxParts[1];
+  const importMultipleLinesFromJSON = (linesData: any[]) => {
+    setIsProcessing(true);
+    try {
+      // Reset state
+      setZoom(1);
+      setPan({ x: 0, y: 0 });
+      setSvgPaths([]);
+      setDetectedNodes([]);
+      setLineName("Importación Múltiple");
+      setLineColor("#ffffff");
 
-      const randomCatKey =
-        Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
-      setDetectedNodes((prev) => [
-        ...prev,
-        {
-          id: `manual-${Date.now()}`,
-          x,
-          y,
-          name: `Estación ${prev.length + 1}`,
-          phi: Math.floor(Math.random() * 50) + 35,
-          palabraClave: PALABRAS_CLAVE[randomCatKey][0],
-          categoria: randomCatKey,
-        },
-      ]);
+      let allNodes: DetectedNode[] = [];
+      let allPaths: SVGPath[] = [];
+      let minX = Infinity,
+        minY = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
+
+      linesData.forEach((lineData, lineIndex) => {
+        const lineColor = lineData.color || "#e91e8b";
+
+        // Process paths
+        if (lineData.paths && Array.isArray(lineData.paths)) {
+          const paths = lineData.paths.map((p: any) => ({
+            ...p,
+            stroke: p.stroke || lineColor, // Ensure path has color
+          }));
+          allPaths = [...allPaths, ...paths];
+        }
+
+        // Process stations
+        if (lineData.stations && Array.isArray(lineData.stations)) {
+          const nodes = lineData.stations.map((station: any, i: number) => {
+            const x =
+              typeof station.x === "string"
+                ? parseFloat(station.x)
+                : Number(station.x);
+            const y =
+              typeof station.y === "string"
+                ? parseFloat(station.y)
+                : Number(station.y);
+
+            // Update bounds
+            if (!isNaN(x)) {
+              minX = Math.min(minX, x);
+              maxX = Math.max(maxX, x);
+            }
+            if (!isNaN(y)) {
+              minY = Math.min(minY, y);
+              maxY = Math.max(maxY, y);
+            }
+
+            const randomCatKey =
+              Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
+
+            return {
+              id: station.id || `node-${lineIndex}-${i}`,
+              x: isNaN(x) ? 0 : x,
+              y: isNaN(y) ? 0 : y,
+              name: station.name || `Estación ${i + 1}`,
+              phi: Math.floor(Math.random() * 50) + 35,
+              palabraClave: PALABRAS_CLAVE[randomCatKey][0],
+              categoria: randomCatKey,
+              color: lineColor, // Add color property
+            };
+          });
+          allNodes = [...allNodes, ...nodes];
+        }
+
+        // Also try to parse viewBox to update bounds if stations are missing or weird
+        if (lineData.viewBox) {
+          const parts = lineData.viewBox.split(" ").map(Number);
+          if (parts.length === 4) {
+            minX = Math.min(minX, parts[0]);
+            minY = Math.min(minY, parts[1]);
+            maxX = Math.max(maxX, parts[0] + parts[2]);
+            maxY = Math.max(maxY, parts[1] + parts[3]);
+          }
+        }
+      });
+
+      // Set global viewBox
+      // Add some padding
+      const padding = 50;
+      const width = maxX - minX + padding * 2;
+      const height = maxY - minY + padding * 2;
+      const viewBox = `${minX - padding} ${minY - padding} ${width} ${height}`;
+
+      if (minX !== Infinity) {
+        setSvgViewBox(viewBox);
+        console.log("Global ViewBox calculado:", viewBox);
+      } else {
+        setSvgViewBox("0 0 800 600");
+      }
+
+      setSvgPaths(allPaths);
+      setDetectedNodes(allNodes);
+
+      console.log(`Importadas ${linesData.length} líneas.`);
+      console.log(`Total estaciones: ${allNodes.length}`);
+      console.log(`Total paths: ${allPaths.length}`);
+
+      // Create a minimal SVG representation
+      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}"></svg>`;
+      setImportedSVG(svgContent);
+
+      // Automatically save/import each line to the app
+      linesData.forEach((line) => {
+        onSave(line);
+      });
+    } catch (error) {
+      console.error("Error importing multiple lines:", error);
     }
+    setIsProcessing(false);
+  };
+  const importLineFromJSON = (lineData: any) => {
+    setIsProcessing(true);
+    try {
+      // Reset state completely
+      setZoom(1);
+      setPan({ x: 0, y: 0 });
+      setSvgPaths([]);
+      setDetectedNodes([]);
+
+      // Set line name and color
+      setLineName(lineData.name || "Línea Importada");
+      setLineColor(lineData.color || "#e91e8b");
+
+      // Set viewBox
+      if (lineData.viewBox) {
+        setSvgViewBox(lineData.viewBox);
+        console.log("ViewBox importado:", lineData.viewBox);
+      }
+
+      // Import paths
+      if (lineData.paths && Array.isArray(lineData.paths)) {
+        setSvgPaths(lineData.paths);
+        console.log("Paths importados:", lineData.paths.length);
+      }
+
+      // Import stations
+      if (lineData.stations && Array.isArray(lineData.stations)) {
+        const nodes: DetectedNode[] = lineData.stations.map(
+          (station: any, i: number) => {
+            const randomCatKey =
+              Object.keys(PALABRAS_CLAVE)[Math.floor(Math.random() * 7)];
+
+            // Ensure coordinates are numbers
+            const x =
+              typeof station.x === "string"
+                ? parseFloat(station.x)
+                : Number(station.x);
+            const y =
+              typeof station.y === "string"
+                ? parseFloat(station.y)
+                : Number(station.y);
+
+            return {
+              id: station.id || `node-${i}`,
+              x: isNaN(x) ? 0 : x,
+              y: isNaN(y) ? 0 : y,
+              name: station.name || `Estación ${i + 1}`,
+              phi: Math.floor(Math.random() * 50) + 35,
+              palabraClave: PALABRAS_CLAVE[randomCatKey][0],
+              categoria: randomCatKey,
+            };
+          }
+        );
+        setDetectedNodes(nodes);
+        console.log("Estaciones importadas:", nodes.length);
+        if (nodes.length > 0) {
+          console.log("Primera estación:", nodes[0]);
+          console.log("Última estación:", nodes[nodes.length - 1]);
+        }
+      }
+
+      // Create a minimal SVG representation for display purposes
+      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${
+        lineData.viewBox || "0 0 800 600"
+      }"></svg>`;
+      setImportedSVG(svgContent);
+    } catch (error) {
+      console.error("Error importing line from JSON:", error);
+    }
+    setIsProcessing(false);
   };
 
   const updateNodeName = (id: string, name: string) => {
@@ -168,25 +468,57 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
     setEditingNode(null);
   };
 
-  const deleteNode = (id: string) => {
+  const deleteNode = useCallback((id: string) => {
     setDetectedNodes((prev) => prev.filter((n) => n.id !== id));
-  };
+  }, []);
 
-  const handleNodeDragStart = (e: React.MouseEvent, nodeId: string) => {
-    e.stopPropagation();
-    setDraggingNodeId(nodeId);
-  };
+  const handleNodeDragStart = useCallback(
+    (e: React.MouseEvent, nodeId: string) => {
+      e.stopPropagation();
+      setDraggingNodeId(nodeId);
+
+      // Cachear dimensiones del SVG al iniciar el drag
+      if (svgRef.current) {
+        dragRef.current.svgRect = svgRef.current.getBoundingClientRect();
+        dragRef.current.viewBoxParts = svgViewBox.split(" ").map(Number);
+      }
+    },
+    [svgViewBox]
+  );
 
   const handleNodeDrag = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!draggingNodeId) return;
+    if (!draggingNodeId) {
+      // Si no estamos arrastrando un nodo, manejamos el pan
+      if (isPanning) {
+        setPan({
+          x: e.clientX - panStart.x,
+          y: e.clientY - panStart.y,
+        });
+      }
+      return;
+    }
 
-    const svg = e.currentTarget;
-    const rect = svg.getBoundingClientRect();
-    const viewBoxParts = svgViewBox.split(" ").map(Number);
+    // Usar valores cacheados si existen, si no, calcularlos (fallback)
+    const rect =
+      dragRef.current.svgRect || e.currentTarget.getBoundingClientRect();
+    const viewBoxParts =
+      dragRef.current.viewBoxParts.length === 4
+        ? dragRef.current.viewBoxParts
+        : svgViewBox.split(" ").map(Number);
+
+    // Calcular las coordenadas del mouse en el espacio del SVG
+    // teniendo en cuenta el zoom y el pan
     const scaleX = viewBoxParts[2] / rect.width;
     const scaleY = viewBoxParts[3] / rect.height;
-    const x = (e.clientX - rect.left) * scaleX + viewBoxParts[0];
-    const y = (e.clientY - rect.top) * scaleY + viewBoxParts[1];
+
+    // Primero obtenemos la posición del mouse relativa al SVG
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // Luego ajustamos por el zoom y pan aplicados al grupo <g>
+    // La fórmula correcta es: (mousePos - pan) / zoom
+    const x = ((mouseX - pan.x) / zoom) * scaleX + viewBoxParts[0];
+    const y = ((mouseY - pan.y) / zoom) * scaleY + viewBoxParts[1];
 
     setDetectedNodes((prev) =>
       prev.map((node) =>
@@ -197,7 +529,72 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
 
   const handleNodeDragEnd = () => {
     setDraggingNodeId(null);
+    setIsPanning(false);
+    dragRef.current.svgRect = null;
   };
+
+  // Manejar zoom con la rueda del mouse
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isMapFocused) {
+      return;
+    }
+
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.min(Math.max(zoom * delta, 0.5), 5);
+    setZoom(newZoom);
+  };
+
+  // Activar el mapa para zoom
+  const handleMapClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMapFocused(true);
+  };
+
+  // Manejar inicio de pan
+  const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (draggingNodeId) return;
+    setIsPanning(true);
+    setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  };
+
+  // Desactivar cuando se hace click fuera
+  React.useEffect(() => {
+    const containerElement = containerRef.current;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerElement && !containerElement.contains(e.target as Node)) {
+        setIsMapFocused(false);
+      }
+    };
+
+    const handleWheelCapture = (e: WheelEvent) => {
+      // Siempre prevenir scroll cuando está sobre el mapa
+      if (containerElement && containerElement.contains(e.target as Node)) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Si el mapa está enfocado, manejar el zoom aquí
+        if (isMapFocused) {
+          const delta = e.deltaY > 0 ? 0.9 : 1.1;
+          setZoom((prev) => Math.min(Math.max(prev * delta, 0.5), 5));
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("wheel", handleWheelCapture, {
+      passive: false,
+      capture: true,
+    });
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("wheel", handleWheelCapture, true);
+    };
+  }, [isMapFocused]);
 
   const exportLine = () => {
     const lineData = {
@@ -247,6 +644,25 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
     setSvgPaths([]);
   };
 
+  // Memoize connection path
+  const connectionPath = useMemo(() => {
+    return detectedNodes
+      .map((node, i) => `${i === 0 ? "M" : "L"} ${node.x} ${node.y}`)
+      .join(" ");
+  }, [detectedNodes]);
+
+  // Memoize handlers for StationNode to prevent re-renders
+  const handleDragStartCallback = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      handleNodeDragStart(e, id);
+    },
+    []
+  ); // handleNodeDragStart needs to be stable or included in deps.
+  // Actually handleNodeDragStart uses state setters and refs, so it should be stable if defined with useCallback or if we just use it directly but it's defined inside the component so it changes every render.
+
+  // Let's redefine handleNodeDragStart with useCallback in the next step or just use a wrapper here that calls the current one, but that doesn't help.
+  // I need to wrap the ORIGINAL definitions.
+
   return (
     <div className="space-y-4">
       <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
@@ -266,7 +682,8 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               onChange={(e) => setLineName(e.target.value)}
               className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder={translations.lineNamePlaceholder}
-            /></div>
+            />
+          </div>
           <div>
             <label className="block text-xs text-white/60 mb-1">
               {translations.lineColor}
@@ -296,6 +713,13 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             className="hidden"
             id="svg-upload"
           />
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleJSONUpload}
+            className="hidden"
+            id="json-upload"
+          />
           <label htmlFor="svg-upload" className="cursor-pointer block mb-3">
             <div className="text-4xl mb-2">📁</div>
             <div className="text-sm font-medium text-white/80">
@@ -311,22 +735,26 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               <div className="w-full border-t border-white/20"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-slate-900/50 text-white/50">{translations.or}</span>
+              <span className="px-2 bg-slate-900/50 text-white/50">
+                {translations.or}
+              </span>
             </div>
           </div>
 
-          <button
-            onClick={simulateUpload}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+          <label
+            htmlFor="json-upload"
+            className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto w-fit"
           >
-            <span>⚡</span> {translations.simulateLoadExample}
-          </button>
+            <span>📥</span> Importar JSON
+          </label>
         </div>
 
         {isProcessing && (
           <div className="mt-4 text-center">
             <div className="animate-spin inline-block w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full"></div>
-            <p className="text-xs text-white/60 mt-2">{translations.processingSVG}</p>
+            <p className="text-xs text-white/60 mt-2">
+              {translations.processingSVG}
+            </p>
           </div>
         )}
       </div>
@@ -374,10 +802,11 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                       ({Math.round(node.x)}, {Math.round(node.y)})
                     </span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded ${node.phi >= 50
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-red-500/20 text-red-400"
-                        }`}
+                      className={`text-[10px] px-1.5 py-0.5 rounded ${
+                        node.phi >= 50
+                          ? "bg-green-500/20 text-green-400"
+                          : "bg-red-500/20 text-red-400"
+                      }`}
                     >
                       PHI: {node.phi}
                     </span>
@@ -393,7 +822,9 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             </div>
 
             <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30">
-              <h3 className="text-sm font-semibold mb-3">{translations.actions}</h3>
+              <h3 className="text-sm font-semibold mb-3">
+                {translations.actions}
+              </h3>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={saveToCustomLines}
@@ -419,23 +850,65 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
 
           <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold">
-                {translations.preview}
-              </h3>
-              <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
-                {detectedNodes.length} {translations.stations}
-              </span>
+              <h3 className="text-sm font-semibold">{translations.preview}</h3>
+              <div className="flex items-center gap-3">
+                <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
+                  {detectedNodes.length} {translations.stations}
+                </span>
+                <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">
+                  ViewBox: {svgViewBox}
+                </span>
+              </div>
             </div>
 
-            <div className="relative bg-slate-900 rounded-xl overflow-hidden border border-white/10">
+            <div
+              ref={containerRef}
+              className="relative bg-slate-900 rounded-xl overflow-hidden border border-white/10"
+              style={{ touchAction: "none" }}
+            >
+              {/* Overlay de hover cuando el mapa no está enfocado */}
+              {!isMapFocused && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-20 rounded-xl cursor-pointer"
+                  onClick={handleMapClick}
+                >
+                  <div className="bg-slate-800/90 px-6 py-3 rounded-xl border border-white/20 shadow-2xl">
+                    <p className="text-white text-sm font-semibold flex items-center gap-2">
+                      <span className="text-2xl">🖱️</span>
+                      Click para interactuar con el mapa
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Indicador de zoom activo */}
+              {isMapFocused && (
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
+                  <div className="bg-green-600/90 px-4 py-2 rounded-lg border border-green-400/30 shadow-lg">
+                    <p className="text-white text-xs font-semibold flex items-center gap-2">
+                      <span>🔍</span>
+                      Usa la rueda del mouse para zoom | Arrastra para mover
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <svg
+                ref={svgRef}
                 viewBox={svgViewBox}
-                className={`w-full h-auto min-h-[400px] ${draggingNodeId ? "cursor-grabbing" : "cursor-crosshair"
-                  }`}
-                onClick={addManualNode}
+                className={`w-full h-auto ${
+                  isPanning
+                    ? "cursor-grabbing"
+                    : draggingNodeId
+                    ? "cursor-grabbing"
+                    : "cursor-grab"
+                }`}
+                style={{ minHeight: "800px", touchAction: "none" }}
+                onMouseDown={handleMouseDown}
                 onMouseMove={handleNodeDrag}
                 onMouseUp={handleNodeDragEnd}
                 onMouseLeave={handleNodeDragEnd}
+                onWheel={handleWheel}
               >
                 <defs>
                   <pattern
@@ -452,117 +925,50 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                     />
                   </pattern>
                 </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
+                <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+                  {/* Grid background that respects viewBox */}
+                  <rect
+                    x={svgViewBox.split(" ")[0]}
+                    y={svgViewBox.split(" ")[1]}
+                    width={svgViewBox.split(" ")[2]}
+                    height={svgViewBox.split(" ")[3]}
+                    fill="url(#grid)"
+                  />
 
-                {/* Dynamic connection line between stations */}
-                <path
-                  d={detectedNodes
-                    .map(
-                      (node, i) => `${i === 0 ? "M" : "L"} ${node.x} ${node.y}`
-                    )
-                    .join(" ")}
-                  fill="none"
-                  stroke={lineColor}
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity="0.8"
-                />
+                  {/* SVG paths imported from JSON */}
+                  <BackgroundPaths paths={svgPaths} lineColor={lineColor} />
 
-                {detectedNodes.map((node) => {
-                  const isBeingDragged = draggingNodeId === node.id;
-                  return (
-                    <g
+                  {/* Dynamic connection line between stations */}
+                  <path
+                    d={connectionPath}
+                    fill="none"
+                    stroke={lineColor}
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.8"
+                  />
+
+                  {detectedNodes.map((node) => (
+                    <StationNode
                       key={node.id}
-                      className={
-                        isBeingDragged ? "cursor-grabbing" : "cursor-grab"
-                      }
-                    >
-                      <circle
-                        cx={node.x}
-                        cy={node.y}
-                        r={isBeingDragged ? 35 : 30}
-                        fill={
-                          node.phi >= 70
-                            ? "rgba(16,185,129,0.3)"
-                            : node.phi >= 50
-                              ? "rgba(245,158,11,0.3)"
-                              : "rgba(239,68,68,0.3)"
-                        }
-                        className="transition-all duration-200"
-                      />
-                      <circle
-                        cx={node.x}
-                        cy={node.y}
-                        r={isBeingDragged ? 14 : 12}
-                        fill="#1e1b4b"
-                        stroke={isBeingDragged ? "#a78bfa" : lineColor}
-                        strokeWidth={isBeingDragged ? 4 : 3}
-                        className="transition-all duration-200"
-                        onMouseDown={(e) => handleNodeDragStart(e, node.id)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (!draggingNodeId) {
-                            setEditingNode(node.id);
-                          }
-                        }}
-                      />
-                      <text
-                        x={node.x}
-                        y={node.y + 4}
-                        textAnchor="middle"
-                        className="text-[8px] font-bold fill-white pointer-events-none"
-                      >
-                        {node.phi}
-                      </text>
-                      {!isBeingDragged && (
-                        <g transform={`translate(${node.x}, ${node.y - 20})`}>
-                          <rect
-                            x="-35"
-                            y="-10"
-                            width="70"
-                            height="16"
-                            rx="3"
-                            fill="rgba(0,0,0,0.8)"
-                          />
-                          <text
-                            x="0"
-                            y="2"
-                            textAnchor="middle"
-                            className="text-[7px] fill-white pointer-events-none"
-                          >
-                            {node.name}
-                          </text>
-                        </g>
-                      )}
-                      <g
-                        transform={`translate(${node.x + 15}, ${node.y - 15})`}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteNode(node.id);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <circle r="8" fill="#ef4444" />
-                        <text
-                          x="0"
-                          y="3"
-                          textAnchor="middle"
-                          className="text-[8px] fill-white font-bold pointer-events-none"
-                        >
-                          ×
-                        </text>
-                      </g>
-                    </g>
-                  );
-                })}
+                      node={node}
+                      lineColor={lineColor}
+                      isBeingDragged={draggingNodeId === node.id}
+                      onDragStart={handleNodeDragStart}
+                      onEdit={setEditingNode}
+                      onDelete={deleteNode}
+                    />
+                  ))}
+                </g>
               </svg>
             </div>
           </div>
 
           <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-            <h3 className="text-sm font-semibold mb-3">{translations.instructions}</h3>
+            <h3 className="text-sm font-semibold mb-3">
+              {translations.instructions}
+            </h3>
             <div className="grid grid-cols-2 gap-4 text-xs text-white/70">
               <div className="space-y-2">
                 <div className="flex items-start gap-2">

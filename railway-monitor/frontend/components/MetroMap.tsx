@@ -27,11 +27,6 @@ const MetroMap: React.FC<MetroMapProps> = ({
   const { translations } = useCity();
   const svgWidth = 860;
   const svgHeight = 800;
-  const [editMode, setEditMode] = useState(false);
-  const [draggingNode, setDraggingNode] = useState<{
-    lineId: string;
-    stationId: string;
-  } | null>(null);
 
   // Estados para zoom y pan
   const [zoom, setZoom] = useState(1);
@@ -61,27 +56,6 @@ const MetroMap: React.FC<MetroMapProps> = ({
     selectedLine === "all"
       ? METRO_LINES
       : METRO_LINES.filter((l) => l.id === selectedLine);
-
-  const handleNodeDrag = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!draggingNode || !onUpdateCustomLine) return;
-
-    const svg = e.currentTarget;
-    const rect = svg.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * svgWidth;
-    const y = ((e.clientY - rect.top) / rect.height) * svgHeight;
-
-    const line = customLines.find((l) => l.id === draggingNode.lineId);
-    if (line) {
-      const updatedStations = line.stations.map((s) =>
-        s.id === draggingNode.stationId ? { ...s, x, y } : s
-      );
-      onUpdateCustomLine(draggingNode.lineId, updatedStations);
-    }
-  };
-
-  const handleNodeDragEnd = () => {
-    setDraggingNode(null);
-  };
 
   // Manejar zoom con la rueda del mouse
   const handleWheel = (e: React.WheelEvent) => {
@@ -143,17 +117,11 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
   // Manejar pan (arrastrar el mapa)
   const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (editMode || draggingNode) return;
     setIsPanning(true);
     setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
   };
 
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (editMode && draggingNode) {
-      handleNodeDrag(e);
-      return;
-    }
-
     if (isPanning) {
       setPan({
         x: e.clientX - panStart.x,
@@ -163,9 +131,6 @@ const MetroMap: React.FC<MetroMapProps> = ({
   };
 
   const handleMouseUp = () => {
-    if (editMode) {
-      handleNodeDragEnd();
-    }
     setIsPanning(false);
   };
 
@@ -202,22 +167,6 @@ const MetroMap: React.FC<MetroMapProps> = ({
           </div>
         </div>
       )}
-      {customLines.length > 0 && (
-        <div className="absolute top-2 right-2 z-10">
-          <button
-            onClick={() => setEditMode(!editMode)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              editMode
-                ? "bg-purple-600 text-white shadow-lg"
-                : "bg-white/10 text-white/60 hover:bg-white/20"
-            }`}
-          >
-            {editMode
-              ? `✓ ${translations.editMode}`
-              : `✏️ ${translations.editNodes}`}
-          </button>
-        </div>
-      )}
       <svg
         ref={svgRef}
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -228,7 +177,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         style={{
-          cursor: isPanning ? "grabbing" : editMode ? "default" : "grab",
+          cursor: isPanning ? "grabbing" : "grab",
           touchAction: "none",
         }}
       >
@@ -277,7 +226,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   // Amarillo: rgba(245, 180, 0, 1)
                   const t = (intensity - 0.3) / 0.3;
                   red = Math.floor(245 + (239 - 245) * t);
-                  green = Math.floor(180 - (112 * t));
+                  green = Math.floor(180 - 112 * t);
                   blue = 0;
                 } else {
                   // Naranja a rojo oscuro (0.6 - 1.0)
@@ -648,37 +597,22 @@ const MetroMap: React.FC<MetroMapProps> = ({
           {/* Custom Line Stations */}
           {customLines.map((line) =>
             line.stations.map((station, idx) => {
-              const isBeingDragged =
-                draggingNode?.lineId === line.id &&
-                draggingNode?.stationId === station.id;
               return (
                 <g
                   key={`custom-${station.id}`}
-                  className={editMode ? "cursor-move" : "cursor-pointer"}
-                  onMouseDown={
-                    editMode
-                      ? () =>
-                          setDraggingNode({
-                            lineId: line.id,
-                            stationId: station.id,
-                          })
-                      : undefined
-                  }
-                  onClick={
-                    !editMode
-                      ? () =>
-                          onSelectStation({
-                            ...station,
-                            line: line.name,
-                            lineColor: line.color,
-                          })
-                      : undefined
+                  className="cursor-pointer"
+                  onClick={() =>
+                    onSelectStation({
+                      ...station,
+                      line: line.name,
+                      lineColor: line.color,
+                    })
                   }
                 >
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={isBeingDragged ? 20 : 14}
+                    r={14}
                     fill={line.color}
                     opacity="0.3"
                     className="transition-all duration-200"
@@ -686,10 +620,10 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={isBeingDragged ? 14 : 10}
+                    r={10}
                     fill="#1e1b4b"
-                    stroke={editMode ? "#a78bfa" : line.color}
-                    strokeWidth={editMode ? 3 : 2}
+                    stroke={line.color}
+                    strokeWidth={2}
                     className="transition-all duration-200"
                   />
                   <text
@@ -700,26 +634,24 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   >
                     {idx + 1}
                   </text>
-                  {!editMode && (
-                    <g transform={`translate(${station.x}, ${station.y - 20})`}>
-                      <rect
-                        x="-35"
-                        y="-10"
-                        width="70"
-                        height="16"
-                        rx="3"
-                        fill="rgba(0,0,0,0.8)"
-                      />
-                      <text
-                        x="0"
-                        y="2"
-                        textAnchor="middle"
-                        className="text-[7px] fill-white"
-                      >
-                        {station.name}
-                      </text>
-                    </g>
-                  )}
+                  <g transform={`translate(${station.x}, ${station.y - 20})`}>
+                    <rect
+                      x="-35"
+                      y="-10"
+                      width="70"
+                      height="16"
+                      rx="3"
+                      fill="rgba(0,0,0,0.8)"
+                    />
+                    <text
+                      x="0"
+                      y="2"
+                      textAnchor="middle"
+                      className="text-[7px] fill-white"
+                    >
+                      {station.name}
+                    </text>
+                  </g>
                 </g>
               );
             })
