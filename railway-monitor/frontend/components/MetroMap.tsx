@@ -247,11 +247,25 @@ const MetroMap: React.FC<MetroMapProps> = ({
       {(zoom !== 1 || pan.x !== 0 || pan.y !== 0) && (
         <button
           onClick={handleResetView}
-          className="absolute top-4 right-4 z-30 pointer-events-auto bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200 flex items-center gap-2 font-semibold text-sm"
+          className="absolute top-4 right-4 z-30 pointer-events-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2 font-bold text-sm border border-blue-400/50 hover:scale-105"
           title="Reiniciar vista"
         >
-          <span className="text-lg">🎯</span>
-          Centrar
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+            <path d="M3 21v-5h5" />
+          </svg>
+          Centrar Vista
         </button>
       )}
 
@@ -585,7 +599,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={isSelected ? 18 : 14}
+                    r={isSelected ? 22 : 18}
                     fill={color}
                     opacity="0.3"
                     className="transition-all duration-300"
@@ -593,7 +607,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={isSelected ? 12 : 8}
+                    r={isSelected ? 15 : 11}
                     fill="#ffffff"
                     stroke={
                       isSelected
@@ -609,17 +623,17 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   {hasReports && (
                     <g>
                       <circle
-                        cx={station.x + 10}
-                        cy={station.y - 10}
-                        r="8"
+                        cx={station.x + 12}
+                        cy={station.y - 12}
+                        r="10"
                         fill={strokeColor}
                         className="animate-pulse"
                       />
                       <text
-                        x={station.x + 10}
-                        y={station.y - 7}
+                        x={station.x + 12}
+                        y={station.y - 8}
                         textAnchor="middle"
-                        className="text-[8px] font-bold fill-white"
+                        className="text-[10px] font-bold fill-white"
                       >
                         ⚠
                       </text>
@@ -786,7 +800,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={14}
+                    r={18}
                     fill={hasReports ? heatColor : line.color}
                     opacity="0.3"
                     className="transition-all duration-200"
@@ -794,7 +808,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={10}
+                    r={12}
                     fill="#ffffff"
                     stroke={hasReports ? strokeColor : line.color}
                     strokeWidth={2}
@@ -913,42 +927,42 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 };
                 const { reportCount, severity, complaintIndex } = reportData;
 
-                const maxWidth = 110;
-                const issueLines = wrapText(reportData.recentIssue, 18);
-                const baseHeight = 36;
-                const extraHeight = Math.max(0, issueLines.length - 1) * 8;
+                const maxWidth = 160;
+                const issueLines = wrapText(reportData.recentIssue, 22);
+                const baseHeight = 50;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 11;
                 const totalHeight = baseHeight + extraHeight;
 
                 return (
                   <g
                     key={`tooltip-${stationKey}`}
-                    transform={`translate(${station.x}, ${station.y - 20})`}
+                    transform={`translate(${station.x}, ${station.y - 28})`}
                   >
                     <rect
                       x={-maxWidth / 2}
-                      y="-18"
+                      y="-25"
                       width={maxWidth}
                       height={totalHeight}
-                      rx="4"
+                      rx="6"
                       fill="rgba(255,255,255,0.98)"
-                      stroke="rgba(156,163,175,0.3)"
-                      strokeWidth="1"
+                      stroke="rgba(156,163,175,0.4)"
+                      strokeWidth="1.5"
                     />
 
                     <text
                       x="0"
-                      y="-9"
+                      y="-13"
                       textAnchor="middle"
-                      className="text-[8px] font-bold fill-gray-900"
+                      className="text-[11px] font-bold fill-gray-900"
                     >
                       {station.name}
                     </text>
 
                     <text
                       x="0"
-                      y="-1"
+                      y="-2"
                       textAnchor="middle"
-                      className="text-[7px] fill-gray-600"
+                      className="text-[9px] fill-gray-600"
                     >
                       Reportes: {reportCount} | Índice: {complaintIndex}%
                     </text>
@@ -957,9 +971,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       <text
                         key={idx}
                         x="0"
-                        y={7 + idx * 8}
+                        y={9 + idx * 11}
                         textAnchor="middle"
-                        className={`text-[6px] font-semibold ${
+                        className={`text-[8px] font-semibold ${
                           reportCount > 0 ? "fill-red-600" : "fill-green-600"
                         }`}
                       >
@@ -969,9 +983,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y={15 + extraHeight}
+                      y={20 + extraHeight}
                       textAnchor="middle"
-                      className="text-[6px] fill-gray-500"
+                      className="text-[8px] fill-gray-500"
                     >
                       Gravedad: {(severity * 100).toFixed(0)}%
                     </text>
@@ -997,23 +1011,23 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 const { reportCount, severity, complaintIndex } = reportData;
                 const hasReports = reportCount > 0;
 
-                const maxWidth = 110;
-                const issueLines = wrapText(reportData.recentIssue, 18);
-                const baseHeight = 36;
-                const extraHeight = Math.max(0, issueLines.length - 1) * 8;
+                const maxWidth = 160;
+                const issueLines = wrapText(reportData.recentIssue, 22);
+                const baseHeight = 50;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 11;
                 const totalHeight = baseHeight + extraHeight;
 
                 return (
                   <g
                     key={`tooltip-${stationKey}`}
-                    transform={`translate(${station.x}, ${station.y - 20})`}
+                    transform={`translate(${station.x}, ${station.y - 28})`}
                   >
                     <rect
                       x={-maxWidth / 2}
-                      y="-18"
+                      y="-25"
                       width={maxWidth}
                       height={totalHeight}
-                      rx="4"
+                      rx="6"
                       fill="rgba(255,255,255,0.98)"
                       stroke={line.color}
                       strokeWidth="2"
@@ -1021,18 +1035,18 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y="-9"
+                      y="-13"
                       textAnchor="middle"
-                      className="text-[7px] fill-gray-900 font-bold"
+                      className="text-[11px] fill-gray-900 font-bold"
                     >
                       {station.name}
                     </text>
 
                     <text
                       x="0"
-                      y="-1"
+                      y="-2"
                       textAnchor="middle"
-                      className="text-[6px] fill-gray-600"
+                      className="text-[9px] fill-gray-600"
                     >
                       Reportes: {reportCount} | Índice: {complaintIndex}%
                     </text>
@@ -1041,9 +1055,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       <text
                         key={idx}
                         x="0"
-                        y={7 + idx * 8}
+                        y={9 + idx * 11}
                         textAnchor="middle"
-                        className={`text-[6px] font-semibold ${
+                        className={`text-[8px] font-semibold ${
                           hasReports ? "fill-red-600" : "fill-green-600"
                         }`}
                       >
@@ -1053,9 +1067,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y={15 + extraHeight}
+                      y={20 + extraHeight}
                       textAnchor="middle"
-                      className="text-[6px] fill-gray-500"
+                      className="text-[8px] fill-gray-500"
                     >
                       Gravedad: {(severity * 100).toFixed(0)}%
                     </text>
