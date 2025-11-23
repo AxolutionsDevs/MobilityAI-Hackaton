@@ -102,7 +102,10 @@ export default function TrendsDashboard() {
     });
     
     const lineDistribution = Object.entries(lineCounts)
-      .map(([name, value]) => ({ name: `Línea ${name}`, value }))
+      .map(([name, value]) => ({ 
+        name: name.startsWith('Línea') || name.startsWith('Linea') ? name : `Línea ${name}`, 
+        value 
+      }))
       .sort((a, b) => b.value - a.value); // Ordenar para mejor visualización
 
     // C. Sismógrafo (Timeline)
