@@ -47,6 +47,21 @@ function DashboardContent() {
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
 
+  // Establecer estación por defecto solo si hay líneas personalizadas cargadas
+  useEffect(() => {
+    if (customLines.length > 0 && !selectedStation) {
+      const firstLine = customLines[0];
+      if (firstLine.stations.length > 0) {
+        const firstStation = firstLine.stations[0];
+        setSelectedStation({
+          ...firstStation,
+          line: firstLine.name,
+          lineColor: firstLine.color,
+        });
+      }
+    }
+  }, [customLines]);
+
   const sampleComments: Comment[] = useMemo(() => {
     if (city === "cdmx") {
       return [
@@ -361,7 +376,7 @@ function DashboardContent() {
 
           {/* Right Column - Analytics */}
           <div className="space-y-6">
-            {selectedStation && <StationInfo station={selectedStation} />}
+            <StationInfo station={selectedStation} />
 
             {!selectedStation && (
               <>
@@ -401,72 +416,12 @@ function DashboardContent() {
                     ))}
                   </div>
                 </div>
-
-                {/* Actividad reciente */}
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
-                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-green-600" />
-                    Actividad Reciente
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      {
-                        time: "Hace 5 min",
-                        text: "Nueva incidencia reportada",
-                        type: "alert",
-                      },
-                      {
-                        time: "Hace 12 min",
-                        text: "Estación con alta afluencia",
-                        type: "warning",
-                      },
-                      {
-                        time: "Hace 25 min",
-                        text: "Comentario positivo recibido",
-                        type: "success",
-                      },
-                      {
-                        time: "Hace 1 hora",
-                        text: "Mantenimiento programado",
-                        type: "info",
-                      },
-                    ].map((activity, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 p-2 rounded-lg bg-white/60"
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full mt-1.5 ${
-                            activity.type === "alert"
-                              ? "bg-red-500"
-                              : activity.type === "warning"
-                              ? "bg-yellow-500"
-                              : activity.type === "success"
-                              ? "bg-green-500"
-                              : "bg-blue-500"
-                          }`}
-                        />
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-700">
-                            {activity.text}
-                          </p>
-                          <p className="text-[10px] text-gray-500 mt-0.5">
-                            {activity.time}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </>
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-[10px] text-gray-500 pt-3 border-t border-gray-300">
-          {translations.footer}
-        </footer>
       </div>
     </div>
   );

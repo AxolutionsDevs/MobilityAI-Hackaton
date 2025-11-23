@@ -17,6 +17,11 @@ interface StationInfoProps {
 const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
   const { translations } = useCity();
 
+  // Si no hay estación seleccionada, no mostrar nada
+  if (!station) {
+    return null;
+  }
+
   // Obtener datos reales de la estación
   const stationData = STATION_REPORT_DATA[station.name];
   const topKeywords = stationData?.topKeywords || [];
