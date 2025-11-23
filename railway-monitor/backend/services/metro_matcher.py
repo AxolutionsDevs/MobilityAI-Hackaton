@@ -73,34 +73,37 @@ LINE_COLORS = {
     "Línea 12": "#B09D5B"
 }
 
+METRO_VIENNA_MAP = {
+    "U1": ["Leopoldau", "Kagran", "Praterstern", "Stephansplatz", "Karlsplatz", "Oberlaa"],
+    "U2": ["Seestadt", "Stadion", "Praterstern", "Schottenring", "Volkstheater", "Karlsplatz"],
+    "U3": ["Ottakring", "Westbahnhof", "Volkstheater", "Stephansplatz", "Landstraße", "Simmering"],
+    "U4": ["Hütteldorf", "Schönbrunn", "Karlsplatz", "Landstraße", "Schwedenplatz", "Heiligenstadt"]
+}
 
+COLORS_VIENNA = {
+    "U1": "#E2021B", # Rojo
+    "U2": "#A368A3", # Morado
+    "U3": "#F58220", # Naranja
+    "U4": "#00A54F"  # Verde
+}
 def similarity_ratio(a: str, b: str) -> float:
-    """Calcula la similitud entre dos cadenas (0.0 a 1.0)."""
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
-
-def find_best_match(detected_name: str, threshold: float = 0.6) -> Optional[Tuple[str, str, float]]:
+def find_best_match(detected_name: str, station_map: dict, threshold: float = 0.6) -> Optional[Tuple[str, str, float]]:
     """
-    Encuentra la mejor coincidencia para un nombre detectado.
-    
-    Args:
-        detected_name: Nombre detectado por OCR
-        threshold: Umbral mínimo de similitud (0.0 a 1.0)
-        
-    Returns:
-        Tupla (nombre_estacion, linea, score) o None si no hay coincidencia
+    Ahora recibe 'station_map' para saber en qué ciudad buscar.
     """
     best_match = None
     best_score = 0.0
     best_line = None
     
-    for line, stations in METRO_CDMX_MAP.items():
+    # Iteramos sobre el mapa dinámico que recibimos
+    for line, stations in station_map.items():
         for station in stations:
             score = similarity_ratio(detected_name, station)
             
-            # También verificar si el nombre detectado está contenido en el nombre real
             if detected_name.lower() in station.lower() or station.lower() in detected_name.lower():
-                score = max(score, 0.8)  # Boost para coincidencias parciales
+                score = max(score, 0.8)
             
             if score > best_score:
                 best_score = score
@@ -112,7 +115,5 @@ def find_best_match(detected_name: str, threshold: float = 0.6) -> Optional[Tupl
     
     return None
 
-
-def get_line_color(line_name: str) -> str:
-    """Obtiene el color de una línea."""
-    return LINE_COLORS.get(line_name, "#808080")
+def get_line_color(line_name: str, color_map: dict) -> str:
+    return color_map.get(line_name, "#808080")
