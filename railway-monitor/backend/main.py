@@ -1,29 +1,12 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from services.metro_matcher import find_best_match, get_line_color
+from services.metro_matcher import find_best_match, get_line_color, METRO_CDMX_MAP, METRO_VIENNA_MAP, LINE_COLORS, COLORS_VIENNA
 from models.station_detection import LinesDetectionResponse, MetroLine, StationNode
 from collections import defaultdict
 import time
-from pydantic import BaseModel
-from typing import List, Union
+import json
+import os
 
-# 1. Coordenadas de la estación detectada
-class Coords(BaseModel):
-    x: float
-    y: float
-
-# 2. Objeto de estación cruda (como viene de tu OCR)
-class RawStationInput(BaseModel):
-    id: Union[int, str]  # Puede ser número o texto
-    nombre: str          # El texto sucio detectado (ej: "Stephansplz")
-    coords: Coords
-
-# 3. El Request principal que recibe el endpoint
-class ProcessStationsRequest(BaseModel):
-    filename: str                   # Ej: "mapa_vienna.png"
-    stations: List[RawStationInput] # Lista de estaciones detectadas
-
-    
 app = FastAPI(title="Railway Monitor Backend")
 
 origins = [
@@ -48,91 +31,91 @@ async def health():
 @app.get("/")
 async def root():
     return {"message": "Railway Monitor Backend"}
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from collections import defaultdict
-import time
-# Asumo que tienes tus modelos y funciones auxiliares importadas:
-# from models import LinesDetectionResponse, MetroLine, StationNode
-# from utils import find_best_match, get_line_color
-
-class StationRequest(BaseModel):
-    filename: str
-
-# Función auxiliar para simular lo que devolvería el OCR según el nombre del archivo
-def get_mock_stations_by_filename(filename: str):
-    # Datos de prueba (Simulación de OCR)
-    if "linea1" in filename.lower():
-        return [
-            {"id": 101, "nombre": "Observatorio", "coords": {"x": 100, "y": 500}},
-            {"id": 102, "nombre": "Tacubaya", "coords": {"x": 150, "y": 500}},
-            {"id": 103, "nombre": "Balderas", "coords": {"x": 300, "y": 500}},
-            {"id": 104, "nombre": "Pino Suárez", "coords": {"x": 400, "y": 500}},
-            {"id": 105, "nombre": "Pantitlán", "coords": {"x": 800, "y": 500}},
-            {"id": 999, "nombre": "Texto Basura", "coords": {"x": 0, "y": 0}} # Para probar no identificadas
-        ]
-    elif "mix" in filename.lower():
-        return [
-            {"id": 201, "nombre": "Polanco", "coords": {"x": 200, "y": 300}}, # Línea 7
-            {"id": 202, "nombre": "Hidalgo", "coords": {"x": 400, "y": 400}}, # Línea 2/3
-            {"id": 203, "nombre": "Bellas Artes", "coords": {"x": 450, "y": 400}} # Línea 2/8
-        ]
-    else:
-        return [] # Archivo desconocido devuelve lista vacía
 
 
-
-@app.post("/process-detected-stations", response_model=LinesDetectionResponse)
-async def process_detected_stations(request: ProcessStationsRequest):
+@app.post("/detect-stations", response_model=LinesDetectionResponse)
+async def detect_stations(file: UploadFile = File(...)):
     """
-    Recibe el JSON crudo del OCR y el nombre del archivo.
-    Realiza el fuzzy matching y agrupación dependiendo de la ciudad (detectada por filename).
+    Endpoint que recibe una imagen PNG y detecta las estaciones.
+    Según el nombre del archivo (vienna.png o cdmx.png), carga el JSON correspondiente
+    y hace fuzzy matching con las estaciones del Metro.
+    
+    Args:
+        file: Archivo PNG con el mapa del metro (vienna.png o cdmx.png)
+        
+    Returns:
+        JSON con las líneas y estaciones detectadas agrupadas
     """
+    # Validar que sea un archivo de imagen
+    if not file.content_type or "image" not in file.content_type:
+        raise HTTPException(
+            status_code=400, 
+            detail="El archivo debe ser una imagen (PNG recomendado)"
+        )
+    
     try:
-        # 1. SELECCIONAR MAPA Y COLORES SEGÚN EL NOMBRE DEL ARCHIVO
-        filename = request.filename.lower()
+        # 1. DETERMINAR CIUDAD POR NOMBRE DE ARCHIVO
+        filename = file.filename.lower() if file.filename else ""
         
         if "vienna" in filename or "wien" in filename:
+            json_file = "services/estacionesvienna.json"
             current_map = METRO_VIENNA_MAP
             current_colors = COLORS_VIENNA
-            city_name = "Viena"
-        else:
-            # Default a CDMX
+            city_name = "Vienna"
+        elif "cdmx" in filename or "mexico" in filename:
+            json_file = "services/estacionescdmx.json"
             current_map = METRO_CDMX_MAP
-            current_colors = COLORS_CDMX
+            current_colors = LINE_COLORS
             city_name = "CDMX"
-
-        # 2. PROCESAR LAS ESTACIONES QUE NOS ENVIASTE
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="El nombre del archivo debe contener 'vienna' o 'cdmx' para identificar la ciudad"
+            )
+        
+        # 2. CARGAR JSON CON ESTACIONES DETECTADAS
+        json_path = os.path.join(os.path.dirname(__file__), json_file)
+        
+        if not os.path.exists(json_path):
+            raise HTTPException(
+                status_code=404,
+                detail=f"No se encontró el archivo JSON: {json_file}"
+            )
+        
+        with open(json_path, 'r', encoding='utf-8') as f:
+            stations_data = json.load(f)
+        
+        # 3. PROCESAR ESTACIONES CON FUZZY MATCHING
         lines_dict = defaultdict(list)
         unmatched_stations = []
         
-        # Iteramos sobre la lista que viene en el request
-        for raw_station in request.stations:
-            detected_name = raw_station.nombre
+        for station in stations_data:
+            detected_name = station["nombre"]
             
-            # Hacemos match contra el mapa seleccionado
+            # Hacer match contra el mapa seleccionado
             match_result = find_best_match(detected_name, current_map)
             
             if match_result:
                 real_name, line_name, score = match_result
                 
-                # Creamos el nodo limpio
+                # Crear nodo de estación
                 station_node = StationNode(
-                    id=f"node-{raw_station.id}",
+                    id=f"node-{station['id']}",
                     name=real_name,
-                    x=raw_station.coords.x,
-                    y=raw_station.coords.y
+                    x=float(station["coords"]["x"]),
+                    y=float(station["coords"]["y"])
                 )
                 
                 lines_dict[line_name].append(station_node)
             else:
+                # Estación no identificada
                 unmatched_stations.append(detected_name)
         
-        # 3. CONSTRUIR LA RESPUESTA AGRUPADA
+        # 4. CONSTRUIR RESPUESTA AGRUPADA POR LÍNEA
         lines = []
         for line_name, stations_list in lines_dict.items():
             metro_line = MetroLine(
-                id=f"{city_name}-{line_name}-{int(time.time())}",
+                id=f"{city_name}-{line_name}-{int(time.time() * 1000)}",
                 name=line_name,
                 color=get_line_color(line_name, current_colors),
                 stations=stations_list
@@ -141,9 +124,9 @@ async def process_detected_stations(request: ProcessStationsRequest):
         
         total_stations = sum(len(line.stations) for line in lines)
         
-        message = f"Procesado mapa de {city_name}. Detectadas {total_stations} estaciones."
+        message = f"Procesado mapa de {city_name}. {total_stations} estaciones identificadas en {len(lines)} líneas"
         if unmatched_stations:
-            message += f" ({len(unmatched_stations)} no reconocidas)."
+            message += f". {len(unmatched_stations)} estaciones no reconocidas"
         
         return LinesDetectionResponse(
             success=True,
@@ -152,6 +135,12 @@ async def process_detected_stations(request: ProcessStationsRequest):
             lines=lines,
             message=message
         )
-
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error procesando estaciones: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al procesar la imagen: {str(e)}"
+        )
+
