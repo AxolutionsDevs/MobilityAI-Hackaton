@@ -30,28 +30,69 @@ const MetroMap: React.FC<MetroMapProps> = ({
   const svgWidth = 860;
   const svgHeight = 800;
 
+  // Función para dividir texto en múltiples líneas
+  const wrapText = (text: string, maxCharsPerLine: number = 18) => {
+    if (text.length <= maxCharsPerLine) return [text];
+
+    const words = text.split(" ");
+    const lines: string[] = [];
+    let currentLine = "";
+
+    words.forEach((word) => {
+      if ((currentLine + " " + word).trim().length <= maxCharsPerLine) {
+        currentLine = (currentLine + " " + word).trim();
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  };
+
   // Estados para zoom y pan
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [isMapFocused, setIsMapFocused] = useState(false);
   const [hoveredStation, setHoveredStation] = useState<string | null>(null);
-  const [visibleStations, setVisibleStations] = useState<number>(0);
+  const [isResetting, setIsResetting] = useState(false);
   const svgRef = React.useRef<SVGSVGElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Calcular color e intensidad del rojo basado en gravedad (0-1)
   const getHeatColor = (severity: number) => {
-    // severity: 0 = sin problema, 1 = gravedad máxima
-    // A mayor severidad, rojo más intenso
+    // severity: 0 = sin problema (verde), 1 = gravedad máxima (rojo)
     const intensity = Math.min(Math.max(severity, 0), 1);
-    const red = Math.floor(139 + (255 - 139) * intensity); // De #8B0000 a #FF0000
-    const alpha = 0.3 + 0.7 * intensity; // De 0.3 a 1.0 opacidad
+
+    let red, green, blue;
+
+    if (intensity < 0.3) {
+      // Verde brillante a amarillo-verde (0.0 - 0.3)
+      const t = intensity / 0.3;
+      red = Math.floor(32 + (245 - 32) * t);
+      green = Math.floor(224 + (158 - 224) * t);
+      blue = Math.floor(10 * (1 - t));
+    } else if (intensity < 0.6) {
+      // Amarillo a naranja (0.3 - 0.6)
+      const t = (intensity - 0.3) / 0.3;
+      red = Math.floor(245 + (239 - 245) * t);
+      green = Math.floor(158 - 90 * t);
+      blue = 0;
+    } else {
+      // Naranja a rojo oscuro (0.6 - 1.0)
+      const t = (intensity - 0.6) / 0.4;
+      red = Math.floor(239 - 100 * t);
+      green = Math.floor(68 * (1 - t));
+      blue = 0;
+    }
+
+    const alpha = 0.3 + 0.7 * intensity;
 
     return {
-      color: `rgba(${red}, 0, 0, ${alpha})`,
-      strokeColor: `rgb(${red}, 0, 0)`,
+      color: `rgba(${red}, ${green}, ${blue}, ${alpha})`,
+      strokeColor: `rgb(${red}, ${green}, ${blue})`,
       intensity: intensity,
     };
   };
@@ -63,78 +104,30 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
   const hasNoLines = METRO_LINES.length === 0 && customLines.length === 0;
 
-  // Animación progresiva de estaciones
-  React.useEffect(() => {
-    setVisibleStations(0);
-    const totalStations = customLines.reduce(
-      (acc, line) => acc + line.stations.length,
-      0
-    );
-
-    if (totalStations === 0) return;
-
-    // Duración total: 3 segundos para que todo termine al mismo tiempo
-    const totalDuration = 3000;
-    const intervalTime = totalDuration / totalStations;
-
-    const interval = setInterval(() => {
-      setVisibleStations((prev) => {
-        if (prev >= totalStations) {
-          clearInterval(interval);
-          return totalStations;
-        }
-        return prev + 1;
-      });
-    }, intervalTime);
-
-    return () => clearInterval(interval);
-  }, [customLines]);
-
   // Manejar zoom con la rueda del mouse
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!isMapFocused) {
-      return;
-    }
 
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.min(Math.max(zoom * delta, 0.5), 5);
     setZoom(newZoom);
   };
 
-  // Activar el mapa para zoom
-  const handleMapClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsMapFocused(true);
-  };
-
-  // Desactivar cuando se hace click fuera y manejar scroll
+  // Manejar scroll cuando el cursor está sobre el mapa
   React.useEffect(() => {
     const containerElement = containerRef.current;
 
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerElement && !containerElement.contains(e.target as Node)) {
-        setIsMapFocused(false);
-      }
-    };
-
     const handleWheelCapture = (e: WheelEvent) => {
-      // Siempre prevenir scroll cuando está sobre el mapa
+      // Prevenir scroll cuando está sobre el mapa
       if (containerElement && containerElement.contains(e.target as Node)) {
         e.preventDefault();
         e.stopPropagation();
 
-        // Si el mapa está enfocado, manejar el zoom aquí
-        if (isMapFocused) {
-          const delta = e.deltaY > 0 ? 0.9 : 1.1;
-          setZoom((prev) => Math.min(Math.max(prev * delta, 0.5), 5));
-        }
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        setZoom((prev) => Math.min(Math.max(prev * delta, 0.5), 5));
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
 
     // Agregar listener para prevenir scroll y manejar zoom
     document.addEventListener("wheel", handleWheelCapture, {
@@ -143,10 +136,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
     });
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("wheel", handleWheelCapture, true);
     };
-  }, [isMapFocused]);
+  }, []);
 
   // Manejar pan (arrastrar el mapa)
   const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -156,9 +148,22 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (isPanning) {
+      // Calcular nuevo pan
+      const newX = e.clientX - panStart.x;
+      const newY = e.clientY - panStart.y;
+
+      // Límites de movimiento que se escalan con el zoom
+      // Aumentar el límite base y usar una fórmula más generosa
+      const basePanLimit = 400;
+      // Usar una escala que crece más rápido con el zoom
+      const zoomFactor = Math.max(1, zoom * 1.5);
+      const maxPanX = basePanLimit * zoomFactor;
+      const maxPanY = basePanLimit * zoomFactor;
+
+      // Aplicar límites
       setPan({
-        x: e.clientX - panStart.x,
-        y: e.clientY - panStart.y,
+        x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
+        y: Math.max(-maxPanY, Math.min(maxPanY, newY)),
       });
     }
   };
@@ -167,11 +172,51 @@ const MetroMap: React.FC<MetroMapProps> = ({
     setIsPanning(false);
   };
 
+  // Función para resetear zoom y pan con animación suave
+  const handleResetView = () => {
+    if (isResetting) return; // Evitar múltiples animaciones simultáneas
+
+    setIsResetting(true);
+    const startZoom = zoom;
+    const startPan = { ...pan };
+    const targetZoom = 0.55; // Zoom más alejado para ver todo el mapa
+    const targetPan = { x: 0, y: -100 };
+
+    const duration = 500; // 500ms de animación
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Función de easing suave (ease-out-cubic)
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+      // Interpolar zoom y pan
+      const newZoom = startZoom + (targetZoom - startZoom) * easeProgress;
+      const newPan = {
+        x: startPan.x + (targetPan.x - startPan.x) * easeProgress,
+        y: startPan.y + (targetPan.y - startPan.y) * easeProgress,
+      };
+
+      setZoom(newZoom);
+      setPan(newPan);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setIsResetting(false);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden bg-gray-100 border border-gray-300 rounded-lg p-4"
-      style={{ touchAction: "none" }}
+      className="relative w-full overflow-hidden bg-gray-100 border border-gray-300 rounded-lg p-4 select-none"
+      style={{ touchAction: "none", userSelect: "none" }}
       onWheel={handleWheel}
     >
       {/* Mensaje cuando no hay líneas */}
@@ -198,32 +243,32 @@ const MetroMap: React.FC<MetroMapProps> = ({
         </div>
       )}
 
-      {/* Overlay de hover cuando el mapa no está enfocado */}
-      {!isMapFocused && !hasNoLines && (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-200/30 to-gray-300/30 z-20 rounded-2xl cursor-pointer"
-          onClick={handleMapClick}
+      {/* Botón de reset zoom */}
+      {(zoom !== 1 || pan.x !== 0 || pan.y !== 0) && (
+        <button
+          onClick={handleResetView}
+          className="absolute top-4 right-4 z-30 pointer-events-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2 font-bold text-sm border border-blue-400/50 hover:scale-105"
+          title="Reiniciar vista"
         >
-          <div className="bg-gray-300 px-6 py-3 rounded-xl border border-gray-400 shadow-2xl">
-            <p className="text-gray-800 text-sm font-semibold flex items-center gap-2">
-              <span className="text-2xl">🖱️</span>
-              Click para interactuar con el mapa
-            </p>
-          </div>
-        </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+            <path d="M3 21v-5h5" />
+          </svg>
+          Centrar Vista
+        </button>
       )}
 
-      {/* Indicador de zoom activo */}
-      {isMapFocused && (
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
-          <div className="bg-green-500 px-4 py-2 rounded-lg border border-green-600 shadow-lg">
-            <p className="text-gray-900 text-xs font-semibold flex items-center gap-2">
-              <span>🔍</span>
-              Usa la rueda del mouse para zoom | Arrastra para mover
-            </p>
-          </div>
-        </div>
-      )}
       <svg
         ref={svgRef}
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -241,6 +286,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
         <g
           transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
           transformOrigin="center"
+          style={{
+            transition: isResetting ? "none" : "transform 0.1s ease-out",
+          }}
         >
           <defs>
             {METRO_LINES.map((line) => (
@@ -349,16 +397,30 @@ const MetroMap: React.FC<MetroMapProps> = ({
           <g className="heatmap-layer" filter="url(#heatmap-blur)">
             {filteredLines.map((line) =>
               line.stations.map((station) => {
-                const reportData = STATION_REPORT_DATA[station.id] || {
+                const reportData = STATION_REPORT_DATA[station.name] || {
                   reportCount: 0,
-                  severity: 0,
+                  severity: 0.05,
+                  recentIssue: "Todo en orden",
                 };
                 const { reportCount, severity } = reportData;
+
+                // Debug log
+                if (station.name === "Ciudad Azteca" || reportCount > 0) {
+                  console.log(
+                    "Heatmap - Station:",
+                    station.name,
+                    "Reports:",
+                    reportCount,
+                    "Severity:",
+                    severity
+                  );
+                }
 
                 // Radio del blur basado en número de reportes (más reportes = blur más grande)
                 const baseRadius = 25;
                 const maxRadius = 150;
-                const normalizedReports = Math.min(reportCount / 100, 1); // Normalizar a 0-1
+                const normalizedReports =
+                  reportCount === 0 ? 0.1 : Math.min(reportCount / 100, 1);
                 const heatRadius =
                   baseRadius +
                   (maxRadius - baseRadius) *
@@ -372,12 +434,65 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   19
                 )}`;
 
-                // Solo mostrar heatmap si hay reportes
-                if (reportCount === 0) return null;
-
                 return (
                   <circle
                     key={`heat-${station.id}`}
+                    cx={station.x}
+                    cy={station.y}
+                    r={heatRadius}
+                    fill={`url(#${gradientId})`}
+                    className="transition-all duration-700 ease-in-out"
+                    style={{ mixBlendMode: "screen" }}
+                  />
+                );
+              })
+            )}
+          </g>
+
+          {/* Custom Heatmap Layer para líneas importadas */}
+          <g className="heatmap-layer-custom" filter="url(#heatmap-blur)">
+            {customLines.map((line) =>
+              line.stations.map((station) => {
+                const reportData = STATION_REPORT_DATA[station.name] || {
+                  reportCount: 0,
+                  severity: 0.05,
+                  recentIssue: "Todo en orden",
+                };
+                const { reportCount, severity } = reportData;
+
+                // Debug log
+                if (reportCount > 0) {
+                  console.log(
+                    "Custom Heatmap - Station:",
+                    station.name,
+                    "Reports:",
+                    reportCount,
+                    "Severity:",
+                    severity
+                  );
+                }
+
+                // Radio del blur basado en número de reportes
+                const baseRadius = 25;
+                const maxRadius = 150;
+                const normalizedReports =
+                  reportCount === 0 ? 0.1 : Math.min(reportCount / 100, 1);
+                const heatRadius =
+                  baseRadius +
+                  (maxRadius - baseRadius) *
+                    normalizedReports *
+                    heatmapIntensity;
+
+                // Seleccionar gradiente basado en severidad
+                const gradientIndex = Math.floor(severity * 19);
+                const gradientId = `heat-gradient-${Math.min(
+                  gradientIndex,
+                  19
+                )}`;
+
+                return (
+                  <circle
+                    key={`heat-custom-${line.id}-${station.id}`}
                     cx={station.x}
                     cy={station.y}
                     r={heatRadius}
@@ -434,12 +549,6 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   opacity="0.6"
-                  className="animate-draw-line"
-                  style={{
-                    strokeDasharray: "2000",
-                    strokeDashoffset: "2000",
-                    animation: "drawLine 3s ease-out forwards",
-                  }}
                 />
                 <path
                   d={pathData}
@@ -448,12 +557,6 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   strokeWidth="4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="animate-draw-line"
-                  style={{
-                    strokeDasharray: "2000",
-                    strokeDashoffset: "2000",
-                    animation: "drawLine 3s ease-out forwards",
-                  }}
                 />
               </g>
             );
@@ -463,11 +566,13 @@ const MetroMap: React.FC<MetroMapProps> = ({
           {filteredLines.map((line) =>
             line.stations.map((station) => {
               const data = stationData[station.id];
-              const reportData = STATION_REPORT_DATA[station.id] || {
+              const reportData = STATION_REPORT_DATA[station.name] || {
                 reportCount: 0,
-                severity: 0,
+                severity: 0.05,
+                recentIssue: "Todo en orden",
+                complaintIndex: 0,
               };
-              const { reportCount, severity } = reportData;
+              const { reportCount, severity, complaintIndex } = reportData;
               const { color, strokeColor, intensity } = getHeatColor(severity);
               const isSelected = selectedStation?.id === station.id;
               const hasReports = reportCount > 0;
@@ -494,7 +599,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={isSelected ? 18 : 14}
+                    r={isSelected ? 22 : 18}
                     fill={color}
                     opacity="0.3"
                     className="transition-all duration-300"
@@ -502,7 +607,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={isSelected ? 12 : 8}
+                    r={isSelected ? 15 : 11}
                     fill="#ffffff"
                     stroke={
                       isSelected
@@ -514,53 +619,21 @@ const MetroMap: React.FC<MetroMapProps> = ({
                     strokeWidth={isSelected ? 3 : 2}
                     className="transition-all duration-300 hover:r-12"
                   />
-                  <text
-                    x={station.x}
-                    y={station.y + 3}
-                    textAnchor="middle"
-                    className="text-[8px] font-bold fill-gray-900 pointer-events-none"
-                  >
-                    {reportCount}
-                  </text>
-
-                  {/* Nombre al hacer hover (solo si no está seleccionada) */}
-                  {isHovered && !isSelected && (
-                    <g transform={`translate(${station.x}, ${station.y - 20})`}>
-                      <rect
-                        x="-40"
-                        y="-12"
-                        width="80"
-                        height="18"
-                        rx="4"
-                        fill="rgba(255,255,255,0.98)"
-                        stroke={line.color}
-                        strokeWidth="2"
-                      />
-                      <text
-                        x="0"
-                        y="2"
-                        textAnchor="middle"
-                        className="text-[8px] fill-gray-900 font-semibold"
-                      >
-                        {station.name}
-                      </text>
-                    </g>
-                  )}
 
                   {hasReports && (
                     <g>
                       <circle
-                        cx={station.x + 10}
-                        cy={station.y - 10}
-                        r="8"
+                        cx={station.x + 12}
+                        cy={station.y - 12}
+                        r="10"
                         fill={strokeColor}
                         className="animate-pulse"
                       />
                       <text
-                        x={station.x + 10}
-                        y={station.y - 7}
+                        x={station.x + 12}
+                        y={station.y - 8}
                         textAnchor="middle"
-                        className="text-[8px] font-bold fill-white"
+                        className="text-[10px] font-bold fill-white"
                       >
                         ⚠
                       </text>
@@ -697,46 +770,28 @@ const MetroMap: React.FC<MetroMapProps> = ({
               const stationKey = `custom-${line.id}-${station.id}`;
               const isHovered = hoveredStation === stationKey;
 
-              // Calcular índice global de la estación
-              let globalIndex = 0;
-              for (const l of customLines) {
-                if (l.id === line.id) {
-                  globalIndex += idx;
-                  break;
-                }
-                globalIndex += l.stations.length;
-              }
-
-              const isVisible = globalIndex < visibleStations;
-
-              if (!isVisible) return null;
-
-              // Calcular delay dinámico para que todo termine en 3 segundos
-              // La animación dura 0.4s, así que el último delay debe ser 3s - 0.4s = 2.6s
-              const totalStations = customLines.reduce(
-                (acc, l) => acc + l.stations.length,
-                0
-              );
-              const animationDuration = 0.4;
-              const totalAnimationTime = 3;
-              const maxDelay = totalAnimationTime - animationDuration;
-              const delayPerStation =
-                totalStations > 1 ? maxDelay / (totalStations - 1) : 0;
+              // Obtener datos reales de quejas
+              const reportData = STATION_REPORT_DATA[station.name] || {
+                reportCount: 0,
+                severity: 0.05,
+                recentIssue: "Todo en orden",
+                complaintIndex: 0,
+              };
+              const { reportCount, severity, complaintIndex } = reportData;
+              const { color: heatColor, strokeColor } = getHeatColor(severity);
+              const hasReports = reportCount > 0;
 
               return (
                 <g
                   key={`custom-${station.id}`}
-                  className="cursor-pointer animate-fade-in"
-                  style={{
-                    animation: `fadeInScale ${animationDuration}s ease-out ${
-                      globalIndex * delayPerStation
-                    }s both`,
-                  }}
+                  className="cursor-pointer"
                   onClick={() =>
                     onSelectStation({
                       ...station,
                       line: line.name,
                       lineColor: line.color,
+                      reportCount,
+                      severity,
                     })
                   }
                   onMouseEnter={() => setHoveredStation(stationKey)}
@@ -745,50 +800,20 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={14}
-                    fill={line.color}
+                    r={18}
+                    fill={hasReports ? heatColor : line.color}
                     opacity="0.3"
                     className="transition-all duration-200"
                   />
                   <circle
                     cx={station.x}
                     cy={station.y}
-                    r={10}
+                    r={12}
                     fill="#ffffff"
-                    stroke={line.color}
+                    stroke={hasReports ? strokeColor : line.color}
                     strokeWidth={2}
                     className="transition-all duration-200"
                   />
-                  <text
-                    x={station.x}
-                    y={station.y + 3}
-                    textAnchor="middle"
-                    className="text-[8px] font-bold fill-gray-900 pointer-events-none"
-                  >
-                    {idx + 1}
-                  </text>
-                  {isHovered && (
-                    <g transform={`translate(${station.x}, ${station.y - 20})`}>
-                      <rect
-                        x="-35"
-                        y="-10"
-                        width="70"
-                        height="16"
-                        rx="3"
-                        fill="rgba(255,255,255,0.98)"
-                        stroke={line.color}
-                        strokeWidth="2"
-                      />
-                      <text
-                        x="0"
-                        y="2"
-                        textAnchor="middle"
-                        className="text-[7px] fill-gray-900 font-semibold"
-                      >
-                        {station.name}
-                      </text>
-                    </g>
-                  )}
                 </g>
               );
             })
@@ -821,7 +846,238 @@ const MetroMap: React.FC<MetroMapProps> = ({
             </g>
           ))}
 
-          {/* Custom Line Labels - Removed */}
+          {/* Custom Line Labels */}
+          {customLines.map((line) => {
+            // Extraer el número/letra de la línea del nombre
+            // "Metro CDMX Línea 6" → "L6"
+            // "Metro CDMX Línea B" → "LB"
+            const lineMatch = line.name.match(/Línea\s+([A-Z0-9]+)/i);
+            const lineLabel = lineMatch ? `L${lineMatch[1]}` : line.name;
+            const lastStation = line.stations[line.stations.length - 1];
+
+            return (
+              <React.Fragment key={`label-custom-${line.id}`}>
+                {/* Label al inicio de la línea */}
+                <g
+                  transform={`translate(${line.stations[0].x - 30}, ${
+                    line.stations[0].y - 20
+                  })`}
+                >
+                  <rect
+                    x="0"
+                    y="0"
+                    width="24"
+                    height="14"
+                    rx="3"
+                    fill={line.color}
+                  />
+                  <text
+                    x="12"
+                    y="11"
+                    textAnchor="middle"
+                    className="text-[8px] fill-white font-bold"
+                  >
+                    {lineLabel}
+                  </text>
+                </g>
+
+                {/* Label al final de la línea */}
+                <g
+                  transform={`translate(${lastStation.x + 6}, ${
+                    lastStation.y - 20
+                  })`}
+                >
+                  <rect
+                    x="0"
+                    y="0"
+                    width="24"
+                    height="14"
+                    rx="3"
+                    fill={line.color}
+                  />
+                  <text
+                    x="12"
+                    y="11"
+                    textAnchor="middle"
+                    className="text-[8px] fill-white font-bold"
+                  >
+                    {lineLabel}
+                  </text>
+                </g>
+              </React.Fragment>
+            );
+          })}
+
+          {/* Hover Tooltips Layer - Siempre al frente */}
+          <g className="tooltips-layer" style={{ pointerEvents: "none" }}>
+            {/* Tooltips for predefined lines */}
+            {filteredLines.map((line) =>
+              line.stations.map((station) => {
+                const stationKey = `${line.id}-${station.id}`;
+                const isHovered = hoveredStation === stationKey;
+                const isSelected = selectedStation?.id === station.id;
+
+                if (!isHovered || isSelected) return null;
+
+                const reportData = STATION_REPORT_DATA[station.name] || {
+                  reportCount: 0,
+                  severity: 0.05,
+                  recentIssue: "Todo en orden",
+                  complaintIndex: 0,
+                };
+                const { reportCount, severity, complaintIndex } = reportData;
+
+                const maxWidth = 160;
+                const issueLines = wrapText(reportData.recentIssue, 22);
+                const baseHeight = 50;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 11;
+                const totalHeight = baseHeight + extraHeight;
+
+                return (
+                  <g
+                    key={`tooltip-${stationKey}`}
+                    transform={`translate(${station.x}, ${station.y - 28})`}
+                  >
+                    <rect
+                      x={-maxWidth / 2}
+                      y="-25"
+                      width={maxWidth}
+                      height={totalHeight}
+                      rx="6"
+                      fill="rgba(255,255,255,0.98)"
+                      stroke="rgba(156,163,175,0.4)"
+                      strokeWidth="1.5"
+                    />
+
+                    <text
+                      x="0"
+                      y="-13"
+                      textAnchor="middle"
+                      className="text-[11px] font-bold fill-gray-900"
+                    >
+                      {station.name}
+                    </text>
+
+                    <text
+                      x="0"
+                      y="-2"
+                      textAnchor="middle"
+                      className="text-[9px] fill-gray-600"
+                    >
+                      Reportes: {reportCount} | Índice: {complaintIndex}%
+                    </text>
+
+                    {issueLines.map((line, idx) => (
+                      <text
+                        key={idx}
+                        x="0"
+                        y={9 + idx * 11}
+                        textAnchor="middle"
+                        className={`text-[8px] font-semibold ${
+                          reportCount > 0 ? "fill-red-600" : "fill-green-600"
+                        }`}
+                      >
+                        {line}
+                      </text>
+                    ))}
+
+                    <text
+                      x="0"
+                      y={20 + extraHeight}
+                      textAnchor="middle"
+                      className="text-[8px] fill-gray-500"
+                    >
+                      Gravedad: {(severity * 100).toFixed(0)}%
+                    </text>
+                  </g>
+                );
+              })
+            )}
+
+            {/* Tooltips for custom lines */}
+            {customLines.map((line) =>
+              line.stations.map((station) => {
+                const stationKey = `custom-${line.id}-${station.id}`;
+                const isHovered = hoveredStation === stationKey;
+
+                if (!isHovered) return null;
+
+                const reportData = STATION_REPORT_DATA[station.name] || {
+                  reportCount: 0,
+                  severity: 0.05,
+                  recentIssue: "Todo en orden",
+                  complaintIndex: 0,
+                };
+                const { reportCount, severity, complaintIndex } = reportData;
+                const hasReports = reportCount > 0;
+
+                const maxWidth = 160;
+                const issueLines = wrapText(reportData.recentIssue, 22);
+                const baseHeight = 50;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 11;
+                const totalHeight = baseHeight + extraHeight;
+
+                return (
+                  <g
+                    key={`tooltip-${stationKey}`}
+                    transform={`translate(${station.x}, ${station.y - 28})`}
+                  >
+                    <rect
+                      x={-maxWidth / 2}
+                      y="-25"
+                      width={maxWidth}
+                      height={totalHeight}
+                      rx="6"
+                      fill="rgba(255,255,255,0.98)"
+                      stroke={line.color}
+                      strokeWidth="2"
+                    />
+
+                    <text
+                      x="0"
+                      y="-13"
+                      textAnchor="middle"
+                      className="text-[11px] fill-gray-900 font-bold"
+                    >
+                      {station.name}
+                    </text>
+
+                    <text
+                      x="0"
+                      y="-2"
+                      textAnchor="middle"
+                      className="text-[9px] fill-gray-600"
+                    >
+                      Reportes: {reportCount} | Índice: {complaintIndex}%
+                    </text>
+
+                    {issueLines.map((line, idx) => (
+                      <text
+                        key={idx}
+                        x="0"
+                        y={9 + idx * 11}
+                        textAnchor="middle"
+                        className={`text-[8px] font-semibold ${
+                          hasReports ? "fill-red-600" : "fill-green-600"
+                        }`}
+                      >
+                        {line}
+                      </text>
+                    ))}
+
+                    <text
+                      x="0"
+                      y={20 + extraHeight}
+                      textAnchor="middle"
+                      className="text-[8px] fill-gray-500"
+                    >
+                      Gravedad: {(severity * 100).toFixed(0)}%
+                    </text>
+                  </g>
+                );
+              })
+            )}
+          </g>
         </g>
 
         {/* Legend - Fija, no afectada por zoom */}

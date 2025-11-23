@@ -12,7 +12,6 @@ import { Comment, CustomLine } from "@/types";
 import {
   Activity,
   AlertTriangle,
-  BarChart3,
   Globe,
   Map,
   ThumbsUp,
@@ -22,8 +21,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Area,
-  AreaChart,
   CartesianGrid,
   Legend,
   Line,
@@ -49,6 +46,21 @@ function DashboardContent() {
   >("heatmap");
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
+
+  // Establecer estación por defecto solo si hay líneas personalizadas cargadas
+  useEffect(() => {
+    if (customLines.length > 0 && !selectedStation) {
+      const firstLine = customLines[0];
+      if (firstLine.stations.length > 0) {
+        const firstStation = firstLine.stations[0];
+        setSelectedStation({
+          ...firstStation,
+          line: firstLine.name,
+          lineColor: firstLine.color,
+        });
+      }
+    }
+  }, [customLines]);
 
   const sampleComments: Comment[] = useMemo(() => {
     if (city === "cdmx") {
@@ -178,7 +190,6 @@ function DashboardContent() {
     () => [
       { id: "heatmap", label: translations.heatmap, icon: Map },
       { id: "import", label: translations.importSVG, icon: Upload },
-      { id: "indicators", label: translations.indicators, icon: BarChart3 },
       { id: "predictive", label: translations.predictive, icon: TrendingUp },
       { id: "comparison", label: translations.comparison, icon: Globe },
       { id: "trends", label: "Tendencias", icon: Activity },
@@ -253,110 +264,6 @@ function DashboardContent() {
 
             {activeView === "import" && (
               <SVGImporter onSave={handleSaveCustomLine} />
-            )}
-
-            {activeView === "indicators" && (
-              <div className="p-6 rounded-2xl bg-gray-200 backdrop-blur-sm border border-gray-400">
-                <h3 className="text-lg font-semibold mb-6 flex items-center gap-3 text-gray-900">
-                  <BarChart3 className="w-5 h-5 text-blue-600" />
-                  {translations.weeklyTrends}
-                </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={trendData}>
-                    <defs>
-                      <linearGradient
-                        id="colorSeguridad"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#dc2626"
-                          stopOpacity={0.8}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#dc2626"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="colorPuntualidad"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#ea580c"
-                          stopOpacity={0.8}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#ea580c"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="colorLimpieza"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#16a34a"
-                          stopOpacity={0.8}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#16a34a"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
-                    <XAxis dataKey="day" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#f9fafb",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="seguridad"
-                      stroke="#dc2626"
-                      fillOpacity={1}
-                      fill="url(#colorSeguridad)"
-                      name={translations.security}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="puntualidad"
-                      stroke="#ea580c"
-                      fillOpacity={1}
-                      fill="url(#colorPuntualidad)"
-                      name={translations.punctuality}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="limpieza"
-                      stroke="#16a34a"
-                      fillOpacity={1}
-                      fill="url(#colorLimpieza)"
-                      name={translations.cleanliness}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
             )}
 
             {activeView === "predictive" && (
@@ -469,7 +376,7 @@ function DashboardContent() {
 
           {/* Right Column - Analytics */}
           <div className="space-y-6">
-            {selectedStation && <StationInfo station={selectedStation} />}
+            <StationInfo station={selectedStation} />
 
             {!selectedStation && (
               <>
@@ -509,72 +416,12 @@ function DashboardContent() {
                     ))}
                   </div>
                 </div>
-
-                {/* Actividad reciente */}
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
-                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-green-600" />
-                    Actividad Reciente
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      {
-                        time: "Hace 5 min",
-                        text: "Nueva incidencia reportada",
-                        type: "alert",
-                      },
-                      {
-                        time: "Hace 12 min",
-                        text: "Estación con alta afluencia",
-                        type: "warning",
-                      },
-                      {
-                        time: "Hace 25 min",
-                        text: "Comentario positivo recibido",
-                        type: "success",
-                      },
-                      {
-                        time: "Hace 1 hora",
-                        text: "Mantenimiento programado",
-                        type: "info",
-                      },
-                    ].map((activity, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 p-2 rounded-lg bg-white/60"
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full mt-1.5 ${
-                            activity.type === "alert"
-                              ? "bg-red-500"
-                              : activity.type === "warning"
-                              ? "bg-yellow-500"
-                              : activity.type === "success"
-                              ? "bg-green-500"
-                              : "bg-blue-500"
-                          }`}
-                        />
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-700">
-                            {activity.text}
-                          </p>
-                          <p className="text-[10px] text-gray-500 mt-0.5">
-                            {activity.time}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </>
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-[10px] text-gray-500 pt-3 border-t border-gray-300">
-          {translations.footer}
-        </footer>
       </div>
     </div>
   );
