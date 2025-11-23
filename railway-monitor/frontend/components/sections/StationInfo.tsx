@@ -1,4 +1,7 @@
+'use client';
+
 import { StationData } from "@/types";
+import { useCity } from "@/lib/CityContext";
 import React from "react";
 
 interface StationInfoProps {
@@ -11,6 +14,8 @@ interface StationInfoProps {
 }
 
 const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
+  const { translations } = useCity();
+
   return (
     <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30">
       <div className="flex items-center justify-between mb-3">
@@ -25,14 +30,14 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
 
       <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-red-500/30 to-orange-500/30 border border-red-500/40 text-center">
         <div className="text-[10px] text-white/60 mb-1">
-          🔥 PALABRA PREDOMINANTE
+          {translations.predominantWord}
         </div>
         <div className="text-2xl font-black text-white tracking-wide animate-pulse">
           {station.palabraClave}
         </div>
         <div className="flex items-center justify-center gap-2 mt-2">
           <span className="text-xs px-2 py-0.5 rounded-full bg-white/20">
-            {station.menciones} menciones
+            {station.menciones} {translations.mentions}
           </span>
         </div>
       </div>
@@ -44,7 +49,7 @@ const StationInfo: React.FC<StationInfoProps> = ({ station }) => {
         </div>
         <div className="text-center p-2 rounded-lg bg-white/10">
           <div className="text-xl font-bold">{station.comments}</div>
-          <div className="text-[10px] text-white/60">Comentarios</div>
+          <div className="text-[10px] text-white/60">{translations.comments}</div>
         </div>
       </div>
     </div>

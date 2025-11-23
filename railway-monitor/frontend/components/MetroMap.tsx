@@ -1,6 +1,7 @@
 "use client";
 
 import { METRO_LINES } from "@/lib/constants";
+import { useCity } from "@/lib/CityContext";
 import { CustomLine, StationData } from "@/types";
 import React, { useState } from "react";
 
@@ -23,6 +24,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
   customLines = [],
   onUpdateCustomLine,
 }) => {
+  const { translations } = useCity();
   const svgWidth = 860;
   const svgHeight = 800;
   const [editMode, setEditMode] = useState(false);
@@ -69,13 +71,12 @@ const MetroMap: React.FC<MetroMapProps> = ({
         <div className="absolute top-2 right-2 z-10">
           <button
             onClick={() => setEditMode(!editMode)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              editMode
-                ? "bg-purple-600 text-white shadow-lg"
-                : "bg-white/10 text-white/60 hover:bg-white/20"
-            }`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${editMode
+              ? "bg-purple-600 text-white shadow-lg"
+              : "bg-white/10 text-white/60 hover:bg-white/20"
+              }`}
           >
-            {editMode ? "✓ Modo Edición" : "✏️ Editar Nodos"}
+            {editMode ? `✓ ${translations.editMode}` : `✏️ ${translations.editNodes}`}
           </button>
         </div>
       )}
@@ -151,8 +152,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 phi >= 70
                   ? "heat-green"
                   : phi >= 50
-                  ? "heat-yellow"
-                  : "heat-red";
+                    ? "heat-yellow"
+                    : "heat-red";
 
               return (
                 <circle
@@ -340,19 +341,19 @@ const MetroMap: React.FC<MetroMapProps> = ({
             fill="rgba(0,0,0,0.6)"
           />
           <text x="10" y="20" className="text-[10px] fill-white font-semibold">
-            Intensidad PHI
+            {translations.intensityPHI}
           </text>
           <circle cx="20" cy="38" r="6" fill="#ef4444" />
           <text x="32" y="42" className="text-[9px] fill-white">
-            Crítico (0-49)
+            {translations.criticalLevel} (0-49)
           </text>
           <circle cx="20" cy="55" r="6" fill="#f59e0b" />
           <text x="32" y="59" className="text-[9px] fill-white">
-            Alerta (50-69)
+            {translations.alertLevel} (50-69)
           </text>
           <circle cx="20" cy="72" r="6" fill="#10b981" />
           <text x="32" y="76" className="text-[9px] fill-white">
-            Óptimo (70-100)
+            {translations.optimalLevel} (70-100)
           </text>
         </g>
 
@@ -369,20 +370,20 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 onMouseDown={
                   editMode
                     ? () =>
-                        setDraggingNode({
-                          lineId: line.id,
-                          stationId: station.id,
-                        })
+                      setDraggingNode({
+                        lineId: line.id,
+                        stationId: station.id,
+                      })
                     : undefined
                 }
                 onClick={
                   !editMode
                     ? () =>
-                        onSelectStation({
-                          ...station,
-                          line: line.name,
-                          lineColor: line.color,
-                        })
+                      onSelectStation({
+                        ...station,
+                        line: line.name,
+                        lineColor: line.color,
+                      })
                     : undefined
                 }
               >
@@ -440,9 +441,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
         {filteredLines.map((line) => (
           <g
             key={`label-${line.id}`}
-            transform={`translate(${line.stations[0].x - 30}, ${
-              line.stations[0].y - 20
-            })`}
+            transform={`translate(${line.stations[0].x - 30}, ${line.stations[0].y - 20
+              })`}
           >
             <rect x="0" y="0" width="24" height="14" rx="3" fill={line.color} />
             <text
@@ -460,9 +460,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
         {customLines.map((line) => (
           <g
             key={`label-${line.id}`}
-            transform={`translate(${line.stations[0].x - 35}, ${
-              line.stations[0].y - 25
-            })`}
+            transform={`translate(${line.stations[0].x - 35}, ${line.stations[0].y - 25
+              })`}
           >
             <rect x="0" y="0" width="70" height="16" rx="4" fill={line.color} />
             <text
