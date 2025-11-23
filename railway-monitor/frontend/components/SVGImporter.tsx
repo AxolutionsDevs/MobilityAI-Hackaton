@@ -727,58 +727,28 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-500 transition-colors">
           <input
             type="file"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="svg-upload"
-          />
-          <input
-            type="file"
-            onChange={handleJSONUpload}
-            className="hidden"
-            id="json-upload"
-          />
-          <input
-            type="file"
             onChange={handleImageUpload}
+            accept="image/*"
             className="hidden"
             id="image-upload"
           />
-          <label htmlFor="svg-upload" className="cursor-pointer block mb-3">
-            <div className="text-4xl mb-2">📁</div>
-            <div className="text-sm font-medium text-gray-700">
-              {translations.dragSVGFile}
+          <label htmlFor="image-upload" className="cursor-pointer block">
+            <div className="text-6xl mb-4">🖼️</div>
+            <div className="text-lg font-bold text-gray-900 mb-2">
+              Arrastra o selecciona una imagen del mapa
             </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {translations.autoDetectNodes}
+            <div className="text-sm text-gray-600 mb-1">
+              Sube una imagen del sistema de transporte
             </div>
-          </label>
-
-          <div className="relative my-3">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+            <div className="text-xs text-gray-500 mt-2">
+              El sistema detectará automáticamente las estaciones usando IA
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-white text-gray-500">
-                {translations.or}
+            <div className="mt-4">
+              <span className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-base font-semibold hover:opacity-90 transition-opacity inline-flex items-center gap-2">
+                Detectar Estaciones con IA
               </span>
             </div>
-          </div>
-
-          <div className="flex justify-center gap-2">
-            <label
-              htmlFor="json-upload"
-              className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
-            >
-              <span>📥</span> Importar JSON
-            </label>
-
-            <label
-              htmlFor="image-upload"
-              className="cursor-pointer px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
-            >
-              <span>🖼️</span> Detectar (Backend)
-            </label>
-          </div>
+          </label>
         </div>
 
         {isProcessing && (

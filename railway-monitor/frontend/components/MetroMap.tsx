@@ -28,10 +28,102 @@ const MetroMap: React.FC<MetroMapProps> = ({
 }) => {
   const { translations } = useCity();
 
-  // ViewBox fijo grande para acomodar cualquier mapa
+  // Calcular dimensiones reales del mapa y zoom automático
+  const calculateMapBoundsAndZoom = () => {
+    const allStations = [
+      ...METRO_LINES.flatMap((line) => line.stations),
+      ...customLines.flatMap((line) => line.stations),
+    ];
+
+    if (allStations.length === 0) {
+      return {
+        minX: 0,
+        minY: 0,
+        maxX: 2000,
+        maxY: 2000,
+        autoZoom: 0.6,
+        centerX: 1000,
+        centerY: 1000,
+      };
+    }
+
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+
+    allStations.forEach((station) => {
+      const x =
+        typeof station.x === "string"
+          ? parseFloat(station.x)
+          : Number(station.x);
+      const y =
+        typeof station.y === "string"
+          ? parseFloat(station.y)
+          : Number(station.y);
+
+      if (!isNaN(x)) {
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+      }
+      if (!isNaN(y)) {
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+      }
+    });
+
+    if (minX === Infinity) {
+      return {
+        minX: 0,
+        minY: 0,
+        maxX: 2000,
+        maxY: 2000,
+        autoZoom: 0.6,
+        centerX: 1000,
+        centerY: 1000,
+      };
+    }
+
+    const mapWidth = maxX - minX;
+    const mapHeight = maxY - minY;
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    // Calcular zoom para que el mapa quepa bien en el viewport
+    // ViewBox es 2000x2000, queremos que el mapa ocupe ~70% del espacio
+    const targetViewportRatio = 0.7;
+    const viewBoxSize = 2000;
+
+    const zoomForWidth = (viewBoxSize * targetViewportRatio) / mapWidth;
+    const zoomForHeight = (viewBoxSize * targetViewportRatio) / mapHeight;
+
+    // Usar el menor zoom para que todo quepa
+    const autoZoom = Math.min(zoomForWidth, zoomForHeight, 2.0); // Máximo 2.0x
+    const clampedZoom = Math.max(0.3, Math.min(autoZoom, 2.0)); // Entre 0.3 y 2.0
+
+    return {
+      minX,
+      minY,
+      maxX,
+      maxY,
+      autoZoom: clampedZoom,
+      centerX,
+      centerY,
+    };
+  };
+
+  const mapBounds = calculateMapBoundsAndZoom();
   const svgViewBox = "0 0 2000 2000";
-  const initialZoom = 0.6;
-  const initialPan = { x: 0, y: 0 };
+  const initialZoom = mapBounds.autoZoom;
+
+  // Calcular pan inicial para centrar el mapa en el viewport
+  // El centro del viewport es (1000, 1000) en el viewBox de 2000x2000
+  // Necesitamos trasladar el centro del mapa al centro del viewport
+  const viewBoxCenter = 1000; // Centro del viewBox (2000/2)
+  const initialPan = {
+    x: (viewBoxCenter - mapBounds.centerX) * initialZoom,
+    y: (viewBoxCenter - mapBounds.centerY) * initialZoom,
+  };
 
   // Función para dividir texto en múltiples líneas
   const wrapText = (text: string, maxCharsPerLine: number = 18) => {
@@ -182,8 +274,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
     setIsResetting(true);
     const startZoom = zoom;
     const startPan = { ...pan };
-    const targetZoom = 0.6;
-    const targetPan = { x: 0, y: 0 };
+    const targetZoom = initialZoom; // Usar zoom calculado automáticamente
+    const targetPan = initialPan; // Usar pan calculado para centrar el mapa
 
     const duration = 500; // 500ms de animación
     const startTime = performance.now();
@@ -247,9 +339,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
       )}
 
       {/* Botón de reset zoom */}
-      {(Math.abs(zoom - 0.6) > 0.01 ||
-        Math.abs(pan.x - 0) > 1 ||
-        Math.abs(pan.y - 0) > 1) && (
+      {(Math.abs(zoom - initialZoom) > 0.01 ||
+        Math.abs(pan.x - initialPan.x) > 1 ||
+        Math.abs(pan.y - initialPan.y) > 1) && (
         <button
           onClick={handleResetView}
           className="absolute top-4 right-4 z-30 pointer-events-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2 font-bold text-sm border border-blue-400/50 hover:scale-105"
@@ -933,42 +1025,43 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 };
                 const { reportCount, severity, complaintIndex } = reportData;
 
-                const maxWidth = 280;
-                const issueLines = wrapText(reportData.recentIssue, 35);
-                const baseHeight = 90;
-                const extraHeight = Math.max(0, issueLines.length - 1) * 18;
+                const maxWidth = 380;
+                const issueLines = wrapText(reportData.recentIssue, 45);
+                const baseHeight = 120;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 24;
                 const totalHeight = baseHeight + extraHeight;
 
                 return (
                   <g
                     key={`tooltip-${stationKey}`}
-                    transform={`translate(${station.x}, ${station.y - 50})`}
+                    transform={`translate(${station.x}, ${station.y - 65})`}
                   >
                     <rect
                       x={-maxWidth / 2}
-                      y="-45"
+                      y="-60"
                       width={maxWidth}
                       height={totalHeight}
-                      rx="10"
+                      rx="12"
                       fill="rgba(255,255,255,0.98)"
                       stroke="rgba(156,163,175,0.4)"
-                      strokeWidth="2.5"
+                      strokeWidth="3"
+                      filter="drop-shadow(0 4px 8px rgba(0,0,0,0.15))"
                     />
 
                     <text
                       x="0"
-                      y="-24"
+                      y="-34"
                       textAnchor="middle"
-                      className="text-[16px] font-bold fill-gray-900"
+                      className="text-[20px] font-bold fill-gray-900"
                     >
                       {station.name}
                     </text>
 
                     <text
                       x="0"
-                      y="-4"
+                      y="-8"
                       textAnchor="middle"
-                      className="text-[13px] fill-gray-600"
+                      className="text-[17px] fill-gray-600"
                     >
                       Reportes: {reportCount} | Índice: {complaintIndex}%
                     </text>
@@ -977,9 +1070,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       <text
                         key={idx}
                         x="0"
-                        y={16 + idx * 18}
+                        y={20 + idx * 24}
                         textAnchor="middle"
-                        className={`text-[13px] font-semibold ${
+                        className={`text-[17px] font-semibold ${
                           reportCount > 0 ? "fill-red-600" : "fill-green-600"
                         }`}
                       >
@@ -989,9 +1082,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y={38 + extraHeight}
+                      y={50 + extraHeight}
                       textAnchor="middle"
-                      className="text-[12px] fill-gray-500"
+                      className="text-[16px] fill-gray-500"
                     >
                       Gravedad: {(severity * 100).toFixed(0)}%
                     </text>
@@ -1017,42 +1110,43 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 const { reportCount, severity, complaintIndex } = reportData;
                 const hasReports = reportCount > 0;
 
-                const maxWidth = 280;
-                const issueLines = wrapText(reportData.recentIssue, 35);
-                const baseHeight = 90;
-                const extraHeight = Math.max(0, issueLines.length - 1) * 18;
+                const maxWidth = 380;
+                const issueLines = wrapText(reportData.recentIssue, 45);
+                const baseHeight = 120;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 24;
                 const totalHeight = baseHeight + extraHeight;
 
                 return (
                   <g
                     key={`tooltip-${stationKey}`}
-                    transform={`translate(${station.x}, ${station.y - 50})`}
+                    transform={`translate(${station.x}, ${station.y - 65})`}
                   >
                     <rect
                       x={-maxWidth / 2}
-                      y="-45"
+                      y="-60"
                       width={maxWidth}
                       height={totalHeight}
-                      rx="10"
+                      rx="12"
                       fill="rgba(255,255,255,0.98)"
                       stroke={line.color}
-                      strokeWidth="3"
+                      strokeWidth="3.5"
+                      filter="drop-shadow(0 4px 8px rgba(0,0,0,0.15))"
                     />
 
                     <text
                       x="0"
-                      y="-24"
+                      y="-34"
                       textAnchor="middle"
-                      className="text-[16px] fill-gray-900 font-bold"
+                      className="text-[20px] fill-gray-900 font-bold"
                     >
                       {station.name}
                     </text>
 
                     <text
                       x="0"
-                      y="-4"
+                      y="-8"
                       textAnchor="middle"
-                      className="text-[13px] fill-gray-600"
+                      className="text-[17px] fill-gray-600"
                     >
                       Reportes: {reportCount} | Índice: {complaintIndex}%
                     </text>
@@ -1061,9 +1155,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       <text
                         key={idx}
                         x="0"
-                        y={16 + idx * 18}
+                        y={20 + idx * 24}
                         textAnchor="middle"
-                        className={`text-[13px] font-semibold ${
+                        className={`text-[17px] font-semibold ${
                           hasReports ? "fill-red-600" : "fill-green-600"
                         }`}
                       >
@@ -1073,9 +1167,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y={38 + extraHeight}
+                      y={50 + extraHeight}
                       textAnchor="middle"
-                      className="text-[12px] fill-gray-500"
+                      className="text-[16px] fill-gray-500"
                     >
                       Gravedad: {(severity * 100).toFixed(0)}%
                     </text>
@@ -1087,72 +1181,73 @@ const MetroMap: React.FC<MetroMapProps> = ({
         </g>
 
         {/* Legend - Fija, no afectada por zoom */}
-        <g transform="translate(20, 20)">
+        <g transform="translate(40, 40)">
           <rect
             x="0"
             y="0"
-            width="340"
-            height="200"
-            rx="12"
-            fill="rgba(255,255,255,0.95)"
-            stroke="rgba(156,163,175,0.8)"
-            strokeWidth="2"
+            width="520"
+            height="320"
+            rx="18"
+            fill="rgba(255,255,255,0.98)"
+            stroke="rgba(156,163,175,0.9)"
+            strokeWidth="3"
+            filter="drop-shadow(0 6px 12px rgba(0,0,0,0.15))"
           />
-          <text x="20" y="35" className="text-[18px] fill-gray-900 font-bold">
+          <text x="30" y="55" className="text-[28px] fill-gray-900 font-bold">
             Heatmap de Incidencias
           </text>
 
           {/* Intensidad de color */}
           <text
-            x="20"
-            y="65"
-            className="text-[15px] fill-gray-700 font-semibold"
+            x="30"
+            y="110"
+            className="text-[22px] fill-gray-700 font-semibold"
           >
             Intensidad de color:
           </text>
           <rect
-            x="20"
-            y="78"
-            width="55"
-            height="16"
-            rx="4"
+            x="30"
+            y="130"
+            width="90"
+            height="28"
+            rx="6"
             fill="rgba(32, 224, 10, 1)"
           />
-          <text x="85" y="91" className="text-[14px] fill-gray-600">
+          <text x="130" y="151" className="text-[21px] fill-gray-600">
             Baja gravedad
           </text>
           <rect
-            x="20"
-            y="102"
-            width="55"
-            height="16"
-            rx="4"
+            x="30"
+            y="170"
+            width="90"
+            height="28"
+            rx="6"
             fill="rgba(245, 180, 0, 1)"
           />
-          <text x="85" y="115" className="text-[14px] fill-gray-600">
+          <text x="130" y="191" className="text-[21px] fill-gray-600">
             Media gravedad
           </text>
           <rect
-            x="20"
-            y="126"
-            width="55"
-            height="16"
-            rx="4"
+            x="30"
+            y="210"
+            width="90"
+            height="28"
+            rx="6"
             fill="rgba(139, 0, 0, 1)"
           />
-          <text x="85" y="139" className="text-[14px] fill-gray-600">
+          <text x="130" y="231" className="text-[21px] fill-gray-600">
             Alta gravedad
           </text>
 
           {/* Tamaño del blur */}
           <text
-            x="20"
-            y="165"
-            className="text-[15px] fill-gray-700 font-semibold"
+            x="30"
+            y="275"
+            className="text-[22px] fill-gray-700 font-semibold"
           >
             Tamaño del área:
           </text>
-          <text x="20" y="185" className="text-[13px] fill-gray-600">
+          <text x="30" y="305" className="text-[20px] fill-gray-600">
             Mayor área = más reportes
           </text>
         </g>
