@@ -14,6 +14,7 @@ interface MetroMapProps {
   customLines?: CustomLine[];
   onUpdateCustomLine?: (lineId: string, updatedStations: any[]) => void;
   onNavigateToImport?: () => void;
+  displayMap?: string; // 'cdmx' | 'vienna' | custom line id
 }
 
 const MetroMap: React.FC<MetroMapProps> = ({
@@ -25,6 +26,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
   customLines = [],
   onUpdateCustomLine,
   onNavigateToImport,
+  displayMap = "cdmx",
 }) => {
   const { translations, city } = useCity();
 
@@ -33,9 +35,17 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
   // Calcular dimensiones reales del mapa y zoom automático
   const calculateMapBoundsAndZoom = () => {
+    // Determinar qué líneas mostrar para calcular bounds
+    const isCustomSelected = typeof displayMap === "string" && displayMap.startsWith("L-custom-");
+
+    const shownBaseLines = isCustomSelected ? [] : METRO_LINES;
+    const shownCustomLines = isCustomSelected
+      ? customLines.filter((l) => l.id === displayMap)
+      : customLines.filter((line) => line.city === undefined || line.city === displayMap);
+
     const allStations = [
-      ...METRO_LINES.flatMap((line) => line.stations),
-      ...customLines.flatMap((line) => line.stations),
+      ...shownBaseLines.flatMap((line) => line.stations),
+      ...shownCustomLines.flatMap((line) => line.stations),
     ];
 
     if (allStations.length === 0) {
@@ -195,12 +205,20 @@ const MetroMap: React.FC<MetroMapProps> = ({
     };
   };
 
-  const filteredLines =
-    selectedLine === "all"
-      ? METRO_LINES
-      : METRO_LINES.filter((l) => l.id === selectedLine);
+  const isCustomSelected = typeof displayMap === "string" && displayMap.startsWith("L-custom-");
 
-  const hasNoLines = METRO_LINES.length === 0 && customLines.length === 0;
+  const filteredLines = isCustomSelected
+    ? []
+    : selectedLine === "all"
+    ? METRO_LINES
+    : METRO_LINES.filter((l) => l.id === selectedLine);
+
+  // Filtrar customLines por ciudad seleccionada, o mostrar sólo la importada si fue seleccionada
+  const filteredCustomLines = isCustomSelected
+    ? customLines.filter((l) => l.id === displayMap)
+    : customLines.filter((line) => line.city === undefined || line.city === displayMap);
+
+  const hasNoLines = filteredLines.length === 0 && filteredCustomLines.length === 0;
 
   // Manejar zoom con la rueda del mouse
   const handleWheel = (e: React.WheelEvent) => {
@@ -323,10 +341,10 @@ const MetroMap: React.FC<MetroMapProps> = ({
           <div className="bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-xl max-w-md text-center">
             <div className="text-6xl mb-4">🗺️</div>
             <h3 className="text-xl font-bold text-gray-900 mb-3">
-              No hay líneas en el mapa
+              {translations.noLines}
             </h3>
             <p className="text-gray-600 mb-6 text-sm">
-              Comienza importando un archivo SVG o JSON con las líneas del metro
+              {translations.noLinesDescription}
             </p>
             {onNavigateToImport && (
               <button
@@ -334,7 +352,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mx-auto"
               >
                 <span className="text-lg">📁</span>
-                Ir a Importar el mapa
+                {translations.goToImport}
               </button>
             )}
           </div>
@@ -365,7 +383,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
             <path d="M3 21v-5h5" />
           </svg>
-          Centrar Vista
+          {translations.centerView}
         </button>
       )}
 
@@ -562,7 +580,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
           {/* Custom Heatmap Layer para líneas importadas */}
           <g className="heatmap-layer-custom" filter="url(#heatmap-blur)">
-            {customLines.map((line) =>
+            {filteredCustomLines.map((line) =>
               line.stations.map((station) => {
                 const stationReportData = getStationReportData(city);
                 const reportData = stationReportData[station.name] || {
@@ -647,7 +665,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
           })}
 
           {/* Custom Imported Lines */}
-          {customLines.map((line) => {
+          {filteredCustomLines.map((line) => {
             const pathData = line.stations
               .map((s, i) => `${i === 0 ? "M" : "L"} ${s.x} ${s.y}`)
               .join(" ");
@@ -878,7 +896,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
           )}
 
           {/* Custom Line Stations */}
-          {customLines.map((line) =>
+          {filteredCustomLines.map((line) =>
             line.stations.map((station, idx) => {
               const stationKey = `custom-${line.id}-${station.id}`;
               const isHovered = hoveredStation === stationKey;
@@ -961,7 +979,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
           ))}
 
           {/* Custom Line Labels */}
-          {customLines.map((line) => {
+          {filteredCustomLines.map((line) => {
             // Extraer el número/letra de la línea del nombre
             // "Metro CDMX Línea 6" → "L6"
             // "Metro CDMX Línea B" → "LB"
@@ -1080,7 +1098,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       textAnchor="middle"
                       className="text-[17px] fill-gray-600"
                     >
-                      Reportes: {reportCount} | Índice: {complaintIndex}%
+                      {translations.reportCount}: {reportCount} | {translations.complaintIndex}: {complaintIndex}%
                     </text>
 
                     {issueLines.map((line, idx) => (
@@ -1103,7 +1121,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       textAnchor="middle"
                       className="text-[16px] fill-gray-500"
                     >
-                      Gravedad: {(severity * 100).toFixed(0)}%
+                      {translations.severity}: {(severity * 100).toFixed(0)}%
                     </text>
                   </g>
                 );
@@ -1111,7 +1129,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             )}
 
             {/* Tooltips for custom lines */}
-            {customLines.map((line) =>
+            {filteredCustomLines.map((line) =>
               line.stations.map((station) => {
                 const stationKey = `custom-${line.id}-${station.id}`;
                 const isHovered = hoveredStation === stationKey;
@@ -1166,7 +1184,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       textAnchor="middle"
                       className="text-[17px] fill-gray-600"
                     >
-                      Reportes: {reportCount} | Índice: {complaintIndex}%
+                      {translations.reportCount}: {reportCount} | {translations.complaintIndex}: {complaintIndex}%
                     </text>
 
                     {issueLines.map((line, idx) => (

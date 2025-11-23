@@ -25,6 +25,7 @@ export interface MetroLine {
 export interface CustomLine extends MetroLine {
   paths?: SVGPath[];
   viewBox?: string;
+  city?: "cdmx" | "vienna";
 }
 
 export interface SVGPath {

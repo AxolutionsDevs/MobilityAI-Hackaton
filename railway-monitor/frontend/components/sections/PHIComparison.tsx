@@ -3,8 +3,10 @@
 import React, { useMemo } from "react";
 import { GLOBAL_PHI_DATA, PHIData } from "@/lib/data/calculatePHI";
 import { Activity, TrendingDown, TrendingUp } from "lucide-react";
+import { useCity } from "@/lib/CityContext";
 
 const PHIComparison: React.FC = () => {
+    const { translations } = useCity();
     const { cdmx, vienna } = GLOBAL_PHI_DATA;
 
     // Determinar cuál sistema tiene mejor PHI
@@ -21,10 +23,10 @@ const PHIComparison: React.FC = () => {
 
     // Función para obtener etiqueta de estado
     const getPHILabel = (phi: number): string => {
-        if (phi >= 70) return "Excelente";
-        if (phi >= 50) return "Aceptable";
-        if (phi >= 30) return "Preocupante";
-        return "Crítico";
+        if (phi >= 70) return translations.excellent;
+        if (phi >= 50) return translations.acceptable;
+        if (phi >= 30) return translations.concerning;
+        return translations.criticalPHI;
     };
 
     // Renderizar tarjeta de metro
@@ -45,7 +47,7 @@ const PHIComparison: React.FC = () => {
                     {isBetter && (
                         <div className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
                             <TrendingUp className="w-4 h-4" />
-                            Mejor
+                            {translations.better}
                         </div>
                     )}
                 </div>
@@ -94,13 +96,13 @@ const PHIComparison: React.FC = () => {
                 {/* Statistics */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-gray-50 rounded-lg p-3">
-                        <div className="text-xs text-gray-600 mb-1">Total Quejas</div>
+                        <div className="text-xs text-gray-600 mb-1">{translations.totalComplaints}</div>
                         <div className="text-2xl font-bold text-gray-800">
                             {data.totalComplaints.toLocaleString()}
                         </div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                        <div className="text-xs text-gray-600 mb-1">Impacto Ponderado</div>
+                        <div className="text-xs text-gray-600 mb-1">{translations.weightedImpact}</div>
                         <div className="text-2xl font-bold text-gray-800">
                             {data.weightedSum.toLocaleString()}
                         </div>
@@ -111,7 +113,7 @@ const PHIComparison: React.FC = () => {
                 <div>
                     <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                         <Activity className="w-4 h-4" />
-                        Top 5 Categorías por Impacto
+                        {translations.top5CategoriesByImpact}
                     </h4>
                     <div className="space-y-2">
                         {data.categoryBreakdown.slice(0, 5).map((cat, idx) => (
@@ -125,9 +127,9 @@ const PHIComparison: React.FC = () => {
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-xs text-gray-600">
-                                    <span>{cat.count} quejas</span>
+                                    <span>{cat.count} {translations.complaints_plural}</span>
                                     <span>•</span>
-                                    <span>peso: {cat.weight.toFixed(2)}</span>
+                                    <span>{translations.weight}: {cat.weight.toFixed(2)}</span>
                                 </div>
                                 {/* Progress bar */}
                                 <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -152,13 +154,13 @@ const PHIComparison: React.FC = () => {
             <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
                 <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                     <Activity className="w-7 h-7" />
-                    Índice de Felicidad del Pasajero (PHI) Global
+                    {translations.passengerHappiness}
                 </h2>
                 <p className="text-blue-100 text-sm">
-                    Comparación entre sistemas de metro basada en quejas ponderadas
+                    {translations.comparisonBased}
                 </p>
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                    <div className="text-xs text-blue-100 mb-1">Fórmula:</div>
+                    <div className="text-xs text-blue-100 mb-1">{translations.formula}:</div>
                     <code className="text-sm font-mono">
                         PHI = 100 - [ Σ( e^(peso_del_asunto) × cantidad ) / total_quejas ] × 100
                     </code>
@@ -169,15 +171,15 @@ const PHIComparison: React.FC = () => {
             <div className="bg-gray-100 rounded-2xl p-6 border-2 border-gray-200">
                 <div className="flex items-center justify-center gap-4">
                     <div className="text-center">
-                        <div className="text-sm text-gray-600 mb-1">Diferencia</div>
+                        <div className="text-sm text-gray-600 mb-1">{translations.difference}</div>
                         <div className="text-4xl font-bold text-gray-800">
                             {difference.toFixed(1)}
                         </div>
-                        <div className="text-xs text-gray-500">puntos PHI</div>
+                        <div className="text-xs text-gray-500">{translations.phiPoints}</div>
                     </div>
                     <div className="h-16 w-px bg-gray-300" />
                     <div className="text-center">
-                        <div className="text-sm text-gray-600 mb-1">Sistema Superior</div>
+                        <div className="text-sm text-gray-600 mb-1">{translations.superiorSystem}</div>
                         <div className="text-2xl font-bold text-green-600">
                             {betterSystem === "cdmx" ? "🇲🇽 CDMX" : "🇦🇹 Vienna"}
                         </div>
@@ -197,31 +199,31 @@ const PHIComparison: React.FC = () => {
             {/* Legend */}
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                    Interpretación del PHI
+                    {translations.phiInterpretation}
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-green-500" />
                         <span className="text-xs text-gray-700">
-                            70-100: Excelente
+                            {translations.phiRange70to100}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-yellow-500" />
                         <span className="text-xs text-gray-700">
-                            50-69: Aceptable
+                            {translations.phiRange50to69}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-orange-500" />
                         <span className="text-xs text-gray-700">
-                            30-49: Preocupante
+                            {translations.phiRange30to49}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-red-500" />
                         <span className="text-xs text-gray-700">
-                            0-29: Crítico
+                            {translations.phiRange0to29}
                         </span>
                     </div>
                 </div>

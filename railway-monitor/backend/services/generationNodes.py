@@ -7,7 +7,7 @@ import math
 
 INPUT_IMAGE = "vienna.png"
 JSON_OUTPUT = "estacionesvienna.json"
-VISUAL_OUTPUT = "resultadovienna.jpg"
+VISUAL_OUTPUT = "ViennaResult.jpg"
 
 MIN_RADIUS = 5      
 MAX_RADIUS = 20     
@@ -144,7 +144,7 @@ def procesar_todo():
         json.dump(estaciones_finales, f, indent=4, ensure_ascii=False)
     
     cv2.imwrite(VISUAL_OUTPUT, vis_img)
-    print(f" ¡LISTO! Revisa {VISUAL_OUTPUT}")
+    print(f" ¡LISTO! {VISUAL_OUTPUT}")
 
 if __name__ == "__main__":
     procesar_todo()

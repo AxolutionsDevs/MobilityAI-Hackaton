@@ -184,7 +184,7 @@ export default function TrendsDashboard() {
             {translations.trends}
           </h2>
           <p className="text-gray-600 text-sm mt-1">
-            Analysis of incidents in real time and historical patterns.
+            {translations.trendsSubtitle}
           </p>
         </div>
 

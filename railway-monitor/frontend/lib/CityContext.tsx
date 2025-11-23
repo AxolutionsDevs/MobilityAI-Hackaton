@@ -7,14 +7,17 @@ interface CityContextType {
     city: City;
     language: Language;
     translations: Translations;
+    selectedMapCity: City;
     toggleCity: () => void;
     toggleLanguage: () => void;
+    setSelectedMapCity: (city: City) => void;
 }
 
 const CityContext = createContext<CityContextType | undefined>(undefined);
 
 export const CityProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [city, setCity] = useState<City>('cdmx');
+    const [selectedMapCity, setSelectedMapCity] = useState<City>('cdmx');
 
     const language: Language = city === 'cdmx' ? 'en' : 'de';
     const translations = getTranslations(city);
@@ -24,11 +27,16 @@ export const CityProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const toggleLanguage = () => {
-        setCity(prevCity => prevCity === 'cdmx' ? 'vienna' : 'cdmx');
+        // Cambiar idioma y automáticamente cambiar el mapa
+        setCity(prevCity => {
+            const newCity = prevCity === 'cdmx' ? 'vienna' : 'cdmx';
+            setSelectedMapCity(newCity);
+            return newCity;
+        });
     };
 
     return (
-        <CityContext.Provider value={{ city, language, translations, toggleCity, toggleLanguage }}>
+        <CityContext.Provider value={{ city, language, translations, selectedMapCity, toggleCity, toggleLanguage, setSelectedMapCity }}>
             {children}
         </CityContext.Provider>
     );

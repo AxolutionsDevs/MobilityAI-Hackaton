@@ -308,10 +308,39 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       console.log("Respuesta del backend:", data);
 
       if (data.success && Array.isArray(data.lines)) {
-        // Adaptar respuesta del backend al formato esperado por importMultipleLinesFromJSON
-        // El backend devuelve 'lines' con 'stations' que tienen x, y, name
-        // No devuelve 'paths' ni 'viewBox' explícito, se calculará
-        importMultipleLinesFromJSON(data.lines);
+        // Normalizar cada línea para que tenga id, name, color, stations y city
+        const normalized = data.lines.map((line: any, idx: number) => {
+          const id = line.id || `L-custom-${Date.now()}-${idx}`;
+          const name = line.name || line.lineName || `Línea ${idx + 1}`;
+          const color = line.color || line.lineColor || "#e91e8b";
+          const stations = Array.isArray(line.stations)
+            ? line.stations.map((s: any, si: number) => ({
+                id: s.id || `node-${idx}-${si}`,
+                name: s.name || s.station || `Estación ${si + 1}`,
+                x: typeof s.x === "string" ? parseFloat(s.x) : Number(s.x),
+                y: typeof s.y === "string" ? parseFloat(s.y) : Number(s.y),
+              }))
+            : [];
+
+          // Inferir ciudad por el nombre de archivo si el backend no la envió
+          const inferredCity = (file && file.name && /vienna|wien/i.test(file.name))
+            ? "vienna"
+            : (file && file.name && /cdmx|mexico/i.test(file.name))
+            ? "cdmx"
+            : undefined;
+
+          return {
+            id,
+            name,
+            color,
+            stations,
+            paths: line.paths || [],
+            viewBox: line.viewBox || undefined,
+            city: line.city || inferredCity,
+          };
+        });
+
+        importMultipleLinesFromJSON(normalized);
         alert(data.message || "Detección completada exitosamente");
       } else {
         throw new Error("Formato de respuesta inválido");
@@ -683,6 +712,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       id: `L-custom-${Date.now()}`,
       name: lineName,
       color: lineColor,
+      city: city,
       stations: detectedNodes.map((n) => ({
         id: n.id,
         name: n.name,
@@ -738,17 +768,17 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           <label htmlFor="image-upload" className="cursor-pointer block">
             <div className="text-6xl mb-4">🖼️</div>
             <div className="text-lg font-bold text-gray-900 mb-2">
-              Arrastra o selecciona una imagen del mapa
+              {translations.dragDropImage}
             </div>
             <div className="text-sm text-gray-600 mb-1">
-              Sube una imagen del sistema de transporte
+              {translations.uploadTransportImage}
             </div>
             <div className="text-xs text-gray-500 mt-2">
-              El sistema detectará automáticamente las estaciones usando IA
+              {translations.aiDetectStations}
             </div>
             <div className="mt-4">
               <span className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-base font-semibold hover:opacity-90 transition-opacity inline-flex items-center gap-2">
-                Detectar Estaciones con IA
+                {translations.autoDetectNodes}
               </span>
             </div>
           </label>
@@ -870,7 +900,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                   <div className="bg-white px-6 py-3 rounded-xl border border-gray-300 shadow-2xl">
                     <p className="text-gray-900 text-sm font-semibold flex items-center gap-2">
                       <span className="text-2xl">🖱️</span>
-                      Click para interactuar con el mapa
+                      {translations.clickInteractMap}
                     </p>
                   </div>
                 </div>
@@ -882,7 +912,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                   <div className="bg-green-500 px-4 py-2 rounded-lg border border-green-600 shadow-lg">
                     <p className="text-white text-xs font-semibold flex items-center gap-2">
                       <span>🔍</span>
-                      Usa la rueda del mouse para zoom | Arrastra para mover
+                      {translations.wheelZoomDrag}
                     </p>
                   </div>
                 </div>
