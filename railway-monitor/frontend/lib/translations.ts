@@ -177,6 +177,45 @@ export interface Translations {
   clickInteractMap: string;
   wheelZoomDrag: string;
 
+  // MetroMap
+  reportCount: string;
+  complaintIndex: string;
+  noLines: string;
+  allOk: string;
+
+  // PHIComparison
+  passengerHappiness: string;
+  excellent: string;
+  acceptable: string;
+  concerning: string;
+  criticalPHI: string;
+  better: string;
+  totalComplaints: string;
+  weightedImpact: string;
+  top5CategoriesByImpact: string;
+  complaints_plural: string;
+  weight: string;
+  difference: string;
+  phiPoints: string;
+  superiorSystem: string;
+  comparisonBased: string;
+  formula: string;
+  phiInterpretation: string;
+  phiRange70to100: string;
+  phiRange50to69: string;
+  phiRange30to49: string;
+  phiRange0to29: string;
+
+  // ComparisonView
+  problemDistribution: string;
+  slowTrain: string;
+  theft: string;
+  overcrowding: string;
+  cleanliness_: string;
+  noAvailability: string;
+  technicalFailure: string;
+  otherIssues: string;
+
   // Footer
   footer: string;
 }
@@ -359,6 +398,45 @@ export const translations: Record<City, Translations> = {
     clickInteractMap: "Click to interact with the map",
     wheelZoomDrag: "Use mouse wheel for zoom | Drag to move",
 
+    // MetroMap
+    reportCount: "Reports",
+    complaintIndex: "Index",
+    noLines: "No lines on the map",
+    allOk: "All OK",
+
+    // PHIComparison
+    passengerHappiness: "Passenger Happiness Index (PHI) Global",
+    excellent: "Excellent",
+    acceptable: "Acceptable",
+    concerning: "Concerning",
+    criticalPHI: "Critical",
+    better: "Better",
+    totalComplaints: "Total Complaints",
+    weightedImpact: "Weighted Impact",
+    top5CategoriesByImpact: "Top 5 Categories by Impact",
+    complaints_plural: "complaints",
+    weight: "weight",
+    difference: "Difference",
+    phiPoints: "PHI points",
+    superiorSystem: "Superior System",
+    comparisonBased: "Comparison between systems based on weighted complaints",
+    formula: "Formula",
+    phiInterpretation: "PHI Interpretation",
+    phiRange70to100: "70-100: Excellent",
+    phiRange50to69: "50-69: Acceptable",
+    phiRange30to49: "30-49: Concerning",
+    phiRange0to29: "0-29: Critical",
+
+    // ComparisonView
+    problemDistribution: "Problem Distribution",
+    slowTrain: "Slow Train",
+    theft: "Theft",
+    overcrowding: "Overcrowding",
+    cleanliness_: "Cleanliness",
+    noAvailability: "No Availability",
+    technicalFailure: "Technical Failure",
+    otherIssues: "Other Issues",
+
     // Footer
     footer:
       "PHI Dashboard v3.0 • Predictive Analysis • International Comparison • Real-time NLP",
@@ -539,6 +617,45 @@ export const translations: Record<City, Translations> = {
     aiDetectStations: "KI erkennt automatisch Stationen",
     clickInteractMap: "Klicken Sie, um mit der Karte zu interagieren",
     wheelZoomDrag: "Verwenden Sie das Mausrad für Zoom | Ziehen zum Verschieben",
+
+    // MetroMap
+    reportCount: "Berichte",
+    complaintIndex: "Index",
+    noLines: "Keine Linien auf der Karte",
+    allOk: "Alles in Ordnung",
+
+    // PHIComparison
+    passengerHappiness: "Fahrgast-Zufriedenheitsindex (PHI) Global",
+    excellent: "Ausgezeichnet",
+    acceptable: "Akzeptabel",
+    concerning: "Besorgniserregend",
+    criticalPHI: "Kritisch",
+    better: "Besser",
+    totalComplaints: "Gesamtbeschwerden",
+    weightedImpact: "Gewichtete Auswirkung",
+    top5CategoriesByImpact: "Top 5 Kategorien nach Auswirkung",
+    complaints_plural: "Beschwerden",
+    weight: "Gewicht",
+    difference: "Unterschied",
+    phiPoints: "PHI-Punkte",
+    superiorSystem: "Überlegenes System",
+    comparisonBased: "Vergleich zwischen Systemen basierend auf gewichteten Beschwerden",
+    formula: "Formel",
+    phiInterpretation: "PHI-Interpretation",
+    phiRange70to100: "70-100: Ausgezeichnet",
+    phiRange50to69: "50-69: Akzeptabel",
+    phiRange30to49: "30-49: Besorgniserregend",
+    phiRange0to29: "0-29: Kritisch",
+
+    // ComparisonView
+    problemDistribution: "Problemverteilung",
+    slowTrain: "Langsamer Zug",
+    theft: "Diebstahl",
+    overcrowding: "Überbelegung",
+    cleanliness_: "Sauberkeit",
+    noAvailability: "Keine Verfügbarkeit",
+    technicalFailure: "Technischer Fehler",
+    otherIssues: "Sonstige Probleme",
 
     // Footer
     footer:

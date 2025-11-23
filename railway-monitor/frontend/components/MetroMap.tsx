@@ -320,10 +320,10 @@ const MetroMap: React.FC<MetroMapProps> = ({
           <div className="bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-xl max-w-md text-center">
             <div className="text-6xl mb-4">🗺️</div>
             <h3 className="text-xl font-bold text-gray-900 mb-3">
-              No hay líneas en el mapa
+              {translations.noLines}
             </h3>
             <p className="text-gray-600 mb-6 text-sm">
-              Comienza importando un archivo SVG o JSON con las líneas del metro
+              {translations.noLinesDescription}
             </p>
             {onNavigateToImport && (
               <button
@@ -331,7 +331,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mx-auto"
               >
                 <span className="text-lg">📁</span>
-                Ir a Importar el mapa
+                {translations.goToImport}
               </button>
             )}
           </div>
@@ -362,7 +362,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
             <path d="M3 21v-5h5" />
           </svg>
-          Centrar Vista
+          {translations.centerView}
         </button>
       )}
 
@@ -1063,7 +1063,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       textAnchor="middle"
                       className="text-[17px] fill-gray-600"
                     >
-                      Reportes: {reportCount} | Índice: {complaintIndex}%
+                      {translations.reportCount}: {reportCount} | {translations.complaintIndex}: {complaintIndex}%
                     </text>
 
                     {issueLines.map((line, idx) => (
@@ -1086,7 +1086,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       textAnchor="middle"
                       className="text-[16px] fill-gray-500"
                     >
-                      Gravedad: {(severity * 100).toFixed(0)}%
+                      {translations.severity}: {(severity * 100).toFixed(0)}%
                     </text>
                   </g>
                 );
@@ -1148,7 +1148,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       textAnchor="middle"
                       className="text-[17px] fill-gray-600"
                     >
-                      Reportes: {reportCount} | Índice: {complaintIndex}%
+                      {translations.reportCount}: {reportCount} | {translations.complaintIndex}: {complaintIndex}%
                     </text>
 
                     {issueLines.map((line, idx) => (
