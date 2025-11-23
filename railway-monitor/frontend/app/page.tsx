@@ -1,13 +1,10 @@
 "use client";
 
 import MetroMap from "@/components/MetroMap";
-import CategoryWeights from "@/components/sections/CategoryWeights";
 import GlobalPHI from "@/components/sections/GlobalPHI";
 import Header from "@/components/sections/Header";
-import LiveFeed from "@/components/sections/LiveFeed";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
-import KPICard from "@/components/ui/KPICard";
 import TrendsDashboard from "@/components/trends/TrendsDashboard";
 import { CATEGORIES } from "@/lib/constants";
 import { calculateGlobalPHI, generateStationPHI } from "@/lib/utils";
@@ -167,127 +164,82 @@ function DashboardContent() {
       <div className="max-w-7xl mx-auto space-y-4">
         <Header />
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-4 gap-3">
-          {kpiData.map((kpi, i) => (
-            <KPICard key={i} data={kpi} />
-          ))}
-        </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-2 p-2 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+        <div className="flex gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveView(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all ${activeView === tab.id
-                ? "bg-purple-600 text-white"
-                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl transition-all ${activeView === tab.id
+                ? "bg-purple-700 text-white shadow-lg"
+                : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
                 }`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-5 h-5" />
               <span className="text-sm font-semibold">{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           {/* Left Column - Dynamic Content */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-6">
             {activeView === "heatmap" && (
-              <>
-                <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <Map className="w-4 h-4" />
-                      {translations.heatmapTitle}
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      <select
-                        value={selectedLine}
-                        onChange={(e) => setSelectedLine(e.target.value)}
-                        className="px-3 py-1 rounded-lg bg-white/10 text-sm border border-white/20"
-                      >
-                        <option value="all">{translations.allLines}</option>
-                        <option value="L1">{translations.line} 1</option>
-                        <option value="L2">{translations.line} 2</option>
-                        <option value="L3">{translations.line} 3</option>
-                      </select>
-                      <label className="flex items-center gap-2 text-xs">
-                        <span>{translations.intensity}:</span>
-                        <input
-                          type="range"
-                          min="0.5"
-                          max="3"
-                          step="0.1"
-                          value={heatmapIntensity}
-                          onChange={(e) =>
-                            setHeatmapIntensity(parseFloat(e.target.value))
-                          }
-                          className="w-24"
-                        />
-                        <span>{heatmapIntensity.toFixed(1)}</span>
-                      </label>
-                    </div>
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold flex items-center gap-3">
+                    <Map className="w-5 h-5" />
+                    {translations.heatmapTitle}
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <select
+                      value={selectedLine}
+                      onChange={(e) => setSelectedLine(e.target.value)}
+                      className="px-4 py-2 rounded-lg bg-white/20 text-sm border border-white/30"
+                    >
+                      <option value="all">{translations.allLines}</option>
+                      <option value="L1">{translations.line} 1</option>
+                      <option value="L2">{translations.line} 2</option>
+                      <option value="L3">{translations.line} 3</option>
+                    </select>
+                    <label className="flex items-center gap-3 text-sm">
+                      <span>{translations.intensity}:</span>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="3"
+                        step="0.1"
+                        value={heatmapIntensity}
+                        onChange={(e) =>
+                          setHeatmapIntensity(parseFloat(e.target.value))
+                        }
+                        className="w-32"
+                      />
+                      <span>{heatmapIntensity.toFixed(1)}</span>
+                    </label>
                   </div>
-                  <MetroMap
-                    stationData={stationData}
-                    selectedStation={selectedStation}
-                    onSelectStation={setSelectedStation}
-                    selectedLine={selectedLine}
-                    heatmapIntensity={heatmapIntensity}
-                    customLines={customLines}
-                    onUpdateCustomLine={handleUpdateCustomLine}
-                  />
                 </div>
-              </>
+                <MetroMap
+                  stationData={stationData}
+                  selectedStation={selectedStation}
+                  onSelectStation={setSelectedStation}
+                  selectedLine={selectedLine}
+                  heatmapIntensity={heatmapIntensity}
+                  customLines={customLines}
+                  onUpdateCustomLine={handleUpdateCustomLine}
+                />
+              </div>
             )}
 
             {activeView === "import" && (
-              <>
-                <SVGImporter onSave={handleSaveCustomLine} />
-
-                {/* Custom Lines Display */}
-                {customLines.length > 0 && (
-                  <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-sm font-semibold mb-3">
-                      {translations.importedLines}
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {customLines.map((line) => (
-                        <div
-                          key={line.id}
-                          className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3"
-                        >
-                          <div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
-                            style={{ backgroundColor: line.color }}
-                          >
-                            {line.id.split("-")[2]?.substring(0, 2) || "C"}
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-sm font-medium">
-                              {line.name}
-                            </div>
-                            <div className="text-[10px] text-white/50">
-                              {line.stations.length} {translations.stations}
-                            </div>
-                          </div>
-                          <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
-                            {translations.active}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
+              <SVGImporter onSave={handleSaveCustomLine} />
             )}
 
             {activeView === "indicators" && (
-              <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-3">
                   <BarChart3 className="w-5 h-5" />
                   {translations.weeklyTrends}
                 </h3>
@@ -390,7 +342,7 @@ function DashboardContent() {
             )}
 
             {activeView === "predictive" && (
-              <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
                   {translations.predictiveTitle}
@@ -442,7 +394,7 @@ function DashboardContent() {
             )}
 
             {activeView === "comparison" && (
-              <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Globe className="w-5 h-5" />
                   {translations.internationalComparison}
@@ -510,14 +462,14 @@ function DashboardContent() {
           </div>
 
           {/* Right Column - Analytics */}
-          <div className="space-y-4">
-            <GlobalPHI globalPHI={globalPHI} />
-
+          <div className="space-y-6">
             {selectedStation && <StationInfo station={selectedStation} />}
 
-            <CategoryWeights />
+            <GlobalPHI globalPHI={globalPHI} />
 
-            <LiveFeed comments={sampleComments} />
+            
+
+            
           </div>
         </div>
 
