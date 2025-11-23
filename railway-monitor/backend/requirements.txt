@@ -2,5 +2,8 @@ fastapi
 uvicorn[standard]
 pydantic
 python-multipart
+opencv-python
+easyocr
+numpy
 
 

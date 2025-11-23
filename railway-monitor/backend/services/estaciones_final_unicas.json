@@ -1,0 +1,1379 @@
+[
+    {
+        "id": 0,
+        "nombre": "Mixcoac",
+        "coords": {
+            "x": 402,
+            "y": 2094
+        },
+        "radio": 13
+    },
+    {
+        "id": 1,
+        "nombre": "Bellas",
+        "coords": {
+            "x": 998,
+            "y": 1042
+        },
+        "radio": 13
+    },
+    {
+        "id": 2,
+        "nombre": "Atlalilco",
+        "coords": {
+            "x": 1954,
+            "y": 2412
+        },
+        "radio": 13
+    },
+    {
+        "id": 3,
+        "nombre": "Niños",
+        "coords": {
+            "x": 1002,
+            "y": 1368
+        },
+        "radio": 13
+    },
+    {
+        "id": 4,
+        "nombre": "Tasqueña",
+        "coords": {
+            "x": 1478,
+            "y": 2486
+        },
+        "radio": 10
+    },
+    {
+        "id": 5,
+        "nombre": "San Andres",
+        "coords": {
+            "x": 1952,
+            "y": 2606
+        },
+        "radio": 10
+    },
+    {
+        "id": 6,
+        "nombre": "Viaducta",
+        "coords": {
+            "x": 1478,
+            "y": 1848
+        },
+        "radio": 10
+    },
+    {
+        "id": 7,
+        "nombre": "Villa de",
+        "coords": {
+            "x": 1478,
+            "y": 2030
+        },
+        "radio": 10
+    },
+    {
+        "id": 8,
+        "nombre": "General",
+        "coords": {
+            "x": 1000,
+            "y": 1552
+        },
+        "radio": 10
+    },
+    {
+        "id": 9,
+        "nombre": "del Norte los Venados",
+        "coords": {
+            "x": 1000,
+            "y": 2000
+        },
+        "radio": 10
+    },
+    {
+        "id": 10,
+        "nombre": "de los Pinos",
+        "coords": {
+            "x": 400,
+            "y": 1880
+        },
+        "radio": 10
+    },
+    {
+        "id": 11,
+        "nombre": "Tepito",
+        "coords": {
+            "x": 1618,
+            "y": 948
+        },
+        "radio": 10
+    },
+    {
+        "id": 12,
+        "nombre": "Bosque de Aragon",
+        "coords": {
+            "x": 2268,
+            "y": 856
+        },
+        "radio": 10
+    },
+    {
+        "id": 13,
+        "nombre": "Popotla",
+        "coords": {
+            "x": 522,
+            "y": 980
+        },
+        "radio": 10
+    },
+    {
+        "id": 14,
+        "nombre": "Estacion_14",
+        "coords": {
+            "x": 1776,
+            "y": 1130
+        },
+        "radio": 12
+    },
+    {
+        "id": 15,
+        "nombre": "del Muerto",
+        "coords": {
+            "x": 400,
+            "y": 2244
+        },
+        "radio": 10
+    },
+    {
+        "id": 16,
+        "nombre": "Lagunilla",
+        "coords": {
+            "x": 1462,
+            "y": 948
+        },
+        "radio": 10
+    },
+    {
+        "id": 17,
+        "nombre": "Aculco",
+        "coords": {
+            "x": 1918,
+            "y": 2242
+        },
+        "radio": 10
+    },
+    {
+        "id": 18,
+        "nombre": "Lomas Estrell:",
+        "coords": {
+            "x": 1952,
+            "y": 2700
+        },
+        "radio": 10
+    },
+    {
+        "id": 19,
+        "nombre": "Copilco",
+        "coords": {
+            "x": 1000,
+            "y": 2458
+        },
+        "radio": 10
+    },
+    {
+        "id": 20,
+        "nombre": "C de la UAM",
+        "coords": {
+            "x": 2024,
+            "y": 2450
+        },
+        "radio": 10
+    },
+    {
+        "id": 21,
+        "nombre": "Juarez",
+        "coords": {
+            "x": 1000,
+            "y": 1200
+        },
+        "radio": 10
+    },
+    {
+        "id": 22,
+        "nombre": "Allende",
+        "coords": {
+            "x": 1398,
+            "y": 1080
+        },
+        "radio": 10
+    },
+    {
+        "id": 23,
+        "nombre": "Centra",
+        "coords": {
+            "x": 1478,
+            "y": 2212
+        },
+        "radio": 10
+    },
+    {
+        "id": 24,
+        "nombre": "Merced",
+        "coords": {
+            "x": 1580,
+            "y": 1328
+        },
+        "radio": 10
+    },
+    {
+        "id": 25,
+        "nombre": "Ecatepec",
+        "coords": {
+            "x": 2268,
+            "y": 362
+        },
+        "radio": 10
+    },
+    {
+        "id": 26,
+        "nombre": "Los Reyes",
+        "coords": {
+            "x": 2448,
+            "y": 2372
+        },
+        "radio": 10
+    },
+    {
+        "id": 27,
+        "nombre": "La Paz",
+        "coords": {
+            "x": 2518,
+            "y": 2442
+        },
+        "radio": 10
+    },
+    {
+        "id": 28,
+        "nombre": "Ciudad",
+        "coords": {
+            "x": 2178,
+            "y": 1726
+        },
+        "radio": 10
+    },
+    {
+        "id": 29,
+        "nombre": "Estacion_29",
+        "coords": {
+            "x": 400,
+            "y": 862
+        },
+        "radio": 13
+    },
+    {
+        "id": 30,
+        "nombre": "Etiopia",
+        "coords": {
+            "x": 1000,
+            "y": 1816
+        },
+        "radio": 10
+    },
+    {
+        "id": 31,
+        "nombre": "[Zocalo",
+        "coords": {
+            "x": 1478,
+            "y": 1200
+        },
+        "radio": 10
+    },
+    {
+        "id": 32,
+        "nombre": "Periferico Orient",
+        "coords": {
+            "x": 2002,
+            "y": 2886
+        },
+        "radio": 10
+    },
+    {
+        "id": 33,
+        "nombre": "Hangares",
+        "coords": {
+            "x": 2316,
+            "y": 1420
+        },
+        "radio": 10
+    },
+    {
+        "id": 34,
+        "nombre": "Guelatao",
+        "coords": {
+            "x": 2408,
+            "y": 2002
+        },
+        "radio": 10
+    },
+    {
+        "id": 35,
+        "nombre": "Peñon Viejo",
+        "coords": {
+            "x": 2408,
+            "y": 2094
+        },
+        "radio": 10
+    },
+    {
+        "id": 36,
+        "nombre": "Lazaro",
+        "coords": {
+            "x": 1246,
+            "y": 1726
+        },
+        "radio": 10
+    },
+    {
+        "id": 37,
+        "nombre": "Tacubaya",
+        "coords": {
+            "x": 402,
+            "y": 1724
+        },
+        "radio": 13
+    },
+    {
+        "id": 38,
+        "nombre": "Buenavista",
+        "coords": {
+            "x": 872,
+            "y": 948
+        },
+        "radio": 10
+    },
+    {
+        "id": 39,
+        "nombre": "Indios Verdes",
+        "coords": {
+            "x": 1274,
+            "y": 300
+        },
+        "radio": 10
+    },
+    {
+        "id": 40,
+        "nombre": "Abad",
+        "coords": {
+            "x": 1478,
+            "y": 1592
+        },
+        "radio": 10
+    },
+    {
+        "id": 41,
+        "nombre": "Iztacalco",
+        "coords": {
+            "x": 1918,
+            "y": 2056
+        },
+        "radio": 10
+    },
+    {
+        "id": 42,
+        "nombre": "Remedlos",
+        "coords": {
+            "x": 2268,
+            "y": 528
+        },
+        "radio": 10
+    },
+    {
+        "id": 43,
+        "nombre": "Blvd. Pto",
+        "coords": {
+            "x": 2092,
+            "y": 1422
+        },
+        "radio": 10
+    },
+    {
+        "id": 44,
+        "nombre": "lamaica",
+        "coords": {
+            "x": 1776,
+            "y": 1726
+        },
+        "radio": 13
+    },
+    {
+        "id": 45,
+        "nombre": "Heroes",
+        "coords": {
+            "x": 1000,
+            "y": 1456
+        },
+        "radio": 10
+    },
+    {
+        "id": 46,
+        "nombre": "Gomez Farias",
+        "coords": {
+            "x": 2116,
+            "y": 1528
+        },
+        "radio": 10
+    },
+    {
+        "id": 47,
+        "nombre": "Olivos",
+        "coords": {
+            "x": 2126,
+            "y": 3010
+        },
+        "radio": 10
+    },
+    {
+        "id": 48,
+        "nombre": "Zapotitlat",
+        "coords": {
+            "x": 2250,
+            "y": 3136
+        },
+        "radio": 10
+    },
+    {
+        "id": 49,
+        "nombre": "Ciudad Azteca",
+        "coords": {
+            "x": 2268,
+            "y": 114
+        },
+        "radio": 10
+    },
+    {
+        "id": 50,
+        "nombre": "Nezahualcoyotl",
+        "coords": {
+            "x": 2268,
+            "y": 690
+        },
+        "radio": 10
+    },
+    {
+        "id": 51,
+        "nombre": "Tlahuac",
+        "coords": {
+            "x": 2374,
+            "y": 3260
+        },
+        "radio": 10
+    },
+    {
+        "id": 52,
+        "nombre": "Chapultepec",
+        "coords": {
+            "x": 584,
+            "y": 1542
+        },
+        "radio": 10
+    },
+    {
+        "id": 53,
+        "nombre": "Apatlaco",
+        "coords": {
+            "x": 1918,
+            "y": 2148
+        },
+        "radio": 10
+    },
+    {
+        "id": 54,
+        "nombre": "Calle",
+        "coords": {
+            "x": 1952,
+            "y": 2794
+        },
+        "radio": 10
+    },
+    {
+        "id": 55,
+        "nombre": "Viveros",
+        "coords": {
+            "x": 1000,
+            "y": 2276
+        },
+        "radio": 10
+    },
+    {
+        "id": 56,
+        "nombre": "Constitucion",
+        "coords": {
+            "x": 2296,
+            "y": 2450
+        },
+        "radio": 10
+    },
+    {
+        "id": 57,
+        "nombre": "Chabacano",
+        "coords": {
+            "x": 1478,
+            "y": 1724
+        },
+        "radio": 13
+    },
+    {
+        "id": 58,
+        "nombre": "Ermita",
+        "coords": {
+            "x": 1478,
+            "y": 2308
+        },
+        "radio": 13
+    },
+    {
+        "id": 59,
+        "nombre": "Consulado",
+        "coords": {
+            "x": 1776,
+            "y": 788
+        },
+        "radio": 13
+    },
+    {
+        "id": 60,
+        "nombre": "Patriotismo",
+        "coords": {
+            "x": 610,
+            "y": 1726
+        },
+        "radio": 10
+    },
+    {
+        "id": 61,
+        "nombre": "Oceania",
+        "coords": {
+            "x": 2156,
+            "y": 1008
+        },
+        "radio": 13
+    },
+    {
+        "id": 62,
+        "nombre": "Villa de Aragon",
+        "coords": {
+            "x": 2268,
+            "y": 774
+        },
+        "radio": 10
+    },
+    {
+        "id": 63,
+        "nombre": "Iztapalapa",
+        "coords": {
+            "x": 2206,
+            "y": 2450
+        },
+        "radio": 10
+    },
+    {
+        "id": 64,
+        "nombre": "Tlatelolco",
+        "coords": {
+            "x": 1090,
+            "y": 734
+        },
+        "radio": 10
+    },
+    {
+        "id": 65,
+        "nombre": "Xola",
+        "coords": {
+            "x": 1478,
+            "y": 1938
+        },
+        "radio": 10
+    },
+    {
+        "id": 66,
+        "nombre": "Escuadron 201",
+        "coords": {
+            "x": 1918,
+            "y": 2332
+        },
+        "radio": 10
+    },
+    {
+        "id": 67,
+        "nombre": "Doctores",
+        "coords": {
+            "x": 1242,
+            "y": 1488
+        },
+        "radio": 10
+    },
+    {
+        "id": 68,
+        "nombre": "Salto agua",
+        "coords": {
+            "x": 1210,
+            "y": 1368
+        },
+        "radio": 13
+    },
+    {
+        "id": 69,
+        "nombre": "Martin",
+        "coords": {
+            "x": 1776,
+            "y": 504
+        },
+        "radio": 13
+    },
+    {
+        "id": 70,
+        "nombre": "Anita",
+        "coords": {
+            "x": 1776,
+            "y": 1870
+        },
+        "radio": 13
+    },
+    {
+        "id": 71,
+        "nombre": "Pantitlan",
+        "coords": {
+            "x": 2318,
+            "y": 1618
+        },
+        "radio": 13
+    },
+    {
+        "id": 72,
+        "nombre": "Zapata",
+        "coords": {
+            "x": 1000,
+            "y": 2094
+        },
+        "radio": 12
+    },
+    {
+        "id": 73,
+        "nombre": "Aragon",
+        "coords": {
+            "x": 2236,
+            "y": 928
+        },
+        "radio": 10
+    },
+    {
+        "id": 74,
+        "nombre": "Hospital 20",
+        "coords": {
+            "x": 768,
+            "y": 2092
+        },
+        "radio": 10
+    },
+    {
+        "id": 75,
+        "nombre": "Coyoacan",
+        "coords": {
+            "x": 1230,
+            "y": 2090
+        },
+        "radio": 10
+    },
+    {
+        "id": 76,
+        "nombre": "Mixiuhca",
+        "coords": {
+            "x": 1940,
+            "y": 1726
+        },
+        "radio": 10
+    },
+    {
+        "id": 77,
+        "nombre": "Hidalgo",
+        "coords": {
+            "x": 908,
+            "y": 1042
+        },
+        "radio": 10
+    },
+    {
+        "id": 78,
+        "nombre": "Colegio",
+        "coords": {
+            "x": 594,
+            "y": 1044
+        },
+        "radio": 11
+    },
+    {
+        "id": 79,
+        "nombre": "Chilpancingo",
+        "coords": {
+            "x": 852,
+            "y": 1726
+        },
+        "radio": 10
+    },
+    {
+        "id": 80,
+        "nombre": "Estacion_80",
+        "coords": {
+            "x": 1208,
+            "y": 1042
+        },
+        "radio": 12
+    },
+    {
+        "id": 81,
+        "nombre": "Sur",
+        "coords": {
+            "x": 568,
+            "y": 2090
+        },
+        "radio": 10
+    },
+    {
+        "id": 82,
+        "nombre": "Universidad",
+        "coords": {
+            "x": 1000,
+            "y": 2548
+        },
+        "radio": 10
+    },
+    {
+        "id": 83,
+        "nombre": "loctezuma",
+        "coords": {
+            "x": 1986,
+            "y": 1240
+        },
+        "radio": 10
+    },
+    {
+        "id": 84,
+        "nombre": "Norte",
+        "coords": {
+            "x": 1776,
+            "y": 1030
+        },
+        "radio": 13
+    },
+    {
+        "id": 85,
+        "nombre": "Rosario",
+        "coords": {
+            "x": 402,
+            "y": 396
+        },
+        "radio": 12
+    },
+    {
+        "id": 86,
+        "nombre": "Cuauhtemoc",
+        "coords": {
+            "x": 780,
+            "y": 1368
+        },
+        "radio": 11
+    },
+    {
+        "id": 87,
+        "nombre": "San",
+        "coords": {
+            "x": 784,
+            "y": 1044
+        },
+        "radio": 11
+    },
+    {
+        "id": 88,
+        "nombre": "Molina",
+        "coords": {
+            "x": 1960,
+            "y": 812
+        },
+        "radio": 10
+    },
+    {
+        "id": 89,
+        "nombre": "Estacion_89",
+        "coords": {
+            "x": 1160,
+            "y": 666
+        },
+        "radio": 12
+    },
+    {
+        "id": 90,
+        "nombre": "Observatorio",
+        "coords": {
+            "x": 302,
+            "y": 1828
+        },
+        "radio": 10
+    },
+    {
+        "id": 91,
+        "nombre": "Coyuya",
+        "coords": {
+            "x": 1918,
+            "y": 1968
+        },
+        "radio": 10
+    },
+    {
+        "id": 92,
+        "nombre": "Isabel",
+        "coords": {
+            "x": 1478,
+            "y": 1366
+        },
+        "radio": 12
+    },
+    {
+        "id": 93,
+        "nombre": "Deportivo",
+        "coords": {
+            "x": 1274,
+            "y": 506
+        },
+        "radio": 12
+    },
+    {
+        "id": 94,
+        "nombre": "Potrero",
+        "coords": {
+            "x": 1240,
+            "y": 586
+        },
+        "radio": 10
+    },
+    {
+        "id": 95,
+        "nombre": "Velodromo",
+        "coords": {
+            "x": 2054,
+            "y": 1726
+        },
+        "radio": 10
+    },
+    {
+        "id": 96,
+        "nombre": "Mexicaltzingo_",
+        "coords": {
+            "x": 1760,
+            "y": 2410
+        },
+        "radio": 10
+    },
+    {
+        "id": 97,
+        "nombre": "Estacion_97",
+        "coords": {
+            "x": 1208,
+            "y": 948
+        },
+        "radio": 12
+    },
+    {
+        "id": 98,
+        "nombre": "la Catolica",
+        "coords": {
+            "x": 1344,
+            "y": 1368
+        },
+        "radio": 11
+    },
+    {
+        "id": 99,
+        "nombre": "Misterios",
+        "coords": {
+            "x": 1228,
+            "y": 734
+        },
+        "radio": 10
+    },
+    {
+        "id": 100,
+        "nombre": "San Juan",
+        "coords": {
+            "x": 2410,
+            "y": 1820
+        },
+        "radio": 10
+    },
+    {
+        "id": 101,
+        "nombre": "Gomez",
+        "coords": {
+            "x": 1522,
+            "y": 788
+        },
+        "radio": 10
+    },
+    {
+        "id": 102,
+        "nombre": "La VIga",
+        "coords": {
+            "x": 1580,
+            "y": 1828
+        },
+        "radio": 10
+    },
+    {
+        "id": 103,
+        "nombre": "Olimpica",
+        "coords": {
+            "x": 2268,
+            "y": 280
+        },
+        "radio": 10
+    },
+    {
+        "id": 104,
+        "nombre": "Tlaltenco",
+        "coords": {
+            "x": 2312,
+            "y": 3198
+        },
+        "radio": 10
+    },
+    {
+        "id": 105,
+        "nombre": "San Joaquln",
+        "coords": {
+            "x": 400,
+            "y": 1062
+        },
+        "radio": 11
+    },
+    {
+        "id": 106,
+        "nombre": "[San Servandol",
+        "coords": {
+            "x": 1778,
+            "y": 1478
+        },
+        "radio": 11
+    },
+    {
+        "id": 107,
+        "nombre": "Impulsora",
+        "coords": {
+            "x": 2268,
+            "y": 608
+        },
+        "radio": 10
+    },
+    {
+        "id": 108,
+        "nombre": "Revolucion",
+        "coords": {
+            "x": 998,
+            "y": 948
+        },
+        "radio": 12
+    },
+    {
+        "id": 109,
+        "nombre": "Estacion_109",
+        "coords": {
+            "x": 400,
+            "y": 748
+        },
+        "radio": 11
+    },
+    {
+        "id": 110,
+        "nombre": "Cosme",
+        "coords": {
+            "x": 680,
+            "y": 1044
+        },
+        "radio": 11
+    },
+    {
+        "id": 111,
+        "nombre": "Estacion_111",
+        "coords": {
+            "x": 886,
+            "y": 1368
+        },
+        "radio": 11
+    },
+    {
+        "id": 112,
+        "nombre": "Talisman",
+        "coords": {
+            "x": 1778,
+            "y": 582
+        },
+        "radio": 11
+    },
+    {
+        "id": 113,
+        "nombre": "Constituyentes",
+        "coords": {
+            "x": 400,
+            "y": 1564
+        },
+        "radio": 10
+    },
+    {
+        "id": 114,
+        "nombre": "Panteones",
+        "coords": {
+            "x": 268,
+            "y": 860
+        },
+        "radio": 11
+    },
+    {
+        "id": 115,
+        "nombre": "Polanco",
+        "coords": {
+            "x": 400,
+            "y": 1226
+        },
+        "radio": 11
+    },
+    {
+        "id": 116,
+        "nombre": "Vallejo",
+        "coords": {
+            "x": 872,
+            "y": 506
+        },
+        "radio": 11
+    },
+    {
+        "id": 117,
+        "nombre": "Cuatro",
+        "coords": {
+            "x": 116,
+            "y": 862
+        },
+        "radio": 10
+    },
+    {
+        "id": 118,
+        "nombre": "Sevilla",
+        "coords": {
+            "x": 680,
+            "y": 1446
+        },
+        "radio": 10
+    },
+    {
+        "id": 119,
+        "nombre": "Camarones",
+        "coords": {
+            "x": 400,
+            "y": 602
+        },
+        "radio": 10
+    },
+    {
+        "id": 120,
+        "nombre": "Auditorio",
+        "coords": {
+            "x": 400,
+            "y": 1398
+        },
+        "radio": 10
+    },
+    {
+        "id": 121,
+        "nombre": "Tezozomoc",
+        "coords": {
+            "x": 456,
+            "y": 454
+        },
+        "radio": 10
+    },
+    {
+        "id": 122,
+        "nombre": "Autobuses",
+        "coords": {
+            "x": 1000,
+            "y": 504
+        },
+        "radio": 12
+    },
+    {
+        "id": 123,
+        "nombre": "Politecnico",
+        "coords": {
+            "x": 886,
+            "y": 338
+        },
+        "radio": 11
+    },
+    {
+        "id": 124,
+        "nombre": "Bondojito",
+        "coords": {
+            "x": 1778,
+            "y": 656
+        },
+        "radio": 11
+    },
+    {
+        "id": 125,
+        "nombre": "Puebla",
+        "coords": {
+            "x": 2262,
+            "y": 1682
+        },
+        "radio": 11
+    },
+    {
+        "id": 126,
+        "nombre": "Tepalcates",
+        "coords": {
+            "x": 2408,
+            "y": 1912
+        },
+        "radio": 11
+    },
+    {
+        "id": 127,
+        "nombre": "Agricola",
+        "coords": {
+            "x": 2408,
+            "y": 1730
+        },
+        "radio": 11
+    },
+    {
+        "id": 128,
+        "nombre": "Azcapotzalco",
+        "coords": {
+            "x": 556,
+            "y": 504
+        },
+        "radio": 10
+    },
+    {
+        "id": 129,
+        "nombre": "Ferreria",
+        "coords": {
+            "x": 656,
+            "y": 504
+        },
+        "radio": 10
+    },
+    {
+        "id": 130,
+        "nombre": "Medico",
+        "coords": {
+            "x": 1002,
+            "y": 1724
+        },
+        "radio": 12
+    },
+    {
+        "id": 131,
+        "nombre": "Lazaro",
+        "coords": {
+            "x": 1876,
+            "y": 1126
+        },
+        "radio": 12
+    },
+    {
+        "id": 132,
+        "nombre": "Estacion_132",
+        "coords": {
+            "x": 2116,
+            "y": 2450
+        },
+        "radio": 11
+    },
+    {
+        "id": 133,
+        "nombre": "Terminal",
+        "coords": {
+            "x": 2316,
+            "y": 1254
+        },
+        "radio": 11
+    },
+    {
+        "id": 134,
+        "nombre": "Norte 45",
+        "coords": {
+            "x": 786,
+            "y": 504
+        },
+        "radio": 10
+    },
+    {
+        "id": 135,
+        "nombre": "Canal del",
+        "coords": {
+            "x": 1778,
+            "y": 922
+        },
+        "radio": 11
+    },
+    {
+        "id": 136,
+        "nombre": "Balbuena",
+        "coords": {
+            "x": 2064,
+            "y": 1318
+        },
+        "radio": 11
+    },
+    {
+        "id": 137,
+        "nombre": "Plaza Aragon",
+        "coords": {
+            "x": 2268,
+            "y": 196
+        },
+        "radio": 11
+    },
+    {
+        "id": 138,
+        "nombre": "Aqulles",
+        "coords": {
+            "x": 400,
+            "y": 518
+        },
+        "radio": 10
+    },
+    {
+        "id": 139,
+        "nombre": "Ide Letran",
+        "coords": {
+            "x": 1210,
+            "y": 1198
+        },
+        "radio": 11
+    },
+    {
+        "id": 140,
+        "nombre": "Obrera",
+        "coords": {
+            "x": 1324,
+            "y": 1572
+        },
+        "radio": 11
+    },
+    {
+        "id": 141,
+        "nombre": "Nopalera",
+        "coords": {
+            "x": 2188,
+            "y": 3072
+        },
+        "radio": 9
+    },
+    {
+        "id": 142,
+        "nombre": "Nativitas",
+        "coords": {
+            "x": 1478,
+            "y": 2120
+        },
+        "radio": 11
+    },
+    {
+        "id": 143,
+        "nombre": "La Villa",
+        "coords": {
+            "x": 1508,
+            "y": 506
+        },
+        "radio": 11
+    },
+    {
+        "id": 144,
+        "nombre": "Santa Marta",
+        "coords": {
+            "x": 2408,
+            "y": 2278
+        },
+        "radio": 11
+    },
+    {
+        "id": 145,
+        "nombre": "Lindavista",
+        "coords": {
+            "x": 1180,
+            "y": 506
+        },
+        "radio": 11
+    },
+    {
+        "id": 146,
+        "nombre": "R. Flores Magon",
+        "coords": {
+            "x": 1978,
+            "y": 1126
+        },
+        "radio": 11
+    },
+    {
+        "id": 147,
+        "nombre": "M. Muzquiz",
+        "coords": {
+            "x": 2268,
+            "y": 446
+        },
+        "radio": 11
+    },
+    {
+        "id": 148,
+        "nombre": "Acatitla",
+        "coords": {
+            "x": 2408,
+            "y": 2184
+        },
+        "radio": 11
+    },
+    {
+        "id": 149,
+        "nombre": "Cuitlahuac",
+        "coords": {
+            "x": 460,
+            "y": 918
+        },
+        "radio": 10
+    },
+    {
+        "id": 150,
+        "nombre": "Zaragoza",
+        "coords": {
+            "x": 2178,
+            "y": 1594
+        },
+        "radio": 10
+    },
+    {
+        "id": 151,
+        "nombre": "[Eugenia",
+        "coords": {
+            "x": 1000,
+            "y": 1908
+        },
+        "radio": 11
+    },
+    {
+        "id": 152,
+        "nombre": "General Anay",
+        "coords": {
+            "x": 1372,
+            "y": 2306
+        },
+        "radio": 11
+    }
+]
