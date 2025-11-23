@@ -3,7 +3,7 @@ import json
 import os
 
 # Rutas
-excel_path = r'railway-monitor/data-scripts/datasets/Dataset_Final_Asuntos_Especificos.xlsx'
+excel_path = r'railway-monitor/data-scripts/datasets/Dataset_Completo_Final.xlsx'
 output_dir = r'railway-monitor/frontend/lib/data'
 
 # Asegurar directorio de destino
