@@ -61,64 +61,7 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-export const METRO_LINES: MetroLine[] = [
-  {
-    id: "L2",
-    name: "Línea 2 - Azul",
-    color: "#0054a6",
-    stations: [
-      { id: "cua2", name: "Cuatro Caminos", x: 150, y: 80 },
-      { id: "pan2", name: "Panteones", x: 180, y: 120 },
-      { id: "tac2", name: "Tacuba", x: 210, y: 160 },
-      { id: "col", name: "Colegio Militar", x: 240, y: 200 },
-      { id: "nor", name: "Normal", x: 270, y: 240 },
-      { id: "smc", name: "San Cosme", x: 300, y: 270 },
-      { id: "rev", name: "Revolución", x: 340, y: 290 },
-      { id: "hid", name: "Hidalgo", x: 380, y: 310 },
-      { id: "bea", name: "Bellas Artes", x: 420, y: 330 },
-      { id: "all", name: "Allende", x: 460, y: 350 },
-      { id: "zoc", name: "Zócalo", x: 500, y: 370 },
-      { id: "pid2", name: "Pino Suárez", x: 540, y: 390 },
-      { id: "saa", name: "San Antonio Abad", x: 580, y: 420 },
-      { id: "cha2", name: "Chabacano", x: 610, y: 460 },
-      { id: "vip", name: "Viaducto", x: 630, y: 500 },
-      { id: "xol", name: "Xola", x: 650, y: 540 },
-      { id: "vil", name: "Villa de Cortés", x: 670, y: 580 },
-      { id: "ntz", name: "Nativitas", x: 690, y: 620 },
-      { id: "por", name: "Portales", x: 710, y: 660 },
-      { id: "erm", name: "Ermita", x: 730, y: 700 },
-      { id: "gen", name: "General Anaya", x: 750, y: 740 },
-      { id: "tas", name: "Tasqueña", x: 770, y: 780 },
-    ],
-  },
-  {
-    id: "L12",
-    name: "Línea 12 - Dorada",
-    color: "#b4975a",
-    stations: [
-      { id: "mix", name: "Mixcoac", x: 100, y: 400 },
-      { id: "ins12", name: "Insurgentes Sur", x: 140, y: 430 },
-      { id: "hos", name: "Hospital 20 de Nov.", x: 180, y: 460 },
-      { id: "zap", name: "Zapata", x: 220, y: 490 },
-      { id: "par", name: "Parque de los Venados", x: 260, y: 520 },
-      { id: "eje", name: "Eje Central", x: 300, y: 550 },
-      { id: "erm12", name: "Ermita", x: 340, y: 580 },
-      { id: "mex", name: "Mexicaltzingo", x: 380, y: 610 },
-      { id: "atl", name: "Atlalilco", x: 420, y: 640 },
-      { id: "cul", name: "Culhuacán", x: 460, y: 670 },
-      { id: "sji", name: "San Andrés Tomatlán", x: 500, y: 700 },
-      { id: "lom", name: "Lomas Estrella", x: 540, y: 720 },
-      { id: "cen", name: "Calle 11", x: 580, y: 740 },
-      { id: "per", name: "Periférico Oriente", x: 620, y: 760 },
-      { id: "teo", name: "Tezonco", x: 660, y: 780 },
-      { id: "oli", name: "Olivos", x: 700, y: 780 },
-      { id: "noe", name: "Nopalera", x: 740, y: 780 },
-      { id: "zap12", name: "Zapotitlán", x: 780, y: 780 },
-      { id: "tla", name: "Tlaltenco", x: 820, y: 780 },
-      { id: "tzi", name: "Tláhuac", x: 860, y: 780 },
-    ],
-  },
-];
+export const METRO_LINES: MetroLine[] = [];
 
 // Datos simulados de reportes y gravedad por estación
 // severity: 0.0 = sin gravedad (sin rojo), 1.0 = gravedad máxima (rojo intenso)

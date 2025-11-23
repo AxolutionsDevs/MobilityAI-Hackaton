@@ -13,6 +13,7 @@ interface MetroMapProps {
   heatmapIntensity: number;
   customLines?: CustomLine[];
   onUpdateCustomLine?: (lineId: string, updatedStations: any[]) => void;
+  onNavigateToImport?: () => void;
 }
 
 const MetroMap: React.FC<MetroMapProps> = ({
@@ -23,6 +24,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
   heatmapIntensity,
   customLines = [],
   onUpdateCustomLine,
+  onNavigateToImport,
 }) => {
   const { translations } = useCity();
   const svgWidth = 860;
@@ -34,6 +36,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [isMapFocused, setIsMapFocused] = useState(false);
+  const [hoveredStation, setHoveredStation] = useState<string | null>(null);
+  const [visibleStations, setVisibleStations] = useState<number>(0);
   const svgRef = React.useRef<SVGSVGElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -56,6 +60,35 @@ const MetroMap: React.FC<MetroMapProps> = ({
     selectedLine === "all"
       ? METRO_LINES
       : METRO_LINES.filter((l) => l.id === selectedLine);
+
+  const hasNoLines = METRO_LINES.length === 0 && customLines.length === 0;
+
+  // Animación progresiva de estaciones
+  React.useEffect(() => {
+    setVisibleStations(0);
+    const totalStations = customLines.reduce(
+      (acc, line) => acc + line.stations.length,
+      0
+    );
+
+    if (totalStations === 0) return;
+
+    // Duración total: 3 segundos para que todo termine al mismo tiempo
+    const totalDuration = 3000;
+    const intervalTime = totalDuration / totalStations;
+
+    const interval = setInterval(() => {
+      setVisibleStations((prev) => {
+        if (prev >= totalStations) {
+          clearInterval(interval);
+          return totalStations;
+        }
+        return prev + 1;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(interval);
+  }, [customLines]);
 
   // Manejar zoom con la rueda del mouse
   const handleWheel = (e: React.WheelEvent) => {
@@ -141,10 +174,34 @@ const MetroMap: React.FC<MetroMapProps> = ({
       style={{ touchAction: "none" }}
       onWheel={handleWheel}
     >
+      {/* Mensaje cuando no hay líneas */}
+      {hasNoLines && (
+        <div className="absolute inset-0 flex items-center justify-center z-30">
+          <div className="bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-xl max-w-md text-center">
+            <div className="text-6xl mb-4">🗺️</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">
+              No hay líneas en el mapa
+            </h3>
+            <p className="text-gray-600 mb-6 text-sm">
+              Comienza importando un archivo SVG o JSON con las líneas del metro
+            </p>
+            {onNavigateToImport && (
+              <button
+                onClick={onNavigateToImport}
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mx-auto"
+              >
+                <span className="text-lg">📁</span>
+                Ir a Importar SVG
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Overlay de hover cuando el mapa no está enfocado */}
-      {!isMapFocused && (
+      {!isMapFocused && !hasNoLines && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-200/30 to-gray-300/30 backdrop-blur-[2px] z-20 rounded-2xl cursor-pointer"
+          className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-200/30 to-gray-300/30 z-20 rounded-2xl cursor-pointer"
           onClick={handleMapClick}
         >
           <div className="bg-gray-300 px-6 py-3 rounded-xl border border-gray-400 shadow-2xl">
@@ -377,6 +434,12 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   opacity="0.6"
+                  className="animate-draw-line"
+                  style={{
+                    strokeDasharray: "2000",
+                    strokeDashoffset: "2000",
+                    animation: "drawLine 3s ease-out forwards",
+                  }}
                 />
                 <path
                   d={pathData}
@@ -385,6 +448,12 @@ const MetroMap: React.FC<MetroMapProps> = ({
                   strokeWidth="4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  className="animate-draw-line"
+                  style={{
+                    strokeDasharray: "2000",
+                    strokeDashoffset: "2000",
+                    animation: "drawLine 3s ease-out forwards",
+                  }}
                 />
               </g>
             );
@@ -402,6 +471,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
               const { color, strokeColor, intensity } = getHeatColor(severity);
               const isSelected = selectedStation?.id === station.id;
               const hasReports = reportCount > 0;
+              const stationKey = `${line.id}-${station.id}`;
+              const isHovered = hoveredStation === stationKey;
 
               return (
                 <g
@@ -417,6 +488,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       severity,
                     })
                   }
+                  onMouseEnter={() => setHoveredStation(stationKey)}
+                  onMouseLeave={() => setHoveredStation(null)}
                 >
                   <circle
                     cx={station.x}
@@ -430,10 +503,10 @@ const MetroMap: React.FC<MetroMapProps> = ({
                     cx={station.x}
                     cy={station.y}
                     r={isSelected ? 12 : 8}
-                    fill="#1e1b4b"
+                    fill="#ffffff"
                     stroke={
                       isSelected
-                        ? "#fff"
+                        ? "#374151"
                         : hasReports
                         ? strokeColor
                         : line.color
@@ -445,10 +518,34 @@ const MetroMap: React.FC<MetroMapProps> = ({
                     x={station.x}
                     y={station.y + 3}
                     textAnchor="middle"
-                    className="text-[8px] font-bold fill-white pointer-events-none"
+                    className="text-[8px] font-bold fill-gray-900 pointer-events-none"
                   >
                     {reportCount}
                   </text>
+
+                  {/* Nombre al hacer hover (solo si no está seleccionada) */}
+                  {isHovered && !isSelected && (
+                    <g transform={`translate(${station.x}, ${station.y - 20})`}>
+                      <rect
+                        x="-40"
+                        y="-12"
+                        width="80"
+                        height="18"
+                        rx="4"
+                        fill="rgba(255,255,255,0.98)"
+                        stroke={line.color}
+                        strokeWidth="2"
+                      />
+                      <text
+                        x="0"
+                        y="2"
+                        textAnchor="middle"
+                        className="text-[8px] fill-gray-900 font-semibold"
+                      >
+                        {station.name}
+                      </text>
+                    </g>
+                  )}
 
                   {hasReports && (
                     <g>
@@ -479,7 +576,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                         width="200"
                         height="92"
                         rx="8"
-                        fill="rgba(0,0,0,0.95)"
+                        fill="rgba(255,255,255,0.98)"
                         stroke={strokeColor}
                         strokeWidth="2.5"
                       />
@@ -489,7 +586,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                         x={station.x}
                         y={station.y - 72}
                         textAnchor="middle"
-                        className="text-[11px] fill-white font-bold"
+                        className="text-[11px] fill-gray-900 font-bold"
                       >
                         {station.name}
                       </text>
@@ -500,7 +597,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                         y1={station.y - 64}
                         x2={station.x + 85}
                         y2={station.y - 64}
-                        stroke="rgba(255,255,255,0.2)"
+                        stroke="rgba(156,163,175,0.3)"
                         strokeWidth="1"
                       />
 
@@ -509,7 +606,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                         x={station.x - 50}
                         y={station.y - 48}
                         textAnchor="start"
-                        className="text-[8px] fill-white/70"
+                        className="text-[8px] fill-gray-600"
                       >
                         Reportes: {reportCount}
                       </text>
@@ -517,7 +614,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                         x={station.x + 50}
                         y={station.y - 48}
                         textAnchor="end"
-                        className="text-[8px] fill-white/70"
+                        className="text-[8px] fill-gray-600"
                       >
                         Gravedad: {(severity * 100).toFixed(0)}%
                       </text>
@@ -597,10 +694,44 @@ const MetroMap: React.FC<MetroMapProps> = ({
           {/* Custom Line Stations */}
           {customLines.map((line) =>
             line.stations.map((station, idx) => {
+              const stationKey = `custom-${line.id}-${station.id}`;
+              const isHovered = hoveredStation === stationKey;
+
+              // Calcular índice global de la estación
+              let globalIndex = 0;
+              for (const l of customLines) {
+                if (l.id === line.id) {
+                  globalIndex += idx;
+                  break;
+                }
+                globalIndex += l.stations.length;
+              }
+
+              const isVisible = globalIndex < visibleStations;
+
+              if (!isVisible) return null;
+
+              // Calcular delay dinámico para que todo termine en 3 segundos
+              // La animación dura 0.4s, así que el último delay debe ser 3s - 0.4s = 2.6s
+              const totalStations = customLines.reduce(
+                (acc, l) => acc + l.stations.length,
+                0
+              );
+              const animationDuration = 0.4;
+              const totalAnimationTime = 3;
+              const maxDelay = totalAnimationTime - animationDuration;
+              const delayPerStation =
+                totalStations > 1 ? maxDelay / (totalStations - 1) : 0;
+
               return (
                 <g
                   key={`custom-${station.id}`}
-                  className="cursor-pointer"
+                  className="cursor-pointer animate-fade-in"
+                  style={{
+                    animation: `fadeInScale ${animationDuration}s ease-out ${
+                      globalIndex * delayPerStation
+                    }s both`,
+                  }}
                   onClick={() =>
                     onSelectStation({
                       ...station,
@@ -608,6 +739,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       lineColor: line.color,
                     })
                   }
+                  onMouseEnter={() => setHoveredStation(stationKey)}
+                  onMouseLeave={() => setHoveredStation(null)}
                 >
                   <circle
                     cx={station.x}
@@ -621,7 +754,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
                     cx={station.x}
                     cy={station.y}
                     r={10}
-                    fill="#1e1b4b"
+                    fill="#ffffff"
                     stroke={line.color}
                     strokeWidth={2}
                     className="transition-all duration-200"
@@ -630,28 +763,32 @@ const MetroMap: React.FC<MetroMapProps> = ({
                     x={station.x}
                     y={station.y + 3}
                     textAnchor="middle"
-                    className="text-[8px] font-bold fill-white pointer-events-none"
+                    className="text-[8px] font-bold fill-gray-900 pointer-events-none"
                   >
                     {idx + 1}
                   </text>
-                  <g transform={`translate(${station.x}, ${station.y - 20})`}>
-                    <rect
-                      x="-35"
-                      y="-10"
-                      width="70"
-                      height="16"
-                      rx="3"
-                      fill="rgba(0,0,0,0.8)"
-                    />
-                    <text
-                      x="0"
-                      y="2"
-                      textAnchor="middle"
-                      className="text-[7px] fill-white"
-                    >
-                      {station.name}
-                    </text>
-                  </g>
+                  {isHovered && (
+                    <g transform={`translate(${station.x}, ${station.y - 20})`}>
+                      <rect
+                        x="-35"
+                        y="-10"
+                        width="70"
+                        height="16"
+                        rx="3"
+                        fill="rgba(255,255,255,0.98)"
+                        stroke={line.color}
+                        strokeWidth="2"
+                      />
+                      <text
+                        x="0"
+                        y="2"
+                        textAnchor="middle"
+                        className="text-[7px] fill-gray-900 font-semibold"
+                      >
+                        {station.name}
+                      </text>
+                    </g>
+                  )}
                 </g>
               );
             })
@@ -684,32 +821,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             </g>
           ))}
 
-          {/* Custom Line Labels */}
-          {customLines.map((line) => (
-            <g
-              key={`label-${line.id}`}
-              transform={`translate(${line.stations[0].x - 35}, ${
-                line.stations[0].y - 25
-              })`}
-            >
-              <rect
-                x="0"
-                y="0"
-                width="70"
-                height="16"
-                rx="4"
-                fill={line.color}
-              />
-              <text
-                x="35"
-                y="11"
-                textAnchor="middle"
-                className="text-[7px] fill-white font-bold"
-              >
-                {line.name}
-              </text>
-            </g>
-          ))}
+          {/* Custom Line Labels - Removed */}
         </g>
 
         {/* Legend - Fija, no afectada por zoom */}
@@ -720,16 +832,16 @@ const MetroMap: React.FC<MetroMapProps> = ({
             width="250"
             height="145"
             rx="10"
-            fill="rgba(0,0,0,0.85)"
-            stroke="rgba(255,255,255,0.25)"
+            fill="rgba(255,255,255,0.95)"
+            stroke="rgba(156,163,175,0.8)"
             strokeWidth="1.5"
           />
-          <text x="15" y="25" className="text-[14px] fill-white font-bold">
+          <text x="15" y="25" className="text-[14px] fill-gray-900 font-bold">
             Heatmap de Incidencias
           </text>
 
           {/* Intensidad de color */}
-          <text x="15" y="48" className="text-[11px] fill-white/80">
+          <text x="15" y="48" className="text-[11px] fill-gray-700">
             Intensidad de color:
           </text>
           <rect
@@ -740,7 +852,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             rx="3"
             fill="rgba(32, 224, 10, 1)"
           />
-          <text x="60" y="65" className="text-[10px] fill-white/70">
+          <text x="60" y="65" className="text-[10px] fill-gray-600">
             Baja gravedad
           </text>
           <rect
@@ -751,7 +863,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             rx="3"
             fill="rgba(245, 180, 0, 1)"
           />
-          <text x="60" y="81" className="text-[10px] fill-white/70">
+          <text x="60" y="81" className="text-[10px] fill-gray-600">
             Media gravedad
           </text>
           <rect
@@ -762,15 +874,15 @@ const MetroMap: React.FC<MetroMapProps> = ({
             rx="3"
             fill="rgba(139, 0, 0, 1)"
           />
-          <text x="60" y="97" className="text-[10px] fill-white/70">
+          <text x="60" y="97" className="text-[10px] fill-gray-600">
             Alta gravedad
           </text>
 
           {/* Tamaño del blur */}
-          <text x="15" y="118" className="text-[11px] fill-white/80">
+          <text x="15" y="118" className="text-[11px] fill-gray-700">
             Tamaño del área:
           </text>
-          <text x="15" y="132" className="text-[10px] fill-white/70">
+          <text x="15" y="132" className="text-[10px] fill-gray-600">
             Mayor área = más reportes
           </text>
         </g>

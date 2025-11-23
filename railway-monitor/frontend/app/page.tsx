@@ -1,14 +1,13 @@
 "use client";
 
 import MetroMap from "@/components/MetroMap";
-import GlobalPHI from "@/components/sections/GlobalPHI";
 import Header from "@/components/sections/Header";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
 import TrendsDashboard from "@/components/trends/TrendsDashboard";
 import { CityProvider, useCity } from "@/lib/CityContext";
 import { CATEGORIES } from "@/lib/constants";
-import { calculateGlobalPHI, generateStationPHI } from "@/lib/utils";
+import { generateStationPHI } from "@/lib/utils";
 import { Comment, CustomLine } from "@/types";
 import {
   Activity,
@@ -21,7 +20,7 @@ import {
   Upload,
   Zap,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -51,11 +50,6 @@ function DashboardContent() {
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
 
-  const globalPHI = useMemo(
-    () => calculateGlobalPHI(stationData),
-    [stationData]
-  );
-
   const sampleComments: Comment[] = useMemo(() => {
     if (city === "cdmx") {
       return [
@@ -82,12 +76,6 @@ function DashboardContent() {
   const kpiData = useMemo(
     () => [
       {
-        icon: Globe,
-        label: translations.globalPHI,
-        value: globalPHI,
-        sub: "+2.3%",
-      },
-      {
         icon: ThumbsUp,
         label: translations.positives,
         value: "35%",
@@ -106,7 +94,7 @@ function DashboardContent() {
         sub: translations.average,
       },
     ],
-    [translations, globalPHI]
+    [translations]
   );
 
   const handleSaveCustomLine = (lineData: CustomLine) => {
@@ -136,19 +124,23 @@ function DashboardContent() {
   };
 
   // Radar chart data for category comparison
-  const radarData = useMemo(
-    () =>
+  const [radarData, setRadarData] = useState<any[]>([]);
+  const [trendData, setTrendData] = useState<any[]>([]);
+  const [predictiveData, setPredictiveData] = useState<any[]>([]);
+  const [categoryPercentages, setCategoryPercentages] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Initialize radar data
+    setRadarData(
       CATEGORIES.map((cat) => ({
         category: getCategoryName(cat.id),
         mexico: Math.floor(Math.random() * 40 + 50),
         austria: Math.floor(Math.random() * 30 + 65),
-      })),
-    [translations]
-  );
+      }))
+    );
 
-  // Area chart data for trends
-  const trendData = useMemo(
-    () =>
+    // Initialize trend data
+    setTrendData(
       Array.from({ length: 7 }, (_, i) => ({
         day: [
           translations.monday,
@@ -162,22 +154,25 @@ function DashboardContent() {
         seguridad: Math.floor(Math.random() * 20 + 60),
         puntualidad: Math.floor(Math.random() * 20 + 65),
         limpieza: Math.floor(Math.random() * 20 + 70),
-      })),
-    [translations]
-  );
+      }))
+    );
 
-  // Predictive data
-  const predictiveData = useMemo(
-    () =>
+    // Initialize predictive data
+    setPredictiveData(
       Array.from({ length: 24 }, (_, i) => ({
         hour: `${i}:00`,
         conflictos: Math.floor(
           Math.random() * 30 + (i > 7 && i < 20 ? 40 : 10)
         ),
         riesgo: Math.floor(Math.random() * 20 + (i > 7 && i < 20 ? 50 : 20)),
-      })),
-    []
-  );
+      }))
+    );
+
+    // Initialize category percentages for dashboard
+    setCategoryPercentages(
+      CATEGORIES.map(() => Math.floor(Math.random() * 30 + 10))
+    );
+  }, [translations]);
 
   const tabs = useMemo(
     () => [
@@ -226,16 +221,6 @@ function DashboardContent() {
                     {translations.heatmapTitle}
                   </h3>
                   <div className="flex items-center gap-4">
-                    <select
-                      value={selectedLine}
-                      onChange={(e) => setSelectedLine(e.target.value)}
-                      className="px-4 py-2 rounded-lg bg-gray-300 text-sm border border-gray-400 text-gray-900"
-                    >
-                      <option value="all">{translations.allLines}</option>
-                      <option value="L1">{translations.line} 1</option>
-                      <option value="L2">{translations.line} 2</option>
-                      <option value="L3">{translations.line} 3</option>
-                    </select>
                     <label className="flex items-center gap-3 text-sm text-gray-900">
                       <span>{translations.intensity}:</span>
                       <input
@@ -261,6 +246,7 @@ function DashboardContent() {
                   heatmapIntensity={heatmapIntensity}
                   customLines={customLines}
                   onUpdateCustomLine={handleUpdateCustomLine}
+                  onNavigateToImport={() => setActiveView("import")}
                 />
               </div>
             )}
@@ -466,21 +452,13 @@ function DashboardContent() {
                     <div className="text-xs text-gray-600 mb-1">
                       🇲🇽 {translations.metroCDMX}
                     </div>
-                    <div className="text-2xl font-bold text-pink-600">
-                      {globalPHI}
-                    </div>
-                    <div className="text-[10px] text-gray-500">
-                      {translations.globalAveragePHI}
-                    </div>
+                    <div className="text-2xl font-bold text-pink-600">--</div>
                   </div>
                   <div className="p-3 rounded-xl bg-green-100 border border-green-300">
                     <div className="text-xs text-gray-600 mb-1">
                       🇦🇹 {translations.metroVienna}
                     </div>
-                    <div className="text-2xl font-bold text-green-600">84</div>
-                    <div className="text-[10px] text-gray-500">
-                      {translations.globalAveragePHI}
-                    </div>
+                    <div className="text-2xl font-bold text-green-600">--</div>
                   </div>
                 </div>
               </div>
@@ -493,12 +471,108 @@ function DashboardContent() {
           <div className="space-y-6">
             {selectedStation && <StationInfo station={selectedStation} />}
 
-            <GlobalPHI globalPHI={globalPHI} />
+            {!selectedStation && (
+              <>
+                {/* Categorías de incidentes */}
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
+                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-purple-600" />
+                    Categorías Principales
+                  </h3>
+                  <div className="space-y-3">
+                    {CATEGORIES.slice(0, 5).map((category, idx) => (
+                      <div key={category.id} className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <category.icon
+                              className="w-3 h-3"
+                              style={{ color: category.color }}
+                            />
+                            <span className="text-xs text-gray-700 font-medium">
+                              {category.name}
+                            </span>
+                          </div>
+                          <span className="text-xs font-bold text-gray-900">
+                            {categoryPercentages[idx] || 0}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="h-2 rounded-full transition-all"
+                            style={{
+                              width: `${categoryPercentages[idx] || 0}%`,
+                              backgroundColor: category.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actividad reciente */}
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-green-600" />
+                    Actividad Reciente
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        time: "Hace 5 min",
+                        text: "Nueva incidencia reportada",
+                        type: "alert",
+                      },
+                      {
+                        time: "Hace 12 min",
+                        text: "Estación con alta afluencia",
+                        type: "warning",
+                      },
+                      {
+                        time: "Hace 25 min",
+                        text: "Comentario positivo recibido",
+                        type: "success",
+                      },
+                      {
+                        time: "Hace 1 hora",
+                        text: "Mantenimiento programado",
+                        type: "info",
+                      },
+                    ].map((activity, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 p-2 rounded-lg bg-white/60"
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full mt-1.5 ${
+                            activity.type === "alert"
+                              ? "bg-red-500"
+                              : activity.type === "warning"
+                              ? "bg-yellow-500"
+                              : activity.type === "success"
+                              ? "bg-green-500"
+                              : "bg-blue-500"
+                          }`}
+                        />
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-700">
+                            {activity.text}
+                          </p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">
+                            {activity.time}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-[10px] text-white/40 pt-3 border-t border-white/10">
+        <footer className="text-center text-[10px] text-gray-500 pt-3 border-t border-gray-300">
           {translations.footer}
         </footer>
       </div>

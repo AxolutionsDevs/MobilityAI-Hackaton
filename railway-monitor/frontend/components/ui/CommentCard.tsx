@@ -21,10 +21,10 @@ const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
   const Icon = c.icon;
 
   return (
-    <div className={`p-3 rounded-xl ${c.bg} border border-white/10`}>
+    <div className={`p-3 rounded-xl ${c.bg} border border-gray-200`}>
       <div className="flex items-start gap-2">
         <Icon className={`w-4 h-4 ${c.color} mt-0.5`} />
-        <p className="text-xs text-white/90 flex-1">{comment.text}</p>
+        <p className="text-xs text-gray-700 flex-1">{comment.text}</p>
       </div>
     </div>
   );

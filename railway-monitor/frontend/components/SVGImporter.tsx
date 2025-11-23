@@ -60,7 +60,7 @@ const StationNode = React.memo(
           cx={node.x}
           cy={node.y}
           r={isBeingDragged ? 14 : 12}
-          fill="#1e1b4b"
+          fill="#ffffff"
           stroke={
             (node as any).color || (isBeingDragged ? "#a78bfa" : lineColor)
           }
@@ -76,7 +76,7 @@ const StationNode = React.memo(
           x={node.x}
           y={node.y + 4}
           textAnchor="middle"
-          className="text-[8px] font-bold fill-white pointer-events-none"
+          className="text-[8px] font-bold fill-gray-900 pointer-events-none"
         >
           {node.phi}
         </text>
@@ -88,13 +88,15 @@ const StationNode = React.memo(
               width="70"
               height="16"
               rx="3"
-              fill="rgba(0,0,0,0.8)"
+              fill="rgba(255,255,255,0.95)"
+              stroke="rgba(156,163,175,0.5)"
+              strokeWidth="1"
             />
             <text
               x="0"
               y="2"
               textAnchor="middle"
-              className="text-[7px] fill-white pointer-events-none"
+              className="text-[7px] fill-gray-900 font-medium pointer-events-none"
             >
               {node.name}
             </text>
@@ -665,27 +667,27 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
 
   return (
     <div className="space-y-4">
-      <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-        <h2 className="text-base font-semibold flex items-center gap-2 mb-4">
-          <span className="text-purple-400">🚇</span>
+      <div className="p-4 rounded-2xl bg-white border border-gray-300">
+        <h2 className="text-base font-semibold flex items-center gap-2 mb-4 text-gray-900">
+          <span className="text-purple-600">🚇</span>
           {translations.importTransportLine}
         </h2>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-xs text-white/60 mb-1">
+            <label className="block text-xs text-gray-600 mb-1">
               {translations.lineName}
             </label>
             <input
               type="text"
               value={lineName}
               onChange={(e) => setLineName(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-300 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder={translations.lineNamePlaceholder}
             />
           </div>
           <div>
-            <label className="block text-xs text-white/60 mb-1">
+            <label className="block text-xs text-gray-600 mb-1">
               {translations.lineColor}
             </label>
             <div className="flex gap-2">
@@ -693,19 +695,19 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                 type="color"
                 value={lineColor}
                 onChange={(e) => setLineColor(e.target.value)}
-                className="w-12 h-9 rounded cursor-pointer"
+                className="w-12 h-9 rounded cursor-pointer border border-gray-300"
               />
               <input
                 type="text"
                 value={lineColor}
                 onChange={(e) => setLineColor(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm"
+                className="flex-1 px-3 py-2 rounded-lg bg-gray-100 border border-gray-300 text-sm text-gray-900"
               />
             </div>
           </div>
         </div>
 
-        <div className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-purple-500/50 transition-colors">
+        <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-500 transition-colors">
           <input
             type="file"
             accept=".svg"
@@ -722,20 +724,20 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           />
           <label htmlFor="svg-upload" className="cursor-pointer block mb-3">
             <div className="text-4xl mb-2">📁</div>
-            <div className="text-sm font-medium text-white/80">
+            <div className="text-sm font-medium text-gray-700">
               {translations.dragSVGFile}
             </div>
-            <div className="text-xs text-white/50 mt-1">
+            <div className="text-xs text-gray-500 mt-1">
               {translations.autoDetectNodes}
             </div>
           </label>
 
           <div className="relative my-3">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/20"></div>
+              <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-slate-900/50 text-white/50">
+              <span className="px-2 bg-white text-gray-500">
                 {translations.or}
               </span>
             </div>
@@ -752,7 +754,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
         {isProcessing && (
           <div className="mt-4 text-center">
             <div className="animate-spin inline-block w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full"></div>
-            <p className="text-xs text-white/60 mt-2">
+            <p className="text-xs text-gray-600 mt-2">
               {translations.processingSVG}
             </p>
           </div>
@@ -762,15 +764,15 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       {importedSVG && detectedNodes.length > 0 && (
         <>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <h3 className="text-sm font-semibold mb-3">
+            <div className="p-4 rounded-2xl bg-white border border-gray-300">
+              <h3 className="text-sm font-semibold mb-3 text-gray-900">
                 {translations.editStations}
               </h3>
               <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
                 {detectedNodes.map((node, i) => (
                   <div
                     key={node.id}
-                    className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-2 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
                   >
                     <div
                       className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
@@ -788,7 +790,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                           e.key === "Enter" &&
                           updateNodeName(node.id, e.currentTarget.value)
                         }
-                        className="flex-1 px-2 py-1 rounded bg-white/10 border border-purple-500 text-xs focus:outline-none"
+                        className="flex-1 px-2 py-1 rounded bg-white border border-purple-500 text-xs text-gray-900 focus:outline-none"
                       />
                     ) : (
                       <span
@@ -798,14 +800,14 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                         {node.name}
                       </span>
                     )}
-                    <span className="text-[10px] text-white/40">
+                    <span className="text-[10px] text-gray-500">
                       ({Math.round(node.x)}, {Math.round(node.y)})
                     </span>
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded ${
                         node.phi >= 50
-                          ? "bg-green-500/20 text-green-400"
-                          : "bg-red-500/20 text-red-400"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
                       }`}
                     >
                       PHI: {node.phi}
@@ -821,26 +823,14 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30">
-              <h3 className="text-sm font-semibold mb-3">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-300">
+              <h3 className="text-sm font-semibold mb-3 text-gray-900">
                 {translations.actions}
               </h3>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={saveToCustomLines}
-                  className="px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                >
-                  <span>✓</span> {translations.save}
-                </button>
-                <button
-                  onClick={exportLine}
-                  className="px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                >
-                  <span>📥</span> {translations.export}
-                </button>
+              <div className="grid grid-cols-1 gap-3">
                 <button
                   onClick={clear}
-                  className="px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-medium text-sm hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
+                  className="px-4 py-3 rounded-xl bg-gray-200 border border-gray-300 text-gray-900 font-medium text-sm hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
                 >
                   <span>🗑</span> {translations.clean}
                 </button>
@@ -848,14 +838,16 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+          <div className="p-4 rounded-2xl bg-white border border-gray-300">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold">{translations.preview}</h3>
+              <h3 className="text-sm font-semibold text-gray-900">
+                {translations.preview}
+              </h3>
               <div className="flex items-center gap-3">
-                <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
+                <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
                   {detectedNodes.length} {translations.stations}
                 </span>
-                <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">
+                <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
                   ViewBox: {svgViewBox}
                 </span>
               </div>
@@ -863,17 +855,17 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
 
             <div
               ref={containerRef}
-              className="relative bg-slate-900 rounded-xl overflow-hidden border border-white/10"
+              className="relative bg-gray-50 rounded-xl overflow-hidden border border-gray-300"
               style={{ touchAction: "none" }}
             >
               {/* Overlay de hover cuando el mapa no está enfocado */}
               {!isMapFocused && (
                 <div
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-20 rounded-xl cursor-pointer"
+                  className="absolute inset-0 flex items-center justify-center bg-gray-200/40 backdrop-blur-[2px] z-20 rounded-xl cursor-pointer"
                   onClick={handleMapClick}
                 >
-                  <div className="bg-slate-800/90 px-6 py-3 rounded-xl border border-white/20 shadow-2xl">
-                    <p className="text-white text-sm font-semibold flex items-center gap-2">
+                  <div className="bg-white px-6 py-3 rounded-xl border border-gray-300 shadow-2xl">
+                    <p className="text-gray-900 text-sm font-semibold flex items-center gap-2">
                       <span className="text-2xl">🖱️</span>
                       Click para interactuar con el mapa
                     </p>
@@ -884,7 +876,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
               {/* Indicador de zoom activo */}
               {isMapFocused && (
                 <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
-                  <div className="bg-green-600/90 px-4 py-2 rounded-lg border border-green-400/30 shadow-lg">
+                  <div className="bg-green-500 px-4 py-2 rounded-lg border border-green-600 shadow-lg">
                     <p className="text-white text-xs font-semibold flex items-center gap-2">
                       <span>🔍</span>
                       Usa la rueda del mouse para zoom | Arrastra para mover
@@ -920,7 +912,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                     <path
                       d="M 20 0 L 0 0 0 20"
                       fill="none"
-                      stroke="rgba(255,255,255,0.05)"
+                      stroke="rgba(156,163,175,0.15)"
                       strokeWidth="0.5"
                     />
                   </pattern>
@@ -965,11 +957,11 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-            <h3 className="text-sm font-semibold mb-3">
+          <div className="p-4 rounded-2xl bg-white border border-gray-300">
+            <h3 className="text-sm font-semibold mb-3 text-gray-900">
               {translations.instructions}
             </h3>
-            <div className="grid grid-cols-2 gap-4 text-xs text-white/70">
+            <div className="grid grid-cols-2 gap-4 text-xs text-gray-600">
               <div className="space-y-2">
                 <div className="flex items-start gap-2">
                   <span className="text-purple-400">1.</span>
@@ -999,8 +991,8 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/30">
-              <div className="text-xs text-indigo-300">
+            <div className="mt-4 p-3 rounded-lg bg-indigo-100 border border-indigo-300">
+              <div className="text-xs text-indigo-800">
                 <strong>{translations.tip}</strong> {translations.tipText}
               </div>
             </div>
