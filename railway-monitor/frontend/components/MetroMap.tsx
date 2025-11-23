@@ -27,8 +27,11 @@ const MetroMap: React.FC<MetroMapProps> = ({
   onNavigateToImport,
 }) => {
   const { translations } = useCity();
-  const svgWidth = 860;
-  const svgHeight = 800;
+
+  // ViewBox fijo grande para acomodar cualquier mapa
+  const svgViewBox = "0 0 2000 2000";
+  const initialZoom = 0.6;
+  const initialPan = { x: 0, y: 0 };
 
   // Función para dividir texto en múltiples líneas
   const wrapText = (text: string, maxCharsPerLine: number = 18) => {
@@ -51,9 +54,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
     return lines;
   };
 
-  // Estados para zoom y pan
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  // Estados para zoom y pan con valores calculados automáticamente
+  const [zoom, setZoom] = useState(initialZoom);
+  const [pan, setPan] = useState(initialPan);
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [hoveredStation, setHoveredStation] = useState<string | null>(null);
@@ -179,8 +182,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
     setIsResetting(true);
     const startZoom = zoom;
     const startPan = { ...pan };
-    const targetZoom = 0.55; // Zoom más alejado para ver todo el mapa
-    const targetPan = { x: 0, y: -100 };
+    const targetZoom = 0.6;
+    const targetPan = { x: 0, y: 0 };
 
     const duration = 500; // 500ms de animación
     const startTime = performance.now();
@@ -244,7 +247,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
       )}
 
       {/* Botón de reset zoom */}
-      {(zoom !== 1 || pan.x !== 0 || pan.y !== 0) && (
+      {(Math.abs(zoom - 0.6) > 0.01 ||
+        Math.abs(pan.x - 0) > 1 ||
+        Math.abs(pan.y - 0) > 1) && (
         <button
           onClick={handleResetView}
           className="absolute top-4 right-4 z-30 pointer-events-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2 font-bold text-sm border border-blue-400/50 hover:scale-105"
@@ -271,8 +276,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
       <svg
         ref={svgRef}
-        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-        className="w-full h-auto min-h-[500px]"
+        viewBox={svgViewBox}
+        className="w-full h-auto"
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -281,6 +286,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
         style={{
           cursor: isPanning ? "grabbing" : "grab",
           touchAction: "none",
+          minHeight: "800px",
         }}
       >
         <g
@@ -927,42 +933,42 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 };
                 const { reportCount, severity, complaintIndex } = reportData;
 
-                const maxWidth = 160;
-                const issueLines = wrapText(reportData.recentIssue, 22);
-                const baseHeight = 50;
-                const extraHeight = Math.max(0, issueLines.length - 1) * 11;
+                const maxWidth = 280;
+                const issueLines = wrapText(reportData.recentIssue, 35);
+                const baseHeight = 90;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 18;
                 const totalHeight = baseHeight + extraHeight;
 
                 return (
                   <g
                     key={`tooltip-${stationKey}`}
-                    transform={`translate(${station.x}, ${station.y - 28})`}
+                    transform={`translate(${station.x}, ${station.y - 50})`}
                   >
                     <rect
                       x={-maxWidth / 2}
-                      y="-25"
+                      y="-45"
                       width={maxWidth}
                       height={totalHeight}
-                      rx="6"
+                      rx="10"
                       fill="rgba(255,255,255,0.98)"
                       stroke="rgba(156,163,175,0.4)"
-                      strokeWidth="1.5"
+                      strokeWidth="2.5"
                     />
 
                     <text
                       x="0"
-                      y="-13"
+                      y="-24"
                       textAnchor="middle"
-                      className="text-[11px] font-bold fill-gray-900"
+                      className="text-[16px] font-bold fill-gray-900"
                     >
                       {station.name}
                     </text>
 
                     <text
                       x="0"
-                      y="-2"
+                      y="-4"
                       textAnchor="middle"
-                      className="text-[9px] fill-gray-600"
+                      className="text-[13px] fill-gray-600"
                     >
                       Reportes: {reportCount} | Índice: {complaintIndex}%
                     </text>
@@ -971,9 +977,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       <text
                         key={idx}
                         x="0"
-                        y={9 + idx * 11}
+                        y={16 + idx * 18}
                         textAnchor="middle"
-                        className={`text-[8px] font-semibold ${
+                        className={`text-[13px] font-semibold ${
                           reportCount > 0 ? "fill-red-600" : "fill-green-600"
                         }`}
                       >
@@ -983,9 +989,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y={20 + extraHeight}
+                      y={38 + extraHeight}
                       textAnchor="middle"
-                      className="text-[8px] fill-gray-500"
+                      className="text-[12px] fill-gray-500"
                     >
                       Gravedad: {(severity * 100).toFixed(0)}%
                     </text>
@@ -1011,42 +1017,42 @@ const MetroMap: React.FC<MetroMapProps> = ({
                 const { reportCount, severity, complaintIndex } = reportData;
                 const hasReports = reportCount > 0;
 
-                const maxWidth = 160;
-                const issueLines = wrapText(reportData.recentIssue, 22);
-                const baseHeight = 50;
-                const extraHeight = Math.max(0, issueLines.length - 1) * 11;
+                const maxWidth = 280;
+                const issueLines = wrapText(reportData.recentIssue, 35);
+                const baseHeight = 90;
+                const extraHeight = Math.max(0, issueLines.length - 1) * 18;
                 const totalHeight = baseHeight + extraHeight;
 
                 return (
                   <g
                     key={`tooltip-${stationKey}`}
-                    transform={`translate(${station.x}, ${station.y - 28})`}
+                    transform={`translate(${station.x}, ${station.y - 50})`}
                   >
                     <rect
                       x={-maxWidth / 2}
-                      y="-25"
+                      y="-45"
                       width={maxWidth}
                       height={totalHeight}
-                      rx="6"
+                      rx="10"
                       fill="rgba(255,255,255,0.98)"
                       stroke={line.color}
-                      strokeWidth="2"
+                      strokeWidth="3"
                     />
 
                     <text
                       x="0"
-                      y="-13"
+                      y="-24"
                       textAnchor="middle"
-                      className="text-[11px] fill-gray-900 font-bold"
+                      className="text-[16px] fill-gray-900 font-bold"
                     >
                       {station.name}
                     </text>
 
                     <text
                       x="0"
-                      y="-2"
+                      y="-4"
                       textAnchor="middle"
-                      className="text-[9px] fill-gray-600"
+                      className="text-[13px] fill-gray-600"
                     >
                       Reportes: {reportCount} | Índice: {complaintIndex}%
                     </text>
@@ -1055,9 +1061,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
                       <text
                         key={idx}
                         x="0"
-                        y={9 + idx * 11}
+                        y={16 + idx * 18}
                         textAnchor="middle"
-                        className={`text-[8px] font-semibold ${
+                        className={`text-[13px] font-semibold ${
                           hasReports ? "fill-red-600" : "fill-green-600"
                         }`}
                       >
@@ -1067,9 +1073,9 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
                     <text
                       x="0"
-                      y={20 + extraHeight}
+                      y={38 + extraHeight}
                       textAnchor="middle"
-                      className="text-[8px] fill-gray-500"
+                      className="text-[12px] fill-gray-500"
                     >
                       Gravedad: {(severity * 100).toFixed(0)}%
                     </text>
@@ -1085,60 +1091,68 @@ const MetroMap: React.FC<MetroMapProps> = ({
           <rect
             x="0"
             y="0"
-            width="250"
-            height="145"
-            rx="10"
+            width="340"
+            height="200"
+            rx="12"
             fill="rgba(255,255,255,0.95)"
             stroke="rgba(156,163,175,0.8)"
-            strokeWidth="1.5"
+            strokeWidth="2"
           />
-          <text x="15" y="25" className="text-[14px] fill-gray-900 font-bold">
+          <text x="20" y="35" className="text-[18px] fill-gray-900 font-bold">
             Heatmap de Incidencias
           </text>
 
           {/* Intensidad de color */}
-          <text x="15" y="48" className="text-[11px] fill-gray-700">
+          <text
+            x="20"
+            y="65"
+            className="text-[15px] fill-gray-700 font-semibold"
+          >
             Intensidad de color:
           </text>
           <rect
-            x="15"
-            y="56"
-            width="38"
-            height="10"
-            rx="3"
+            x="20"
+            y="78"
+            width="55"
+            height="16"
+            rx="4"
             fill="rgba(32, 224, 10, 1)"
           />
-          <text x="60" y="65" className="text-[10px] fill-gray-600">
+          <text x="85" y="91" className="text-[14px] fill-gray-600">
             Baja gravedad
           </text>
           <rect
-            x="15"
-            y="72"
-            width="38"
-            height="10"
-            rx="3"
+            x="20"
+            y="102"
+            width="55"
+            height="16"
+            rx="4"
             fill="rgba(245, 180, 0, 1)"
           />
-          <text x="60" y="81" className="text-[10px] fill-gray-600">
+          <text x="85" y="115" className="text-[14px] fill-gray-600">
             Media gravedad
           </text>
           <rect
-            x="15"
-            y="88"
-            width="38"
-            height="10"
-            rx="3"
+            x="20"
+            y="126"
+            width="55"
+            height="16"
+            rx="4"
             fill="rgba(139, 0, 0, 1)"
           />
-          <text x="60" y="97" className="text-[10px] fill-gray-600">
+          <text x="85" y="139" className="text-[14px] fill-gray-600">
             Alta gravedad
           </text>
 
           {/* Tamaño del blur */}
-          <text x="15" y="118" className="text-[11px] fill-gray-700">
+          <text
+            x="20"
+            y="165"
+            className="text-[15px] fill-gray-700 font-semibold"
+          >
             Tamaño del área:
           </text>
-          <text x="15" y="132" className="text-[10px] fill-gray-600">
+          <text x="20" y="185" className="text-[13px] fill-gray-600">
             Mayor área = más reportes
           </text>
         </g>
