@@ -161,29 +161,29 @@ export default function TrendsDashboard() {
   const BAR_COLORS = ['#ef4444', '#ef4444', '#f97316', '#f97316', '#eab308']; // Rojo -> Amarillo
 
   return (
-    <div className="w-full p-6 bg-slate-950/50 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl text-slate-100 my-8">
+    <div className="w-full p-6 bg-white border border-gray-300 rounded-2xl shadow-2xl text-gray-900 my-8">
       
       {/* HEADER & CONTROLS */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-            <Activity className="w-6 h-6 text-blue-400" />
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900">
+            <Activity className="w-6 h-6 text-blue-600" />
             Centro de Comando: Tendencias
           </h2>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-gray-600 text-sm mt-1">
             Análisis de incidentes en tiempo real y patrones históricos.
           </p>
         </div>
 
-        <div className="flex bg-slate-900/80 p-1 rounded-lg border border-slate-800">
+        <div className="flex bg-gray-200 p-1 rounded-lg border border-gray-300">
           {(['24h', 'week', 'month'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
                 timeRange === range 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-blue-600 text-white shadow-lg' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-300'
               }`}
             >
               {range === '24h' ? 'Últimas 24h' : range === 'week' ? 'Esta Semana' : 'Este Mes'}
@@ -196,132 +196,128 @@ export default function TrendsDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* A. TOP CRÍTICO (Ranking) - Span 7 cols */}
-        <div className="lg:col-span-7 bg-slate-900/40 p-5 rounded-xl border border-slate-800/50 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <AlertOctagon className="w-24 h-24 text-red-500" />
-            </div>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-red-200">
-                <TrendingUp className="w-4 h-4 text-red-400" />
-                Top 5 Estaciones Críticas
-            </h3>
-            <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart layout="vertical" data={processedStats.topStations} margin={{ left: 20, right: 20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.3} />
-                        <XAxis type="number" hide />
-                        <YAxis 
-                            dataKey="name" 
-                            type="category" 
-                            tick={{ fill: '#94a3b8', fontSize: 12 }} 
-                            width={120}
-                            interval={0}
-                        />
-                        <Tooltip 
-                            cursor={{ fill: '#ffffff', opacity: 0.05 }}
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
-                        />
-                        <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
-                            {processedStats.topStations.map((entry: { name: string; count: number }, index: number) => (
-                                <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
+        <div className="lg:col-span-7 bg-gray-100 p-5 rounded-xl border border-gray-300 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <AlertOctagon className="w-24 h-24 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-red-600">
+            <TrendingUp className="w-4 h-4 text-red-500" />
+            Top 5 Estaciones Críticas
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart layout="vertical" data={processedStats.topStations} margin={{ left: 20, right: 20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#d1d5db" opacity={0.5} />
+                <XAxis type="number" hide />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  tick={{ fill: '#4b5563', fontSize: 12 }} 
+                  width={120}
+                  interval={0}
+                />
+                <Tooltip 
+                  cursor={{ fill: '#f3f4f6', opacity: 0.5 }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#d1d5db', color: '#374151' }}
+                />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
+                  {processedStats.topStations.map((entry: { name: string; count: number }, index: number) => (
+                    <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* B. DISTRIBUCIÓN POR LÍNEA (Donut) - Span 5 cols */}
-        <div className="lg:col-span-5 bg-slate-900/40 p-5 rounded-xl border border-slate-800/50 relative">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-blue-200">
-                <Filter className="w-4 h-4 text-blue-400" />
-                Distribución por Línea
-            </h3>
-            <div className="h-64 flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={processedStats.lineDistribution}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                        >
-                            {processedStats.lineDistribution.map((entry: { name: string; value: number }, index: number) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0)" />
-                            ))}
-                        </Pie>
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
-                            itemStyle={{ color: '#e2e8f0' }}
-                        />
-                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }}/>
-                    </PieChart>
-                </ResponsiveContainer>
-                
-                {/* KPI Central en Donut */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-6">
-                    <span className="text-3xl font-bold text-white">{processedStats.total}</span>
-                    <span className="text-xs text-slate-400">Quejas</span>
-                </div>
+        <div className="lg:col-span-5 bg-gray-100 p-5 rounded-xl border border-gray-300 relative">
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-blue-600">
+            <Filter className="w-4 h-4 text-blue-500" />
+            Distribución por Línea
+          </h3>
+          <div className="h-64 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={processedStats.lineDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {processedStats.lineDistribution.map((entry: { name: string; value: number }, index: number) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0)" />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#d1d5db', color: '#374151' }}
+                  itemStyle={{ color: '#4b5563' }}
+                />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#6b7280' }}/>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-6">
+              <span className="text-3xl font-bold text-gray-900">{processedStats.total}</span>
+              <span className="text-xs text-gray-600">Quejas</span>
             </div>
+          </div>
         </div>
 
         {/* C. EL SISMÓGRAFO (Timeline) - Span 12 cols (Full Width) */}
-        <div className="lg:col-span-12 bg-slate-900/40 p-5 rounded-xl border border-slate-800/50">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-emerald-200">
-                    <Zap className="w-4 h-4 text-emerald-400" />
-                    Volumen de Quejas (Sismógrafo)
-                </h3>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Actualizado ahora
-                </div>
+        <div className="lg:col-span-12 bg-gray-100 p-5 rounded-xl border border-gray-300">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-green-600">
+              <Zap className="w-4 h-4 text-green-500" />
+              Volumen de Quejas (Sismógrafo)
+            </h3>
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              Actualizado ahora
             </div>
-            
-            <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={processedStats.timelineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                        <defs>
-                            <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.2} vertical={false} />
-                        <XAxis 
-                            dataKey="date" 
-                            stroke="#64748b" 
-                            tick={{ fontSize: 12 }} 
-                            tickLine={false}
-                            axisLine={false}
-                            dy={10}
-                        />
-                        <YAxis 
-                            stroke="#64748b" 
-                            tick={{ fontSize: 12 }} 
-                            tickLine={false}
-                            axisLine={false}
-                        />
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
-                        />
-                        <Area 
-                            type="monotone" 
-                            dataKey="count" 
-                            stroke="#10b981" 
-                            strokeWidth={3}
-                            fillOpacity={1} 
-                            fill="url(#colorVolume)" 
-                            animationDuration={1500}
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
-            </div>
+          </div>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={processedStats.timelineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" opacity={0.5} vertical={false} />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#6b7280" 
+                  tick={{ fontSize: 12 }} 
+                  tickLine={false}
+                  axisLine={false}
+                  dy={10}
+                />
+                <YAxis 
+                  stroke="#6b7280" 
+                  tick={{ fontSize: 12 }} 
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#d1d5db', color: '#374151' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="#10b981" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorVolume)" 
+                  animationDuration={1500}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-
       </div>
     </div>
   );

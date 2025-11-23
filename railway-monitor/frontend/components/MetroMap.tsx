@@ -172,18 +172,18 @@ const MetroMap: React.FC<MetroMapProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden bg-slate-900/50 rounded-2xl border border-white/10 p-4"
+      className="relative w-full overflow-hidden bg-gray-100 border border-gray-300 rounded-lg p-4"
       style={{ touchAction: "none" }}
       onWheel={handleWheel}
     >
       {/* Overlay de hover cuando el mapa no está enfocado */}
       {!isMapFocused && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-20 rounded-2xl cursor-pointer"
+          className="absolute inset-0 flex items-center justify-center bg-gray-200 backdrop-blur-[2px] z-20 rounded-2xl cursor-pointer"
           onClick={handleMapClick}
         >
-          <div className="bg-slate-800/90 px-6 py-3 rounded-xl border border-white/20 shadow-2xl">
-            <p className="text-white text-sm font-semibold flex items-center gap-2">
+          <div className="bg-gray-300 px-6 py-3 rounded-xl border border-gray-400 shadow-2xl">
+            <p className="text-gray-800 text-sm font-semibold flex items-center gap-2">
               <span className="text-2xl">🖱️</span>
               Click para interactuar con el mapa
             </p>
@@ -194,8 +194,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
       {/* Indicador de zoom activo */}
       {isMapFocused && (
         <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
-          <div className="bg-green-600/90 px-4 py-2 rounded-lg border border-green-400/30 shadow-lg">
-            <p className="text-white text-xs font-semibold flex items-center gap-2">
+          <div className="bg-green-500 px-4 py-2 rounded-lg border border-green-600 shadow-lg">
+            <p className="text-gray-900 text-xs font-semibold flex items-center gap-2">
               <span>🔍</span>
               Usa la rueda del mouse para zoom | Arrastra para mover
             </p>
@@ -208,8 +208,8 @@ const MetroMap: React.FC<MetroMapProps> = ({
             onClick={() => setEditMode(!editMode)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               editMode
-                ? "bg-purple-600 text-white shadow-lg"
-                : "bg-white/10 text-white/60 hover:bg-white/20"
+                ? "bg-blue-500 text-white shadow-lg"
+                : "bg-gray-300 text-gray-800 hover:bg-gray-400"
             }`}
           >
             {editMode
