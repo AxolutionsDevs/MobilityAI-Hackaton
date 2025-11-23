@@ -13,16 +13,18 @@ const PHIGauge: React.FC<PHIGaugeProps> = ({ value, size = 160, label }) => {
   const circumference = radius * Math.PI;
   const offset = circumference - percentage * circumference;
 
+  // Determinar color plano según el valor
+  const getColor = (val: number) => {
+    if (val < 40) return "#dc2626"; // Rojo
+    if (val < 70) return "#f59e0b"; // Amarillo
+    return "#16a34a"; // Verde
+  };
+
+  const color = getColor(value);
+
   return (
     <div className="flex flex-col items-center">
       <svg width={size} height={size / 2 + 20}>
-        <defs>
-          <linearGradient id={`g-${label}`} x1="0%" y1="0%" x2="100%">
-            <stop offset="0%" stopColor="#dc2626" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#16a34a" />
-          </linearGradient>
-        </defs>
         <path
           d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${
             size - strokeWidth / 2
@@ -37,7 +39,7 @@ const PHIGauge: React.FC<PHIGaugeProps> = ({ value, size = 160, label }) => {
             size - strokeWidth / 2
           } ${size / 2}`}
           fill="none"
-          stroke={`url(#g-${label})`}
+          stroke={color}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
