@@ -178,23 +178,13 @@ export default function TrendsDashboard() {
             <Activity className="w-6 h-6 text-blue-600" />
             Centro de Comando: Tendencias
           </h2>
-<<<<<<< HEAD
           <p className="text-gray-600 text-sm mt-1">
             Análisis de incidentes en tiempo real y patrones históricos.
           </p>
         </div>
 
         <div className="flex bg-gray-200 p-1 rounded-lg border border-gray-300">
-          {(['24h', 'week', 'month'] as const).map((range) => (
-=======
-          <p className="text-slate-400 text-sm mt-1">
-            Análisis de {processedStats.total} reportes reales.
-          </p>
-        </div>
-
-        <div className="flex bg-slate-900/80 p-1 rounded-lg border border-slate-800">
-          {(['all', 'month', 'week'] as const).map((range) => (
->>>>>>> 070decc7410b67385be26ef4d8c4acd2f0354ecd
+          {(['all', 'week', 'month'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
@@ -214,7 +204,6 @@ export default function TrendsDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* A. TOP CRÍTICO (Ranking) - Span 7 cols */}
-<<<<<<< HEAD
         <div className="lg:col-span-7 bg-gray-100 p-5 rounded-xl border border-gray-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <AlertOctagon className="w-24 h-24 text-red-500" />
@@ -281,147 +270,17 @@ export default function TrendsDashboard() {
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-6">
               <span className="text-3xl font-bold text-gray-900">{processedStats.total}</span>
               <span className="text-xs text-gray-600">Quejas</span>
-=======
-        <div className="lg:col-span-7 bg-slate-900/40 p-5 rounded-xl border border-slate-800/50 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <AlertOctagon className="w-24 h-24 text-red-500" />
-            </div>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-red-200">
-                <TrendingUp className="w-4 h-4 text-red-400" />
-                Top 5 Estaciones Críticas
-            </h3>
-            <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart layout="vertical" data={processedStats.topStations} margin={{ left: 40, right: 20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.3} />
-                        <XAxis type="number" hide />
-                        <YAxis 
-                            dataKey="name" 
-                            type="category" 
-                            tick={{ fill: '#94a3b8', fontSize: 11 }} 
-                            width={140}
-                            interval={0}
-                        />
-                        <Tooltip 
-                            cursor={{ fill: '#ffffff', opacity: 0.05 }}
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
-                        />
-                        <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
-                            {processedStats.topStations.map((entry: { name: string; count: number }, index: number) => (
-                                <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
-        </div>
-
-        {/* B. DISTRIBUCIÓN POR LÍNEA (Donut) - Span 5 cols */}
-        <div className="lg:col-span-5 bg-slate-900/40 p-5 rounded-xl border border-slate-800/50 relative">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-blue-200">
-                <Filter className="w-4 h-4 text-blue-400" />
-                Distribución por Línea
-            </h3>
-            <div className="h-64 flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={processedStats.lineDistribution}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={2}
-                            dataKey="value"
-                        >
-                            {processedStats.lineDistribution.map((entry: { name: string; value: number }, index: number) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0)" />
-                            ))}
-                        </Pie>
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
-                            itemStyle={{ color: '#e2e8f0' }}
-                        />
-                        <Legend 
-                            verticalAlign="bottom" 
-                            height={36} 
-                            iconType="circle" 
-                            wrapperStyle={{ fontSize: '10px', color: '#94a3b8' }}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
-                
-                {/* KPI Central en Donut */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-6">
-                    <span className="text-3xl font-bold text-white">{processedStats.total}</span>
-                    <span className="text-xs text-slate-400">Reportes</span>
-                </div>
->>>>>>> 070decc7410b67385be26ef4d8c4acd2f0354ecd
             </div>
           </div>
         </div>
 
         {/* C. EL SISMÓGRAFO (Timeline) - Span 12 cols (Full Width) */}
-<<<<<<< HEAD
         <div className="lg:col-span-12 bg-gray-100 p-5 rounded-xl border border-gray-300">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-green-600">
               <Zap className="w-4 h-4 text-green-500" />
               Volumen de Quejas (Sismógrafo)
             </h3>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              Actualizado ahora
-=======
-        <div className="lg:col-span-12 bg-slate-900/40 p-5 rounded-xl border border-slate-800/50">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-emerald-200">
-                    <Zap className="w-4 h-4 text-emerald-400" />
-                    Volumen Histórico (Sismógrafo)
-                </h3>
-            </div>
-            
-            <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={processedStats.timelineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                        <defs>
-                            <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.2} vertical={false} />
-                        <XAxis 
-                            dataKey="date" 
-                            stroke="#64748b" 
-                            tick={{ fontSize: 10 }} 
-                            tickLine={false}
-                            axisLine={false}
-                            dy={10}
-                            minTickGap={30}
-                        />
-                        <YAxis 
-                            stroke="#64748b" 
-                            tick={{ fontSize: 12 }} 
-                            tickLine={false}
-                            axisLine={false}
-                        />
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f1f5f9' }}
-                        />
-                        <Area 
-                            type="monotone" 
-                            dataKey="count" 
-                            stroke="#10b981" 
-                            strokeWidth={2}
-                            fillOpacity={1} 
-                            fill="url(#colorVolume)" 
-                            animationDuration={1000}
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
->>>>>>> 070decc7410b67385be26ef4d8c4acd2f0354ecd
-            </div>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
