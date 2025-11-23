@@ -3,6 +3,7 @@
 import MetroMap from "@/components/MetroMap";
 import ComparisonView from "@/components/comparison/ComparisonView";
 import Header from "@/components/sections/Header";
+import PHIComparison from "@/components/sections/PHIComparison";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
 import TrendsDashboard from "@/components/trends/TrendsDashboard";
@@ -32,7 +33,7 @@ function DashboardContent() {
   const [customLines, setCustomLines] = useState<CustomLine[]>([]);
   const [selectedStation, setSelectedStation] = useState<any>(null);
   const [activeView, setActiveView] = useState<
-    "heatmap" | "import" | "indicators" | "comparison" | "trends"
+    "heatmap" | "import" | "indicators" | "comparison" | "trends" | "phi"
   >("heatmap");
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
@@ -160,6 +161,7 @@ function DashboardContent() {
       { id: "import", label: translations.importSVG, icon: Upload },
       { id: "comparison", label: translations.comparison, icon: Globe },
       { id: "trends", label: "Tendencias", icon: Activity },
+      { id: "phi", label: "PHI Global", icon: Activity },
     ],
     [translations]
   );
@@ -235,6 +237,8 @@ function DashboardContent() {
             {activeView === "comparison" && <ComparisonView />}
 
             {activeView === "trends" && <TrendsDashboard />}
+
+            {activeView === "phi" && <PHIComparison />}
           </div>
 
           {/* Right Column - Analytics */}
