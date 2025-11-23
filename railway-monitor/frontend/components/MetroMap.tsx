@@ -14,6 +14,7 @@ interface MetroMapProps {
   customLines?: CustomLine[];
   onUpdateCustomLine?: (lineId: string, updatedStations: any[]) => void;
   onNavigateToImport?: () => void;
+  displayMap?: string; // 'cdmx' | 'vienna' | custom line id
 }
 
 const MetroMap: React.FC<MetroMapProps> = ({
@@ -25,14 +26,23 @@ const MetroMap: React.FC<MetroMapProps> = ({
   customLines = [],
   onUpdateCustomLine,
   onNavigateToImport,
+  displayMap = "cdmx",
 }) => {
   const { translations } = useCity();
 
   // Calcular dimensiones reales del mapa y zoom automático
   const calculateMapBoundsAndZoom = () => {
+    // Determinar qué líneas mostrar para calcular bounds
+    const isCustomSelected = typeof displayMap === "string" && displayMap.startsWith("L-custom-");
+
+    const shownBaseLines = isCustomSelected ? [] : METRO_LINES;
+    const shownCustomLines = isCustomSelected
+      ? customLines.filter((l) => l.id === displayMap)
+      : customLines.filter((line) => line.city === undefined || line.city === displayMap);
+
     const allStations = [
-      ...METRO_LINES.flatMap((line) => line.stations),
-      ...customLines.flatMap((line) => line.stations),
+      ...shownBaseLines.flatMap((line) => line.stations),
+      ...shownCustomLines.flatMap((line) => line.stations),
     ];
 
     if (allStations.length === 0) {
@@ -192,12 +202,20 @@ const MetroMap: React.FC<MetroMapProps> = ({
     };
   };
 
-  const filteredLines =
-    selectedLine === "all"
-      ? METRO_LINES
-      : METRO_LINES.filter((l) => l.id === selectedLine);
+  const isCustomSelected = typeof displayMap === "string" && displayMap.startsWith("L-custom-");
 
-  const hasNoLines = METRO_LINES.length === 0 && customLines.length === 0;
+  const filteredLines = isCustomSelected
+    ? []
+    : selectedLine === "all"
+    ? METRO_LINES
+    : METRO_LINES.filter((l) => l.id === selectedLine);
+
+  // Filtrar customLines por ciudad seleccionada, o mostrar sólo la importada si fue seleccionada
+  const filteredCustomLines = isCustomSelected
+    ? customLines.filter((l) => l.id === displayMap)
+    : customLines.filter((line) => line.city === undefined || line.city === displayMap);
+
+  const hasNoLines = filteredLines.length === 0 && filteredCustomLines.length === 0;
 
   // Manejar zoom con la rueda del mouse
   const handleWheel = (e: React.WheelEvent) => {
@@ -549,7 +567,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
 
           {/* Custom Heatmap Layer para líneas importadas */}
           <g className="heatmap-layer-custom" filter="url(#heatmap-blur)">
-            {customLines.map((line) =>
+            {filteredCustomLines.map((line) =>
               line.stations.map((station) => {
                 const reportData = STATION_REPORT_DATA[station.name] || {
                   reportCount: 0,
@@ -633,7 +651,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
           })}
 
           {/* Custom Imported Lines */}
-          {customLines.map((line) => {
+          {filteredCustomLines.map((line) => {
             const pathData = line.stations
               .map((s, i) => `${i === 0 ? "M" : "L"} ${s.x} ${s.y}`)
               .join(" ");
@@ -863,7 +881,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
           )}
 
           {/* Custom Line Stations */}
-          {customLines.map((line) =>
+          {filteredCustomLines.map((line) =>
             line.stations.map((station, idx) => {
               const stationKey = `custom-${line.id}-${station.id}`;
               const isHovered = hoveredStation === stationKey;
@@ -945,7 +963,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
           ))}
 
           {/* Custom Line Labels */}
-          {customLines.map((line) => {
+          {filteredCustomLines.map((line) => {
             // Extraer el número/letra de la línea del nombre
             // "Metro CDMX Línea 6" → "L6"
             // "Metro CDMX Línea B" → "LB"
@@ -1094,7 +1112,7 @@ const MetroMap: React.FC<MetroMapProps> = ({
             )}
 
             {/* Tooltips for custom lines */}
-            {customLines.map((line) =>
+            {filteredCustomLines.map((line) =>
               line.stations.map((station) => {
                 const stationKey = `custom-${line.id}-${station.id}`;
                 const isHovered = hoveredStation === stationKey;
