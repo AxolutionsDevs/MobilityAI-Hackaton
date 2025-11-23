@@ -132,7 +132,11 @@ export const STATION_REPORT_DATA: Record<
     severity: 0.08,
     recentIssue: "Falta de mapas impresos",
   },
-  pan2: { reportCount: 65, severity: 0.78, recentIssue: "Acoso sexual constante" },
+  pan2: {
+    reportCount: 65,
+    severity: 0.78,
+    recentIssue: "Acoso sexual constante",
+  },
   tac2: { reportCount: 92, severity: 1.0, recentIssue: "Robos frecuentes" },
   col: {
     reportCount: 12,
@@ -147,7 +151,11 @@ export const STATION_REPORT_DATA: Record<
     recentIssue: "Baja conectividad WiFi",
   },
   hid: { reportCount: 88, severity: 0.95, recentIssue: "Asaltos reportados" },
-  bea: { reportCount: 90, severity: 0.92, recentIssue: "Inseguridad y saturación" },
+  bea: {
+    reportCount: 90,
+    severity: 0.92,
+    recentIssue: "Inseguridad y saturación",
+  },
   all: { reportCount: 22, severity: 0.18, recentIssue: "Falta información" },
   zoc: { reportCount: 95, severity: 0.98, recentIssue: "Inseguridad grave" },
   pid2: { reportCount: 82, severity: 0.9, recentIssue: "Carteristas activos" },
@@ -212,8 +220,16 @@ export const STATION_REPORT_DATA: Record<
   },
   lom: { reportCount: 92, severity: 0.95, recentIssue: "Robos y saturación" },
   cen: { reportCount: 42, severity: 0.16, recentIssue: "Clima templado" },
-  per: { reportCount: 88, severity: 0.91, recentIssue: "Asaltos a mano armada" },
-  teo: { reportCount: 85, severity: 0.87, recentIssue: "Inseguridad constante" },
+  per: {
+    reportCount: 88,
+    severity: 0.91,
+    recentIssue: "Asaltos a mano armada",
+  },
+  teo: {
+    reportCount: 85,
+    severity: 0.87,
+    recentIssue: "Inseguridad constante",
+  },
   oli: { reportCount: 30, severity: 0.13, recentIssue: "Necesita más mapas" },
   noe: {
     reportCount: 35,

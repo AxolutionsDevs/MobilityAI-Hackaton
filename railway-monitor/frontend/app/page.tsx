@@ -6,13 +6,13 @@ import Header from "@/components/sections/Header";
 import StationInfo from "@/components/sections/StationInfo";
 import SVGImporter from "@/components/SVGImporter";
 import TrendsDashboard from "@/components/trends/TrendsDashboard";
+import { CityProvider, useCity } from "@/lib/CityContext";
 import { CATEGORIES } from "@/lib/constants";
 import { calculateGlobalPHI, generateStationPHI } from "@/lib/utils";
-import { CityProvider, useCity } from "@/lib/CityContext";
 import { Comment, CustomLine } from "@/types";
 import {
-  AlertTriangle,
   Activity,
+  AlertTriangle,
   BarChart3,
   Globe,
   Map,
@@ -57,7 +57,7 @@ function DashboardContent() {
   );
 
   const sampleComments: Comment[] = useMemo(() => {
-    if (city === 'cdmx') {
+    if (city === "cdmx") {
       return [
         { text: "El metro llegó 15 minutos tarde", sentiment: "negative" },
         { text: "Excelente servicio, muy limpio", sentiment: "positive" },
@@ -69,24 +69,45 @@ function DashboardContent() {
       return [
         { text: "Die U-Bahn kam 15 Minuten zu spät", sentiment: "negative" },
         { text: "Ausgezeichneter Service, sehr sauber", sentiment: "positive" },
-        { text: "Mein Handy wurde zur Hauptverkehrszeit gestohlen", sentiment: "negative" },
+        {
+          text: "Mein Handy wurde zur Hauptverkehrszeit gestohlen",
+          sentiment: "negative",
+        },
         { text: "Heute guter Service", sentiment: "positive" },
         { text: "Wie immer durchschnittlich", sentiment: "neutral" },
       ];
     }
   }, [city]);
 
-  const kpiData = useMemo(() => [
-    { icon: Globe, label: translations.globalPHI, value: globalPHI, sub: "+2.3%" },
-    {
-      icon: ThumbsUp,
-      label: translations.positives,
-      value: "35%",
-      sub: `4,521 ${translations.comments}`,
-    },
-    { icon: AlertTriangle, label: translations.alerts, value: "12", sub: `3 ${translations.critical}` },
-    { icon: Zap, label: translations.response, value: "2.4h", sub: translations.average },
-  ], [translations, globalPHI]);
+  const kpiData = useMemo(
+    () => [
+      {
+        icon: Globe,
+        label: translations.globalPHI,
+        value: globalPHI,
+        sub: "+2.3%",
+      },
+      {
+        icon: ThumbsUp,
+        label: translations.positives,
+        value: "35%",
+        sub: `4,521 ${translations.comments}`,
+      },
+      {
+        icon: AlertTriangle,
+        label: translations.alerts,
+        value: "12",
+        sub: `3 ${translations.critical}`,
+      },
+      {
+        icon: Zap,
+        label: translations.response,
+        value: "2.4h",
+        sub: translations.average,
+      },
+    ],
+    [translations, globalPHI]
+  );
 
   const handleSaveCustomLine = (lineData: CustomLine) => {
     setCustomLines((prev) => [...prev, lineData]);
@@ -129,7 +150,15 @@ function DashboardContent() {
   const trendData = useMemo(
     () =>
       Array.from({ length: 7 }, (_, i) => ({
-        day: [translations.monday, translations.tuesday, translations.wednesday, translations.thursday, translations.friday, translations.saturday, translations.sunday][i],
+        day: [
+          translations.monday,
+          translations.tuesday,
+          translations.wednesday,
+          translations.thursday,
+          translations.friday,
+          translations.saturday,
+          translations.sunday,
+        ][i],
         seguridad: Math.floor(Math.random() * 20 + 60),
         puntualidad: Math.floor(Math.random() * 20 + 65),
         limpieza: Math.floor(Math.random() * 20 + 70),
@@ -150,31 +179,34 @@ function DashboardContent() {
     []
   );
 
-  const tabs = useMemo(() => [
-    { id: "heatmap", label: translations.heatmap, icon: Map },
-    { id: "import", label: translations.importSVG, icon: Upload },
-    { id: "indicators", label: translations.indicators, icon: BarChart3 },
-    { id: "predictive", label: translations.predictive, icon: TrendingUp },
-    { id: "comparison", label: translations.comparison, icon: Globe },
-    { id: "trends", label: "Tendencias", icon: Activity },
-  ], [translations]);
+  const tabs = useMemo(
+    () => [
+      { id: "heatmap", label: translations.heatmap, icon: Map },
+      { id: "import", label: translations.importSVG, icon: Upload },
+      { id: "indicators", label: translations.indicators, icon: BarChart3 },
+      { id: "predictive", label: translations.predictive, icon: TrendingUp },
+      { id: "comparison", label: translations.comparison, icon: Globe },
+      { id: "trends", label: "Tendencias", icon: Activity },
+    ],
+    [translations]
+  );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-5">
+    <div className="min-h-screen bg-white text-gray-900 p-5">
       <div className="max-w-7xl mx-auto space-y-4">
         <Header />
 
-
         {/* Navigation Tabs */}
-        <div className="flex gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+        <div className="flex gap-4 p-4 rounded-2xl bg-gray-200 backdrop-blur-sm border border-gray-400">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveView(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl transition-all ${activeView === tab.id
-                ? "bg-purple-700 text-white shadow-lg"
-                : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
-                }`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl transition-all ${
+                activeView === tab.id
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900"
+              }`}
             >
               <tab.icon className="w-5 h-5" />
               <span className="text-sm font-semibold">{tab.label}</span>
@@ -187,24 +219,24 @@ function DashboardContent() {
           {/* Left Column - Dynamic Content */}
           <div className="lg:col-span-2 space-y-6">
             {activeView === "heatmap" && (
-              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+              <div className="p-6 rounded-2xl bg-gray-200 backdrop-blur-sm border border-gray-400">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold flex items-center gap-3">
-                    <Map className="w-5 h-5" />
+                  <h3 className="text-lg font-semibold flex items-center gap-3 text-gray-900">
+                    <Map className="w-5 h-5 text-blue-600" />
                     {translations.heatmapTitle}
                   </h3>
                   <div className="flex items-center gap-4">
                     <select
                       value={selectedLine}
                       onChange={(e) => setSelectedLine(e.target.value)}
-                      className="px-4 py-2 rounded-lg bg-white/20 text-sm border border-white/30"
+                      className="px-4 py-2 rounded-lg bg-gray-300 text-sm border border-gray-400 text-gray-900"
                     >
                       <option value="all">{translations.allLines}</option>
                       <option value="L1">{translations.line} 1</option>
                       <option value="L2">{translations.line} 2</option>
                       <option value="L3">{translations.line} 3</option>
                     </select>
-                    <label className="flex items-center gap-3 text-sm">
+                    <label className="flex items-center gap-3 text-sm text-gray-900">
                       <span>{translations.intensity}:</span>
                       <input
                         type="range"
@@ -238,9 +270,9 @@ function DashboardContent() {
             )}
 
             {activeView === "indicators" && (
-              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                <h3 className="text-lg font-semibold mb-6 flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5" />
+              <div className="p-6 rounded-2xl bg-gray-200 backdrop-blur-sm border border-gray-400">
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-3 text-gray-900">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
                   {translations.weeklyTrends}
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
@@ -255,12 +287,12 @@ function DashboardContent() {
                       >
                         <stop
                           offset="5%"
-                          stopColor="#ef4444"
+                          stopColor="#dc2626"
                           stopOpacity={0.8}
                         />
                         <stop
                           offset="95%"
-                          stopColor="#ef4444"
+                          stopColor="#dc2626"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -273,12 +305,12 @@ function DashboardContent() {
                       >
                         <stop
                           offset="5%"
-                          stopColor="#f59e0b"
+                          stopColor="#ea580c"
                           stopOpacity={0.8}
                         />
                         <stop
                           offset="95%"
-                          stopColor="#f59e0b"
+                          stopColor="#ea580c"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -291,23 +323,23 @@ function DashboardContent() {
                       >
                         <stop
                           offset="5%"
-                          stopColor="#10b981"
+                          stopColor="#16a34a"
                           stopOpacity={0.8}
                         />
                         <stop
                           offset="95%"
-                          stopColor="#10b981"
+                          stopColor="#16a34a"
                           stopOpacity={0}
                         />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-                    <XAxis dataKey="day" stroke="#ffffff60" />
-                    <YAxis stroke="#ffffff60" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+                    <XAxis dataKey="day" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#1e1b4b",
-                        border: "1px solid #ffffff20",
+                        backgroundColor: "#f9fafb",
+                        border: "1px solid #d1d5db",
                         borderRadius: "8px",
                       }}
                     />
@@ -315,7 +347,7 @@ function DashboardContent() {
                     <Area
                       type="monotone"
                       dataKey="seguridad"
-                      stroke="#ef4444"
+                      stroke="#dc2626"
                       fillOpacity={1}
                       fill="url(#colorSeguridad)"
                       name={translations.security}
@@ -323,7 +355,7 @@ function DashboardContent() {
                     <Area
                       type="monotone"
                       dataKey="puntualidad"
-                      stroke="#f59e0b"
+                      stroke="#ea580c"
                       fillOpacity={1}
                       fill="url(#colorPuntualidad)"
                       name={translations.punctuality}
@@ -331,7 +363,7 @@ function DashboardContent() {
                     <Area
                       type="monotone"
                       dataKey="limpieza"
-                      stroke="#10b981"
+                      stroke="#16a34a"
                       fillOpacity={1}
                       fill="url(#colorLimpieza)"
                       name={translations.cleanliness}
@@ -342,20 +374,20 @@ function DashboardContent() {
             )}
 
             {activeView === "predictive" && (
-              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+              <div className="p-6 rounded-2xl bg-gray-100 border border-gray-300">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
                   {translations.predictiveTitle}
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={predictiveData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-                    <XAxis dataKey="hour" stroke="#ffffff60" />
-                    <YAxis stroke="#ffffff60" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+                    <XAxis dataKey="hour" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#1e1b4b",
-                        border: "1px solid #ffffff20",
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d1d5db",
                         borderRadius: "8px",
                       }}
                     />
@@ -378,15 +410,13 @@ function DashboardContent() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
-                <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
-                  <h4 className="text-sm font-semibold text-red-400 mb-2">
+                <div className="mt-4 p-4 rounded-xl bg-red-100 border border-red-300">
+                  <h4 className="text-sm font-semibold text-red-600 mb-2">
                     {translations.aiRecommendations}
                   </h4>
-                  <ul className="text-xs text-white/70 space-y-1">
+                  <ul className="text-xs text-gray-700 space-y-1">
                     <li>{translations.recommendation1}</li>
-                    <li>
-                      {translations.recommendation2}
-                    </li>
+                    <li>{translations.recommendation2}</li>
                     <li>{translations.recommendation3}</li>
                   </ul>
                 </div>
@@ -394,17 +424,17 @@ function DashboardContent() {
             )}
 
             {activeView === "comparison" && (
-              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Globe className="w-5 h-5" />
+              <div className="p-6 rounded-2xl bg-gray-100 border border-gray-300">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+                  <Globe className="w-5 h-5 text-blue-600" />
                   {translations.internationalComparison}
                 </h3>
                 <ResponsiveContainer width="100%" height={350}>
                   <RadarChart data={radarData}>
-                    <PolarGrid stroke="#ffffff20" />
+                    <PolarGrid stroke="#d1d5db" />
                     <PolarAngleAxis
                       dataKey="category"
-                      tick={{ fill: "#ffffff", fontSize: 11 }}
+                      tick={{ fill: "#6b7280", fontSize: 11 }}
                     />
                     <PolarRadiusAxis angle={90} domain={[0, 100]} />
                     <Radar
@@ -424,31 +454,31 @@ function DashboardContent() {
                     <Legend />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#1e1b4b",
-                        border: "1px solid #ffffff20",
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d1d5db",
                         borderRadius: "8px",
                       }}
                     />
                   </RadarChart>
                 </ResponsiveContainer>
                 <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="p-3 rounded-xl bg-pink-500/10 border border-pink-500/30">
-                    <div className="text-xs text-white/60 mb-1">
+                  <div className="p-3 rounded-xl bg-pink-100 border border-pink-300">
+                    <div className="text-xs text-gray-600 mb-1">
                       🇲🇽 {translations.metroCDMX}
                     </div>
-                    <div className="text-2xl font-bold text-pink-400">
+                    <div className="text-2xl font-bold text-pink-600">
                       {globalPHI}
                     </div>
-                    <div className="text-[10px] text-white/50">
+                    <div className="text-[10px] text-gray-500">
                       {translations.globalAveragePHI}
                     </div>
                   </div>
-                  <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/30">
-                    <div className="text-xs text-white/60 mb-1">
+                  <div className="p-3 rounded-xl bg-green-100 border border-green-300">
+                    <div className="text-xs text-gray-600 mb-1">
                       🇦🇹 {translations.metroVienna}
                     </div>
-                    <div className="text-2xl font-bold text-green-400">84</div>
-                    <div className="text-[10px] text-white/50">
+                    <div className="text-2xl font-bold text-green-600">84</div>
+                    <div className="text-[10px] text-gray-500">
                       {translations.globalAveragePHI}
                     </div>
                   </div>
@@ -456,9 +486,7 @@ function DashboardContent() {
               </div>
             )}
 
-            {activeView === "trends" && (
-              <TrendsDashboard />
-            )}
+            {activeView === "trends" && <TrendsDashboard />}
           </div>
 
           {/* Right Column - Analytics */}
@@ -466,10 +494,6 @@ function DashboardContent() {
             {selectedStation && <StationInfo station={selectedStation} />}
 
             <GlobalPHI globalPHI={globalPHI} />
-
-            
-
-            
           </div>
         </div>
 
