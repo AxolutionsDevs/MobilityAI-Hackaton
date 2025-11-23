@@ -132,7 +132,7 @@ interface SVGImporterProps {
 }
 
 const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
-  const { translations } = useCity();
+  const { translations, city } = useCity();
   const [lineName, setLineName] = useState("Nueva Línea");
   const [lineColor, setLineColor] = useState("#e91e8b");
   const [importedSVG, setImportedSVG] = useState<string | null>(null);
@@ -305,10 +305,39 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       console.log("Respuesta del backend:", data);
 
       if (data.success && Array.isArray(data.lines)) {
-        // Adaptar respuesta del backend al formato esperado por importMultipleLinesFromJSON
-        // El backend devuelve 'lines' con 'stations' que tienen x, y, name
-        // No devuelve 'paths' ni 'viewBox' explícito, se calculará
-        importMultipleLinesFromJSON(data.lines);
+        // Normalizar cada línea para que tenga id, name, color, stations y city
+        const normalized = data.lines.map((line: any, idx: number) => {
+          const id = line.id || `L-custom-${Date.now()}-${idx}`;
+          const name = line.name || line.lineName || `Línea ${idx + 1}`;
+          const color = line.color || line.lineColor || "#e91e8b";
+          const stations = Array.isArray(line.stations)
+            ? line.stations.map((s: any, si: number) => ({
+                id: s.id || `node-${idx}-${si}`,
+                name: s.name || s.station || `Estación ${si + 1}`,
+                x: typeof s.x === "string" ? parseFloat(s.x) : Number(s.x),
+                y: typeof s.y === "string" ? parseFloat(s.y) : Number(s.y),
+              }))
+            : [];
+
+          // Inferir ciudad por el nombre de archivo si el backend no la envió
+          const inferredCity = (file && file.name && /vienna|wien/i.test(file.name))
+            ? "vienna"
+            : (file && file.name && /cdmx|mexico/i.test(file.name))
+            ? "cdmx"
+            : undefined;
+
+          return {
+            id,
+            name,
+            color,
+            stations,
+            paths: line.paths || [],
+            viewBox: line.viewBox || undefined,
+            city: line.city || inferredCity,
+          };
+        });
+
+        importMultipleLinesFromJSON(normalized);
         alert(data.message || "Detección completada exitosamente");
       } else {
         throw new Error("Formato de respuesta inválido");
@@ -680,6 +709,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
       id: `L-custom-${Date.now()}`,
       name: lineName,
       color: lineColor,
+      city: city,
       stations: detectedNodes.map((n) => ({
         id: n.id,
         name: n.name,

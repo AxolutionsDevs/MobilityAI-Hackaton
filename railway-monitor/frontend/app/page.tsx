@@ -31,12 +31,22 @@ function DashboardContent() {
   const { city, translations } = useCity();
   const [stationData] = useState(generateStationPHI);
   const [customLines, setCustomLines] = useState<CustomLine[]>([]);
+  const [availableMaps, setAvailableMaps] = useState<{ id: string; label: string }[]>([]);
   const [selectedStation, setSelectedStation] = useState<any>(null);
   const [activeView, setActiveView] = useState<
     "heatmap" | "import" | "indicators" | "comparison" | "trends" | "phi"
   >("heatmap");
   const [selectedLine, setSelectedLine] = useState("all");
   const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
+  const [displayMap, setDisplayMap] = useState<string>("");
+
+  // Mantener el selector sincronizado con el idioma: sólo cambiar el mapa
+  // si el mapa de la ciudad ya está disponible (evita mostrar CDMX/Vienna por defecto)
+  useEffect(() => {
+    if (availableMaps.find((m) => m.id === city)) {
+      setDisplayMap(city);
+    }
+  }, [city, availableMaps]);
 
   // Establecer estación por defecto solo si hay líneas personalizadas cargadas
   useEffect(() => {
@@ -102,6 +112,29 @@ function DashboardContent() {
 
   const handleSaveCustomLine = (lineData: CustomLine) => {
     setCustomLines((prev) => [...prev, lineData]);
+
+    // Si la línea pertenece a una ciudad completa (cdmx/vienna), registrar el mapa completo
+    if (lineData.city === "cdmx" || lineData.city === "vienna") {
+      const mapId = lineData.city;
+      const mapLabel = lineData.city === "cdmx" ? "CDMX" : "Vienna";
+      setAvailableMaps((prev) => {
+        if (prev.find((m) => m.id === mapId)) return prev;
+        return [...prev, { id: mapId, label: mapLabel }];
+      });
+
+      // Seleccionar automáticamente el mapa de la ciudad cuando se importa por primera vez
+      setDisplayMap(mapId);
+      return;
+    }
+
+    // Para mapas personalizados (sin city), agregar una opción individual
+    if (!lineData.city) {
+      setAvailableMaps((prev) => {
+        if (prev.find((m) => m.id === lineData.id)) return prev;
+        return [...prev, { id: lineData.id, label: lineData.name }];
+      });
+      setDisplayMap(lineData.id);
+    }
   };
 
   const handleUpdateCustomLine = (lineId: string, updatedStations: any[]) => {
@@ -200,6 +233,25 @@ function DashboardContent() {
                     {translations.heatmapTitle}
                   </h3>
                   <div className="flex items-center gap-4">
+                    <select
+                      value={displayMap}
+                      onChange={(e) => setDisplayMap(e.target.value)}
+                      className="px-4 py-2 rounded-lg bg-white border border-gray-400 text-gray-900 text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      <option value="">{translations.selectMap || "Seleccione mapa"}</option>
+                      {availableMaps.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.label}
+                        </option>
+                      ))}
+                      {customLines
+                        .filter((l) => !l.city)
+                        .map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.name}
+                          </option>
+                        ))}
+                    </select>
                     <label className="flex items-center gap-3 text-sm text-gray-900">
                       <span>{translations.intensity}:</span>
                       <input
@@ -226,6 +278,7 @@ function DashboardContent() {
                   customLines={customLines}
                   onUpdateCustomLine={handleUpdateCustomLine}
                   onNavigateToImport={() => setActiveView("import")}
+                  displayMap={displayMap}
                 />
               </div>
             )}
