@@ -46,6 +46,8 @@ export interface StationData {
   menciones: number;
   tendencia: "up" | "down";
   ejemplos: string[];
+  reportCount?: number; // Número de reportes
+  severity?: number; // Gravedad (suma de pesos de categorías)
 }
 
 export interface StationDataMap {

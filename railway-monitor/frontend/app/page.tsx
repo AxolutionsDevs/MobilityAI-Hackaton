@@ -50,7 +50,7 @@ function DashboardContent() {
     "heatmap" | "import" | "indicators" | "predictive" | "comparison"
   >("heatmap");
   const [selectedLine, setSelectedLine] = useState("all");
-  const [heatmapIntensity, setHeatmapIntensity] = useState(1.5);
+  const [heatmapIntensity, setHeatmapIntensity] = useState(0.8);
 
   const globalPHI = useMemo(
     () => calculateGlobalPHI(stationData),
