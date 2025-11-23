@@ -735,17 +735,17 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
           <label htmlFor="image-upload" className="cursor-pointer block">
             <div className="text-6xl mb-4">🖼️</div>
             <div className="text-lg font-bold text-gray-900 mb-2">
-              Arrastra o selecciona una imagen del mapa
+              {translations.dragDropImage}
             </div>
             <div className="text-sm text-gray-600 mb-1">
-              Sube una imagen del sistema de transporte
+              {translations.uploadTransportImage}
             </div>
             <div className="text-xs text-gray-500 mt-2">
-              El sistema detectará automáticamente las estaciones usando IA
+              {translations.aiDetectStations}
             </div>
             <div className="mt-4">
               <span className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-base font-semibold hover:opacity-90 transition-opacity inline-flex items-center gap-2">
-                Detectar Estaciones con IA
+                {translations.autoDetectNodes}
               </span>
             </div>
           </label>
@@ -867,7 +867,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                   <div className="bg-white px-6 py-3 rounded-xl border border-gray-300 shadow-2xl">
                     <p className="text-gray-900 text-sm font-semibold flex items-center gap-2">
                       <span className="text-2xl">🖱️</span>
-                      Click para interactuar con el mapa
+                      {translations.clickInteractMap}
                     </p>
                   </div>
                 </div>
@@ -879,7 +879,7 @@ const SVGImporter: React.FC<SVGImporterProps> = ({ onSave }) => {
                   <div className="bg-green-500 px-4 py-2 rounded-lg border border-green-600 shadow-lg">
                     <p className="text-white text-xs font-semibold flex items-center gap-2">
                       <span>🔍</span>
-                      Usa la rueda del mouse para zoom | Arrastra para mover
+                      {translations.wheelZoomDrag}
                     </p>
                   </div>
                 </div>

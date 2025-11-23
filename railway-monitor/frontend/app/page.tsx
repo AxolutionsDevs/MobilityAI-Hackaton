@@ -160,8 +160,8 @@ function DashboardContent() {
       { id: "heatmap", label: translations.heatmap, icon: Map },
       { id: "import", label: translations.importSVG, icon: Upload },
       { id: "comparison", label: translations.comparison, icon: Globe },
-      { id: "trends", label: "Tendencias", icon: Activity },
-      { id: "phi", label: "PHI Global", icon: Activity },
+      { id: "trends", label: translations.trends, icon: Activity },
+      { id: "phi", label: translations.globalPHITitle, icon: Activity },
     ],
     [translations]
   );
@@ -251,7 +251,7 @@ function DashboardContent() {
                 <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
                   <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-purple-600" />
-                    Categorías Principales
+                    {translations.mainCategories}
                   </h3>
                   <div className="space-y-3">
                     {CATEGORIES.slice(0, 5).map((category, idx) => (
@@ -263,7 +263,7 @@ function DashboardContent() {
                               style={{ color: category.color }}
                             />
                             <span className="text-xs text-gray-700 font-medium">
-                              {category.name}
+                              {getCategoryName(category.id)}
                             </span>
                           </div>
                           <span className="text-xs font-bold text-gray-900">

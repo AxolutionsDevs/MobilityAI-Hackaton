@@ -168,6 +168,14 @@ export interface Translations {
   complaints: string;
   complaintVolume: string;
   seismograph: string;
+  trendsSubtitle: string;
+
+  // SVG Import
+  dragDropImage: string;
+  uploadTransportImage: string;
+  aiDetectStations: string;
+  clickInteractMap: string;
+  wheelZoomDrag: string;
 
   // Footer
   footer: string;
@@ -342,6 +350,14 @@ export const translations: Record<City, Translations> = {
     complaints: "Complaints",
     complaintVolume: "Complaint Volume (Seismograph)",
     seismograph: "Seismograph",
+    trendsSubtitle: "Analysis of incidents in real time and historical patterns",
+
+    // SVG Import
+    dragDropImage: "Drag or select a map image",
+    uploadTransportImage: "Upload an image of the transportation system",
+    aiDetectStations: "AI will automatically detect stations",
+    clickInteractMap: "Click to interact with the map",
+    wheelZoomDrag: "Use mouse wheel for zoom | Drag to move",
 
     // Footer
     footer:
@@ -515,6 +531,14 @@ export const translations: Record<City, Translations> = {
     complaints: "Beschwerden",
     complaintVolume: "Beschwerdevolumen (Seismograph)",
     seismograph: "Seismograph",
+    trendsSubtitle: "Analyse von Vorfällen in Echtzeit und historische Muster",
+
+    // SVG Import
+    dragDropImage: "Ziehen Sie ein Kartenbild oder wählen Sie es aus",
+    uploadTransportImage: "Laden Sie ein Bild des Verkehrssystems hoch",
+    aiDetectStations: "KI erkennt automatisch Stationen",
+    clickInteractMap: "Klicken Sie, um mit der Karte zu interagieren",
+    wheelZoomDrag: "Verwenden Sie das Mausrad für Zoom | Ziehen zum Verschieben",
 
     // Footer
     footer:
